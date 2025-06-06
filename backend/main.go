@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"main.go/lexicalErrors"
 	"net/http"
 	"time"
 
@@ -34,7 +33,6 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 1. Analisis Lexico
-	lexicalErrors.FuncionPrueba() // Example function call from the lexicalErrors package
 	// 2. Tokens
 	// 3. Parser + errores sintácticos
 	// New<Nombre de mi gramatica>(Stream)
