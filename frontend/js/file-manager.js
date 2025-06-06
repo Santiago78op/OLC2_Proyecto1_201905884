@@ -48,6 +48,12 @@ class FileManager {
             const filePath = result.filePath;
             const fileName = filePath.split(/[/\\]/).pop();
 
+            // Validar extensión .vch
+            if (!fileName.toLowerCase().endsWith('.vch')) {
+                window.ideController?.addConsoleMessage(`El archivo debe tener extensión .vch`, 'error');
+                return;
+            }
+
             // Verificar si ya está abierto
             if (this.openFiles.has(fileName)) {
                 window.ideController?.addConsoleMessage(`El archivo '${fileName}' ya está abierto`, 'warning');
