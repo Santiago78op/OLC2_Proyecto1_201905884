@@ -9,6 +9,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
+
+	// Importa el paquete de pruebas que contiene la lógica de ejecución
+	Test "main.go/Test"
 )
 
 type executionResult struct {
@@ -32,6 +35,8 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Testeo del programa manda valores a funcion del archivo Test/TestingRun.go
+	Test.TestingRun(requestData.Code)
 	// 1. Analisis Lexico
 	// 2. Tokens
 	// 3. Parser + errores sintácticos
@@ -43,14 +48,21 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 
 	startTime := time.Now()
 	// Simulate code execution (replace with actual execution logic)
-	result := executionResult{
+	result, err := Test.TestingRun(requestData.Code)
+	duration := time.Since(startTime)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error executing code: %s", err.Error()), http.StatusInternalServerError)
+		return
+	}
+	executionResult := executionResult{
 		Success:  true,
 		Code:     requestData.Code,
-		Result:   "Execution result goes here",
-		Duration: time.Since(startTime).String(),
+		Result:   result,
+		Error:    "",
+		Duration: duration.String(),
 	}
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(result)
+	json.NewEncoder(w).Encode(executionResult)
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {

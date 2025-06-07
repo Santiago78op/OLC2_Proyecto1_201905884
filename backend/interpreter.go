@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/antlr4-go/antlr/v4"
-	"main.go/repl"
-	"main.go/value"
 	"strconv"
 	"strings"
+
+	"main.go/repl"
+	"main.go/value"
 )
 
 // Interpreter implementa el visitor para evaluar el AST
