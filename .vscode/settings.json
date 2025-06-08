@@ -1,5 +1,5 @@
 {
     "antlr4.generation": {
-        "mode": "manual",
+        "mode": "none",
     }
 }
