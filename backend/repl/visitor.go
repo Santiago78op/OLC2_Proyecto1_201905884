@@ -84,3 +84,5 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 func isDeclConst(lexval string) bool {
 	return lexval == "const"
 }
+
+// Validar declaración de variables - Pendiente
