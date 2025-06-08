@@ -1,5 +1,7 @@
 package value
 
+// Tipos de Datos IVOR (Internal Value Object Representation)
+// Representa los tipos de datos que pueden ser utilizados en el lenguaje
 const (
 	IVOR_INT              = "int"
 	IVOR_FLOAT            = "float64"
@@ -19,6 +21,7 @@ const (
 )
 
 // IVOR Es la Representación Interna de Objeto de Valor
+// Representa un valor en el lenguaje, puede ser un número, cadena, booleano, etc.
 type IVOR interface {
 	Value() interface{}
 	Type() string

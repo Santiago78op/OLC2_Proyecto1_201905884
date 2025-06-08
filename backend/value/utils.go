@@ -15,16 +15,16 @@ func ImplicitCast(targetType string, value IVOR) (IVOR, bool) {
 		return value, true
 	}
 
-	// implicit conversion
+	// Casteo implícito de tipos primitivos
 
-	// 1. int can be converted to float
+	// 1. Enteros pueden convertirse a flotantes
 	if targetType == IVOR_FLOAT && value.Type() == IVOR_INT {
 		return &FloatValue{
 			InternalValue: float64(value.(*IntValue).InternalValue),
 		}, true
 	}
 
-	// 2. Character can be converted to string
+	// 2. Los caracteres pueden convertirse a cadenas
 	if targetType == IVOR_STRING && value.Type() == IVOR_CHARACTER {
 		return &StringValue{
 			InternalValue: string(value.(*CharacterValue).InternalValue),
