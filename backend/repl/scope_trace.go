@@ -4,46 +4,51 @@ import (
 	"log"
 	"strings"
 
-	"main.go/value"
-
 	"github.com/antlr4-go/antlr/v4"
+	"main.go/value"
 )
 
+/*
+BaseScope ES una estructura que representa un ámbito base en el REPL (Read-Eval-Print Loop).
+// Contiene información sobre el nombre del ámbito, su ámbito padre, sus hijos, variables y funciones.
+// Esta estructura es utilizada para gestionar el contexto de ejecución y el alcance de las variables y funciones
+// dentro del REPL, permitiendo la creación de ámbitos anidados y la resolución de nombres de variables y funciones.
+*/
 type BaseScope struct {
-	name       string
-	parent     *BaseScope
-	children   []*BaseScope
-	variables  map[string]*Variable
-	functions  map[string]value.IVOR
-	structs    map[string]*Struct
-	isStruct   bool
-	IsMutating bool
+	name      string
+	parent    *BaseScope
+	children  []*BaseScope
+	variables map[string]*Variable
+	functions map[string]value.IVOR
 }
 
+// Name es un método que devuelve el nombre del ámbito actual.
 func (s *BaseScope) Name() string {
 	return s.name
 }
 
+// Parent es un método que devuelve el ámbito padre del ámbito actual.
 func (s *BaseScope) Parent() *BaseScope {
 	return s.parent
 }
 
+// Children es un método que devuelve los hijos del ámbito actual.
 func (s *BaseScope) Children() []*BaseScope {
 	return s.children
 }
 
+// ValidType es un método que verifica si un tipo es válido dentro del ámbito actual.
 func (s *BaseScope) ValidType(_type string) bool {
-
-	_, isStructType := s.structs[_type]
-
-	return value.IsPrimitiveType(_type) || isStructType
+	return value.IsPrimitiveType(_type)
 }
 
+// addChild es un método que agrega un hijo al ámbito actual.
 func (s *BaseScope) AddChild(child *BaseScope) {
 	s.children = append(s.children, child)
 	child.parent = s
 }
 
+// variableExists es un método que verifica si una variable ya existe en el ámbito actual.
 func (s *BaseScope) variableExists(variable *Variable) bool {
 
 	if _, ok := s.variables[variable.Name]; ok {
@@ -54,6 +59,7 @@ func (s *BaseScope) variableExists(variable *Variable) bool {
 
 }
 
+// AddVariable es un método que agrega una variable al ámbito actual.
 func (s *BaseScope) AddVariable(name string, varType string, value value.IVOR, isConst bool, allowNil bool, token antlr.Token) (*Variable, string) {
 
 	variable := &Variable{
@@ -82,6 +88,7 @@ func (s *BaseScope) AddVariable(name string, varType string, value value.IVOR, i
 	return variable, ""
 }
 
+// GetVariable es un método que busca una variable por su nombre en el ámbito actual y sus ámbitos padres.
 func (s *BaseScope) GetVariable(name string) *Variable {
 	// verify if is refering to and object/struct function
 	if strings.Contains(name, ".") {
@@ -111,8 +118,7 @@ func (s *BaseScope) GetVariable(name string) *Variable {
 	return nil
 }
 
-// obj1.obj2.prop1
-
+// GetFunction es un método que busca una función por su nombre en el ámbito actual y sus ámbitos padres.
 func (s *BaseScope) searchObjectVariable(name string, lastObj value.IVOR) *Variable {
 
 	// split name by dot
@@ -228,95 +234,13 @@ func (s *BaseScope) searchObjectFunction(name string, lastObj value.IVOR) (value
 		log.Fatal("idk what u did, cant convert to object")
 		return nil, ""
 	}
-
-	// then parts should be 2 or more
-
-	if lastObj == nil {
-		variable := s.GetVariable(parts[0])
-
-		if variable == nil {
-			return nil, "No se puede acceder a la propiedad " + parts[0]
-		}
-
-		obj := variable.Value
-
-		// obj must be an object/struct or vector
-
-		switch obj := obj.(type) {
-		case *ObjectValue:
-			lastObj = obj
-		case *VectorValue:
-			lastObj = obj.ObjectValue
-		default:
-			return nil, "La propiedad '" + variable.Name + "' de tipo " + obj.Type() + " no tiene propiedades"
-		}
-
-		return s.searchObjectFunction(strings.Join(parts[1:], "."), lastObj)
-	}
-
-	obj, ok := lastObj.(*ObjectValue)
-
-	if ok {
-		lastObj = obj.InternalScope.GetVariable(parts[0]).Value
-
-		return s.searchObjectFunction(strings.Join(parts[1:], "."), lastObj)
-	} else {
-		log.Fatal("idk what u did, cant convert to object")
-		return nil, ""
-	}
 }
 
-func (s *BaseScope) AddStruct(name string, structValue *Struct) (bool, string) {
-
-	if _, ok := s.structs[name]; ok {
-		return false, "La estructura " + name + " ya existe"
-	}
-
-	s.structs[name] = structValue
-	return true, ""
-}
-
-func (s *BaseScope) GetStruct(name string) (*Struct, string) {
-
-	initialScope := s
-
-	for {
-		if structValue, ok := initialScope.structs[name]; ok {
-			return structValue, ""
-		}
-
-		if initialScope.parent == nil {
-			break
-		}
-
-		initialScope = initialScope.parent
-	}
-
-	return nil, "La estructura " + name + " no existe"
-}
-
+// Reset es un método que reinicia el ámbito actual, eliminando todas las variables, hijos y funciones.
 func (s *BaseScope) Reset() {
 	s.variables = make(map[string]*Variable)
 	s.children = make([]*BaseScope, 0)
 	s.functions = make(map[string]value.IVOR)
-}
-
-func (s *BaseScope) IsMutatingScope() bool {
-	aux := s
-
-	for {
-		if aux.IsMutating {
-			return true
-		}
-
-		if aux.parent == nil {
-			break
-		}
-
-		aux = aux.parent
-	}
-
-	return false
 }
 
 func NewGlobalScope() *BaseScope {
@@ -385,149 +309,4 @@ func (s *ScopeTrace) AddFunction(name string, function value.IVOR) (bool, string
 
 func (s *ScopeTrace) GetFunction(name string) (value.IVOR, string) {
 	return s.CurrentScope.GetFunction(name)
-}
-
-func (s *ScopeTrace) IsMutatingEnvironment() bool {
-	return s.CurrentScope.IsMutatingScope()
-}
-
-func NewScopeTrace() *ScopeTrace {
-	globalScope := NewGlobalScope()
-	return &ScopeTrace{
-		GlobalScope:  globalScope,
-		CurrentScope: globalScope,
-	}
-}
-
-func NewVectorScope() *BaseScope {
-	var scope = &BaseScope{
-		name:      "vector",
-		variables: make(map[string]*Variable),
-		children:  make([]*BaseScope, 0),
-		functions: make(map[string]value.IVOR),
-		parent:    nil,
-	}
-
-	// register object built-in functions
-
-	return scope
-}
-
-func NewStructScope() *BaseScope {
-
-	newGlobal := NewGlobalScope()
-
-	return &BaseScope{
-		name:      "struct",
-		variables: make(map[string]*Variable),
-		children:  make([]*BaseScope, 0),
-		functions: make(map[string]value.IVOR),
-		structs:   make(map[string]*Struct),
-		parent:    newGlobal,
-		isStruct:  true,
-	}
-}
-
-// * Report
-
-type ReportTable struct {
-	GlobalScope ReportScope
-}
-
-type ReportScope struct {
-	Name        string
-	Vars        []ReportSymbol
-	Funcs       []ReportSymbol
-	Structs     []ReportSymbol
-	ChildScopes []ReportScope
-}
-
-type ReportSymbol struct {
-	Name   string
-	Type   string
-	Line   int
-	Column int
-}
-
-func (s *ScopeTrace) Report() ReportTable {
-	return ReportTable{
-		GlobalScope: s.CurrentScope.Report(),
-	}
-}
-
-func (s *BaseScope) Report() ReportScope {
-
-	reportScope := ReportScope{
-		Name:        s.name,
-		Vars:        make([]ReportSymbol, 0),
-		Funcs:       make([]ReportSymbol, 0),
-		Structs:     make([]ReportSymbol, 0),
-		ChildScopes: make([]ReportScope, 0),
-	}
-
-	for _, v := range s.variables {
-
-		token := v.Token
-		line := 0
-		column := 0
-
-		if token != nil {
-			line = token.GetLine()
-			column = token.GetColumn()
-		}
-
-		reportScope.Vars = append(reportScope.Vars, ReportSymbol{
-			Name:   v.Name,
-			Type:   v.Type,
-			Line:   line,
-			Column: column,
-		})
-	}
-
-	for _, f := range s.functions {
-		switch function := f.(type) {
-		case *BuiltInFunction:
-			reportScope.Funcs = append(reportScope.Funcs, ReportSymbol{
-				Name:   function.Name,
-				Type:   "Embebida: " + function.Name,
-				Line:   0,
-				Column: 0,
-			})
-		case *Function:
-
-			line := 0
-			column := 0
-
-			if function.Token != nil {
-				line = function.Token.GetLine()
-				column = function.Token.GetColumn()
-			}
-
-			reportScope.Funcs = append(reportScope.Funcs, ReportSymbol{
-				Name:   function.Name,
-				Type:   function.ReturnType,
-				Line:   line,
-				Column: column,
-			})
-		case *ObjectBuiltInFunction:
-			break
-		default:
-			log.Fatal("Function type not found")
-		}
-	}
-
-	for _, v := range s.structs {
-		reportScope.Structs = append(reportScope.Structs, ReportSymbol{
-			Name:   v.Name,
-			Type:   v.Name,
-			Line:   v.Token.GetLine(),
-			Column: v.Token.GetColumn(),
-		})
-	}
-
-	for _, v := range s.children {
-		reportScope.ChildScopes = append(reportScope.ChildScopes, v.Report())
-	}
-
-	return reportScope
 }

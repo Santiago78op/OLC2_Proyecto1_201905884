@@ -6,10 +6,6 @@ package Test
 
 import (
 	"fmt"
-	"log"
-
-	"github.com/antlr4-go/antlr/v4"
-	compiler "main.go/grammar" // Importa tu paquete de gramática
 )
 
 // TestingRun es una función que simula la ejecución de pruebas de código.
@@ -20,11 +16,11 @@ func TestingRun(code string) (string, error) {
 		return "", fmt.Errorf("el código no puede estar vacío")
 	}
 
-	// 1. Análisis Léxico
+	/* // 1. Análisis Léxico
 	// Para verificar errores
 	//lexicalErrorListener := errors.NewLexicalErrorListener()
 	//
-	lexer := compiler.NewCalculatorLexer(antlr.NewInputStream(code))
+	lexer := compiler.NewVLangParserLexer(antlr.NewInputStream(code))
 
 	lexer.RemoveErrorListeners()
 	//lexer.AddErrorListener(lexicalErrorListener)
@@ -34,32 +30,33 @@ func TestingRun(code string) (string, error) {
 
 	// 3. Parser + errores sintácticos
 	// New<Nombre de mi gramatica>(Stream)
-	parser := compiler.NewCalculatorParser(stream)
+	parser := compiler.NewVLangParserParser(stream)
 	parser.BuildParseTrees = true
 
 	tree := parser.Prog()
 
-	evaluator := NewCalculatorVisitor()
+	evaluator := NewVLangVisitor()
 	resultado := evaluator.Visit(tree)
 
-	fmt.Printf("Resultado de la evaluación: %v\n", resultado)
+	fmt.Printf("Resultado de la evaluación: %v\n", resultado) */
 
 	return fmt.Sprintf("Código ejecutado: %s", code), nil
 }
 
+/*
 // Implementar visitor
-type CalculatorVisitor struct {
-	*compiler.BaseCalculatorVisitor
+type VLangVisitor struct {
+	*compiler.BaseVLangParserVisitor
 }
 
 // Es como un constructor para el visitor
-func NewCalculatorVisitor() *CalculatorVisitor {
-	return &CalculatorVisitor{
-		BaseCalculatorVisitor: &compiler.BaseCalculatorVisitor{},
+func NewVLangVisitor() *VLangVisitor {
+	return &VLangVisitor{
+		BaseVLangParserVisitor: &compiler.BaseVLangParserVisitor{},
 	}
 }
 
-func (v *CalculatorVisitor) VisitMulDiv(ctx *compiler.MultipliacacionContext) interface{} {
+func (v *VLangVisitor) VisitMulDiv(ctx *compiler.BinaryExprContext) interface{} {
 	izq := v.Visit(ctx.Expr(0)).(int)
 	der := v.Visit(ctx.Expr(1)).(int)
 	op := ctx.GetText()
@@ -69,7 +66,7 @@ func (v *CalculatorVisitor) VisitMulDiv(ctx *compiler.MultipliacacionContext) in
 }
 
 // Vistor de la expresion
-func (v *CalculatorVisitor) VisitExpr(ctx *compiler.ExprContext) interface{} {
+func (v *VLangVisitor) VisitExpr(ctx *compiler.ExprContext) interface{} {
 	if ctx.GetChildCount() == 1 {
 		// Si solo hay un hijo, es un número
 		num := ctx.GetChild(0).(antlr.TerminalNode).GetSymbol().GetText()
@@ -79,7 +76,7 @@ func (v *CalculatorVisitor) VisitExpr(ctx *compiler.ExprContext) interface{} {
 	return nil
 }
 
-func (v *CalculatorVisitor) Visit(tree antlr.ParseTree) interface{} {
+func (v *VLangVisitor) Visit(tree antlr.ParseTree) interface{} {
 
 	switch val := tree.(type) {
 	case *antlr.ErrorNodeImpl:
@@ -90,3 +87,4 @@ func (v *CalculatorVisitor) Visit(tree antlr.ParseTree) interface{} {
 	}
 
 }
+*/
