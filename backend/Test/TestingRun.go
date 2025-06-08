@@ -63,10 +63,20 @@ func (v *CalculatorVisitor) VisitMulDiv(ctx *compiler.MultipliacacionContext) in
 	izq := v.Visit(ctx.Expr(0)).(int)
 	der := v.Visit(ctx.Expr(1)).(int)
 	op := ctx.GetText()
-
 	fmt.Printf("Visitando operación: %s %s %s\n", izq, op, der)
 
 	return op
+}
+
+// Vistor de la expresion
+func (v *CalculatorVisitor) VisitExpr(ctx *compiler.ExprContext) interface{} {
+	if ctx.GetChildCount() == 1 {
+		// Si solo hay un hijo, es un número
+		num := ctx.GetChild(0).(antlr.TerminalNode).GetSymbol().GetText()
+		fmt.Printf("Visitando número: %s\n", num)
+		return num // Retorna el número como resultado
+	}
+	return nil
 }
 
 func (v *CalculatorVisitor) Visit(tree antlr.ParseTree) interface{} {

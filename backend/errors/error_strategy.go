@@ -1,59 +1,37 @@
 package errors
 
 import (
-	"fmt"
-	"strings"
 	// Traer de parser/parser generado por ANTLR
 	"github.com/antlr4-go/antlr/v4"
 )
 
+/*
+CustomErrorStrategy -> Es una estructura que implementa la interfaz de estrategia de error de ANTLR.
+Permite personalizar el manejo de errores durante el análisis sintáctico.
+Implementa la interfaz de ANTLR DefaultErrorStrategy para proporcionar un comportamiento personalizado.
+*/
 type CustomErrorStrategy struct {
 	*antlr.DefaultErrorStrategy
 }
 
+/*
+NewCustomErrorStrategy -> Es una función que crea una nueva instancia de CustomErrorStrategy.
+Devuelve un puntero a CustomErrorStrategy.
+
+Es el constructor de la estructura CustomErrorStrategy.
+*/
 func NewCustomErrorStrategy() *CustomErrorStrategy {
 	return &CustomErrorStrategy{
 		DefaultErrorStrategy: antlr.NewDefaultErrorStrategy(),
 	}
 }
 
-// Traducción en español de mensajes de error
-func (es *CustomErrorStrategy) ReportInputMismatch(recognizer antlr.Parser, e *antlr.InputMismatchException) {
-	token := e.GetOffendingToken()
-	expected := es.GetExpectedTokens(recognizer, e.GetExpectedTokens())
-	msg := fmt.Sprintf("Se recibió '%s', se esperaba %s", token.GetText(), expected)
+/*
+Funcion para traducir mensajes de error de ANTLR a un formato más amigable.
+En este caso se traduce al español.
+*/
+func (es *CustomErrorStrategy) ReportInputMisMatch(recognizer antlr.Parser, e *antlr.InputMisMatchException) {
+	t1 := recognizer.GetTokenStream().LT(-1)
+	msg := "Se recibió " + t1.GetText() + ", se esperaba " + es.GetExpectedTokens(recognizer).String()
 	recognizer.NotifyErrorListeners(msg, e.GetOffendingToken(), e)
-}
-
-func (es *CustomErrorStrategy) ReportNoViableAlternative(recognizer antlr.Parser, e *antlr.NoViableAltException) {
-	token := e.GetOffendingToken()
-	msg := fmt.Sprintf("No se encontró alternativa válida en '%s'", token.GetText())
-	recognizer.NotifyErrorListeners(msg, e.GetOffendingToken(), e)
-}
-
-func (es *CustomErrorStrategy) GetExpectedTokens(recognizer antlr.Parser, expectedTokens *antlr.IntervalSet) string {
-	if expectedTokens.Length() == 0 {
-		return "fin de archivo"
-	}
-
-	tokenNames := recognizer.GetLiteralNames()
-	symbolicNames := recognizer.GetSymbolicNames()
-
-	var expected []string
-	for i := 0; i < expectedTokens.Length(); i++ {
-		tokenType := expectedTokens.Get(i)
-		if tokenType < len(tokenNames) && tokenNames[tokenType] != "" {
-			expected = append(expected, tokenNames[tokenType])
-		} else if tokenType < len(symbolicNames) && symbolicNames[tokenType] != "" {
-			expected = append(expected, symbolicNames[tokenType])
-		} else {
-			expected = append(expected, fmt.Sprintf("token_%d", tokenType))
-		}
-	}
-
-	if len(expected) == 1 {
-		return expected[0]
-	}
-
-	return strings.Join(expected[:len(expected)-1], ", ") + " o " + expected[len(expected)-1]
 }
