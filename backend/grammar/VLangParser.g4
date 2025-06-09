@@ -4,20 +4,27 @@ grammar VLangParser;
 
 // Palabras clave
 MUT      : 'mut';
-PRINT    : 'print';
-PRINTLN  : 'println';
-NIL      : 'nil';
+FUNC     : 'func';
+STR      : 'struct';
 
-// Tipos Primitivos
+// Control de flujo
+IF_KW       : 'if';
+ELSE_KW     : 'else';
+SWITCH_KW   : 'switch';
+CASE_KW     : 'case';
+DEFAULT_KW  : 'default';
+FOR_KW      : 'for';
+WHILE_KW    : 'while';
+BREAK_KW    : 'break';
+CONTINUE_KW : 'continue';
+RETURN_KW   : 'return';
+
 INT_TYPE    : 'int';
 FLOAT_TYPE  : 'float64';
 STRING_TYPE : 'string';
 BOOL_TYPE   : 'bool';
 SLICE_TYPE  : 'slice';
 
-// Literales
-TRUE     : 'true';
-FALSE    : 'false';
 
 // Operadores Aritmeticos
 PLUS     : '+';
@@ -47,6 +54,13 @@ NOT      : '!';
 // Delimitadores
 LPAREN   : '(';
 RPAREN   : ')';
+LBRACE   : '{';
+RBRACE   : '}';
+LBRACK   : '[';
+RBRACK   : ']';
+SEMI     : ';';
+COLON    : ':';
+DOT      : '.';
 COMMA    : ',';
 
 
@@ -58,6 +72,8 @@ fragment UNDERSCORE : '_';
 INT_LITERAL    : DIGIT+;
 FLOAT_LITERAL  : DIGIT+ '.' DIGIT+;
 STRING_LITERAL : '"' (~["\\\r\n] | EscapeSequence)* '"';
+BOOL_LITERAL   : 'true' | 'false';
+NIL_LITERAL    : 'nil';
 ID             : (LETTER | UNDERSCORE) (LETTER | DIGIT | UNDERSCORE)*;
 
 // Secuencia de escape
@@ -82,20 +98,60 @@ prog: (stmt)* EOF?;
 delim: '\n';
 
 // Sentencias
-stmt: declaration delim
+stmt: 
+    stmt_declaration delim
+    | stmt_assign delim
+    | stmt_transfer delim 
+    | stmt_if
+    | stmt_switch
+    | stmt_while
+    | stmt_for
+    | func_call delim
+    | vect_func delim
+    | func_dcl
+    | struct_dcl
     ;
 
-// Declaraciones
-declaration: 
-    variable_declaration
-    | assignment_declaration
+// Declaracion de Vector
+vect_expr:
+    LBRACK ( expression (COMMA expression)* )? RBRACK  # VectorExpr
     ;
+
+vect_item:
+    id_pattern (LBRACE expression RBRACE)+   # VectorItem
+    ;
+
+vect_prop:
+    vect_item DOT id_pattern   # VectorProperty
+    ;
+
+vect_func:
+    vect_item DOT func_call # VectorFuncCall 
+    ;
+
+repeating:
+    (var_type | matrix_type) LPAREN ID COLON expression COMMA ID COLON expression RPAREN  # RepeatingDecl
+    ;
+
+// tipo de variable
+var_type
+    : MUT
+    ;
+
+type: ID | vector_type | matrix_type;
+
+vector_type: LBRACE ID RBRACK;
+
+matrix_type: aux_matrix_type | LBRACK LBRACK ID RBRACK RBRACK;
+
+aux_matrix_type: LBRACK matrix_type RBRACK;
 
 // Declaracion de variable
-variable_declaration
-    : MUT ID type_annotation (ASSIGN expression)?     # MutableVarDecl
-    | ID type_annotation ASSIGN expression            # TypedVarDecl
+stmt_declaration: 
+    var_type ID type_annotation (ASSIGN expression)?   # MutableVarDecl
+    | ID type_annotation ASSIGN expression             # TypeVarDecl
     ;
+
 
 // Tipos de datos
 type_annotation
@@ -103,16 +159,38 @@ type_annotation
     ;
 
 // Asignacion de Declaracion
-assignment_declaration
-    : ID ASSIGN expression                       # AssignmentDecl
-    | ID PLUS_ASSIGN expression                  # PlusAssignmentDecl
-    | ID MINUS_ASSIGN expression                 # MinusAssignmentDecl 
+assignment_declaration:
+    id_pattern ASSIGN expression                  # AssignmentDecl
+    | id_pattern op = (
+        PLUS_ASSIGN | MINUS_ASSIGN
+    ) expression                                  # AugmentedAssignmentDecl
+    ;
+
+id_pattern
+    : ID (DOT ID)*                                # IdPattern
+    ;
+
+// Expresiones primarias
+literal
+    : INT_LITERAL                                 # IntLiteral
+    | FLOAT_LITERAL                               # FloatLiteral
+    | STRING_LITERAL                              # StringLiteral
+    | BOOL_LITERAL                                # BoolLiteral
+    | NIL_LITERAL                                 # NilLiteral
     ;
 
 // Expresiones
 expression
-    : primary_expression                          # PrimaryExpr
-    | expression LPAREN expression RPAREN         # ParenthesizedExpr
+    : LPAREN expression RPAREN                    # ParensExpr
+    | func_call                                   # FuncCallExpr
+    | id_pattern                                  # IdPatternExpr
+    | vect_item                              # VectorItemExpr
+    | vect_prop                                   # VectorPropertyExpr
+    | vect_func                                   # VectorFuncCallExpr
+    | literal                                     # LiteralExpr
+    | vect_expr                                  # VectorExpr
+    | repeating                                   # RepeatingExpr
+    | struct_vect 
     | op = ( NOT | MINUS) expression              # UnaryExpr
     | left = expression op = (
         MULT | DIV | MOD
@@ -130,26 +208,52 @@ expression
     | left = expression op = OR right = expression   # BinaryExpr
     ;
 
-// Expresiones primarias
-primary_expression
-    : ID                                          # IdentifierExpr
-    | INT_LITERAL                                 # IntLiteral
-    | FLOAT_LITERAL                               # FloatLiteral
-    | STRING_LITERAL                              # StringLiteral
-    | TRUE                                        # TrueLiteral
-    | FALSE                                       # FalseLiteral
-    | NIL                                         # NilLiteral
-    | builtin_function_call                       # BuiltinCall
-    | LPAREN expression RPAREN                    # ParenExpr
-    ;
+if_stmt: if_chain (ELSE_KW if_chain)* else_stmt? # IfStmt;
 
-// Llamadas a funciones integradas
-builtin_function_call
-    : PRINT LPAREN   argument_list? RPAREN          # PrintCall
-    | PRINTLN LPAREN argument_list? RPAREN        # PrintlnCall
-    ;
+if_chain: IF_KW expression LBRACE stmt* RBRACE # IfChain;
+else_stmt: ELSE_KW LBRACE stmt* RBRACE # ElseStmt;
+
+switch_stmt:
+	SWITCH_KW expression LBRACE switch_case* default_case? RBRACE # SwitchStmt;
+
+switch_case: CASE_KW expression COLON stmt* # SwitchCase;
+
+default_case: DEFAULT_KW COLON stmt* # DefaultCase;
+
+while_stmt: WHILE_KW expression LBRACE stmt* RBRACE # WhileStmt;
+
+for_stmt:
+	FOR_KW ID IN_KW (expression | range) LBRACE stmt* RBRACE # ForStmt;
+
+range: expression DOT DOT DOT expression # NumericRange;
 
 // Lista de argumentos
 argument_list
     : expression (COMMA expression)*              # ArgList
     ;
+
+transfer_stmt:
+	RETURN_KW expr?	# ReturnStmt
+	| BREAK_KW		# BreakStmt
+	| CONTINUE_KW	# ContinueStmt;
+
+func_call: id_pattern LPAREN arg_list? RPAREN # FuncCall;
+
+// external names -> num: value, num2: value2
+arg_list: func_arg (COMMA func_arg)* # ArgList;
+func_arg: (ID COLON)? (ANPERSAND)? (id_pattern | expr) # FuncArg; // 
+
+func_dcl:
+	FUNC_KW ID LPAREN param_list? RPAREN (ARROW type)? LBRACE stmt* RBRACE # FuncDecl;
+
+param_list: func_param (COMMA func_param)* # ParamList;
+func_param: ID? ID COLON INOUT_KW? type # FuncParam;
+
+// Estructuras de control
+strct_dcl: STR ID LBRACE struct_prop* RBRACE     # StructDecl;
+
+struct_prop:
+	var_type ID (COLON type)? (ASSIGN expression)?	# StructAttr
+    ;
+
+struct_vect: LBRACK ID RBRACK LPAREN RPAREN # StructVector;

@@ -54,7 +54,7 @@ func (v *Variable) TypeValidation() (bool, string) {
 	}
 
 	// Si todo está bien, retorna True y un mensaje de éxito
-	return true, "Tipo de variable correcto"
+	return true, ""
 }
 
 func (v *Variable) AssignValue(val value.IVOR, isMutatingContext bool) (bool, string) {

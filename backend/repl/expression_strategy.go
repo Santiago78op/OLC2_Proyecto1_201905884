@@ -4,15 +4,15 @@ import (
 	"main.go/value"
 )
 
-type evalFunc func(value.IVOR, value.IVOR) (bool, string, value.IVOR) // takes 2 values and returns a value
-type conversionFunc func(value.IVOR) value.IVOR                       // takes a value and returns a value (different type)
+type evalFunc func(value.IVOR, value.IVOR) (bool, string, value.IVOR) // toma dos valores IVOR y devuelve un booleano, un mensaje y un valor IVOR
+type conversionFunc func(value.IVOR) value.IVOR                       // toma un valor IVOR y devuelve un valor IVOR convertido
 
 type BinaryValidation struct {
-	LeftType        string // allowed left type
-	RightType       string // allowed right type
-	LeftConversion  conversionFunc
-	RightConversion conversionFunc
-	Eval            evalFunc
+	LeftType        string         // permite valores de tipo izquierdo
+	RightType       string         // permite valores de tipo derecho
+	LeftConversion  conversionFunc // función de conversión para el valor izquierdo
+	RightConversion conversionFunc // función de conversión para el valor derecho
+	Eval            evalFunc       // función de evaluación que toma los dos valores y devuelve un booleano, un mensaje y un valor IVOR
 }
 
 type BinaryStrategy struct {
