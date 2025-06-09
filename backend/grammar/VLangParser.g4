@@ -184,11 +184,11 @@ expression
     : LPAREN expression RPAREN                    # ParensExpr
     | func_call                                   # FuncCallExpr
     | id_pattern                                  # IdPatternExpr
-    | vect_item                              # VectorItemExpr
+    | vect_item                                   # VectorItemExpr
     | vect_prop                                   # VectorPropertyExpr
     | vect_func                                   # VectorFuncCallExpr
     | literal                                     # LiteralExpr
-    | vect_expr                                  # VectorExpr
+    | vect_expr                                   # VectorExpr
     | repeating                                   # RepeatingExpr
     | struct_vect 
     | op = ( NOT | MINUS) expression              # UnaryExpr

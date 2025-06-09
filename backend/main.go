@@ -7,11 +7,15 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/antlr4-go/antlr/v4"
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 
 	// Importa el paquete de pruebas que contiene la lógica de ejecución
 	Test "main.go/Test"
+	"main.go/errors"
+	compiler "main.go/grammar"
+	"main.go/repl"
 )
 
 type executionResult struct {
@@ -35,16 +39,35 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Testeo del programa manda valores a funcion del archivo Test/TestingRun.go
-	Test.TestingRun(requestData.Code)
 	// 1. Analisis Lexico
+	lexicalErrorListener := errors.NewLexicalErrorListener()
+	lexer := compiler.NewVLangParserLexer(antlr.NewInputStream(requestData.Code))
+
+	lexer.RemoveErrorListeners()
+	lexer.AddErrorListener(lexicalErrorListener)
 	// 2. Tokens
-	// 3. Parser + errores sintácticos
 	// New<Nombre de mi gramatica>(Stream)
+	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
+	// 3. Analisis Sintactico Parser + errores sintácticos
+	parser := compiler.NewVLangParserParser(stream)
+	parser.BuildParseTrees = true
+
+	syntaxErrorListener := errors.NewSyntaxErrorListener(lexicalErrorListener.ErrorTable)
+	parser.RemoveErrorListeners()
+	parser.SetErrorHandler(errors.NewCustomErrorStrategy())
+	parser.AddErrorListener(syntaxErrorListener)
+
 	// 4. Árbol sintáctico
 	// En tu gramatica tienes el axioma, o simbolo inicial
 	// Este es el que deberas agregar como parte del parser.
-	//tree := parser.Program()
+	tree := parser.Prog() // Aquí se debe llamar al método adecuado según tu gramática
+
+	dclVisitor := repl.NewDclVisitor(syntaxErrorListener.ErrorTable)
+	dclVisitor.Visit(tree)
+
+	replVisitor := repl.NewVisitor(dclVisitor)
+
+	replVisitor.Visit(tree)
 
 	startTime := time.Now()
 	// Simulate code execution (replace with actual execution logic)
