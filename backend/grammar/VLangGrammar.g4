@@ -3,28 +3,32 @@ parser grammar VLangGrammar;
 // Importar las reglas lexicas
 options { tokenVocab = VLangLexer; }
 
-// Reglas de la gramatica
-
 // Program entry point
 prog: (stmt)* EOF?;
 
 // Demilitador del lenguaje -> indica el final de una sentencia
-delim: '\n';
+delim: NEWLINE?;
 
 // Sentencias
-stmt: declaration delim
+stmt: 
+    decl_stmt delim
+    | assign_stmt delim
+    | transfer_stmt delim 
+    | if_stmt
+	| switch_stmt
+	| for_stmt
+    | func_call delim
+    | vect_func delim
+    | func_dcl
+    | strct_dcl
     ;
 
-// Declaraciones
-declaration: 
-    variable_declaration
-    | assignment_declaration
-    ;
-
-// Declaracion de variable
-variable_declaration
-    : MUT ID type_annotation (ASSIGN expression)?     # MutableVarDecl
-    | ID type_annotation ASSIGN expression            # TypedVarDecl
+// Inicia Declaracion de variable
+// Ejemplo: Mut variable_1 int = 10
+// Ejemplo: Mut variable_2 int 
+decl_stmt: 
+    var_type ID type_annotation (ASSIGN expression)?   # MutVarDecl
+    | ID type_annotation ASSIGN expression             # VarAssDecl
     ;
 
 // Tipos de datos
@@ -32,54 +36,157 @@ type_annotation
     : (INT_TYPE | FLOAT_TYPE | STRING_TYPE | BOOL_TYPE | SLICE_TYPE | ID)
     ;
 
-// Asignacion de Declaracion
-assignment_declaration
-    : ID ASSIGN expression                       # AssignmentDecl
-    | ID PLUS_ASSIGN expression                  # PlusAssignmentDecl
-    | ID MINUS_ASSIGN expression                 # MinusAssignmentDecl 
+// tipo de variable
+var_type
+    : MUT
+    ;
+// Termina Declaracion de Variables
+
+// Inicia Asignacion de Variables
+// varSring = "Hola"
+assign_stmt:
+    id_pattern ASSIGN expression                  # AssignmentDecl
+    | id_pattern op = (
+        PLUS_ASSIGN | MINUS_ASSIGN
+    ) expression                                  # AugmentedAssignmentDecl
     ;
 
-// Expresiones
+id_pattern
+    : ID (DOT ID)*                                # IdPattern
+    ;
+// Termina Asignacion de Variables
+
+// Literales
+// Ejemplo 3   = INT_LITERAL
+// Ejemplo 4.5 = FLOAT_LITERAL
+literal
+    : INT_LITERAL                                 # IntLiteral
+    | FLOAT_LITERAL                               # FloatLiteral
+    | STRING_LITERAL                              # StringLiteral
+    | BOOL_LITERAL                                # BoolLiteral
+    | NIL_LITERAL                                 # NilLiteral
+    ;
+
+// Inicio Expresiones
 expression
-    : primary_expression                          # PrimaryExpr
-    | expression LPAREN expression RPAREN         # ParenthesizedExpr
-    | op = ( NOT | MINUS) expression              # UnaryExpr
+    : LPAREN expression RPAREN                       # ParensExpr 
+    | func_call                                      # FuncCallExpr 
+    | id_pattern                                     # IdPatternExpr
+    | vect_item                                      # VectorItemExpr
+    | vect_prop                                      # VectorPropertyExpr
+    | vect_func                                      # VectorFuncCallExpr
+    | literal                                        # LiteralExpr
+    | vect_expr                                      # VectorExpr
+    | repeating                                      # RepeatingExpr
+    | op = ( NOT | MINUS) expression                 # UnaryExpr
     | left = expression op = (
         MULT | DIV | MOD
-    ) right = expression                          # BinaryExpr
+    ) right = expression                             # BinaryExpr
     | left = expression op = (
         PLUS | MINUS
-    ) right = expression                          # BinaryExpr
+    ) right = expression                             # BinaryExpr
     | left = expression op = (
         LE | LT | GE | GT 
-    ) right = expression                          # BinaryExpr
+    ) right = expression                             # BinaryExpr
     | left = expression op = (
         EQ | NE
     ) right = expression                             # BinaryExpr
     | left = expression op = AND right = expression  # BinaryExpr
     | left = expression op = OR right = expression   # BinaryExpr
     ;
+// Terminan Expresiones
 
-// Expresiones primarias
-primary_expression
-    : ID                                          # IdentifierExpr
-    | INT_LITERAL                                 # IntLiteral
-    | FLOAT_LITERAL                               # FloatLiteral
-    | STRING_LITERAL                              # StringLiteral
-    | TRUE                                        # TrueLiteral
-    | FALSE                                       # FalseLiteral
-    | NIL                                         # NilLiteral
-    | builtin_function_call                       # BuiltinCall
-    | LPAREN expression RPAREN                    # ParenExpr
+// Inicia Declaracion de Vector
+vect_expr:
+    LBRACK ( expression (COMMA expression)* )? RBRACK  # VectorItemLis
     ;
 
-// Llamadas a funciones integradas
-builtin_function_call
-    : PRINT LPAREN   argument_list? RPAREN          # PrintCall
-    | PRINTLN LPAREN argument_list? RPAREN        # PrintlnCall
+vect_item:
+    id_pattern (LBRACE expression RBRACE)+   # VectorItem
     ;
 
-// Lista de argumentos
-argument_list
-    : expression (COMMA expression)*              # ArgList
+vect_prop:
+    vect_item DOT id_pattern   # VectorProperty
     ;
+
+vect_func:
+    vect_item DOT func_call   # VectorFuncCall 
+    ;
+
+repeating:
+    (var_type | matrix_type) LPAREN ID COLON expression COMMA ID COLON expression RPAREN  # RepeatingDecl
+    ;
+
+
+type: vector_type | matrix_type;
+
+vector_type: LBRACE ID RBRACK;
+
+matrix_type: aux_matrix_type | LBRACK LBRACK ID RBRACK RBRACK;
+
+aux_matrix_type: LBRACK matrix_type RBRACK;
+// Termina Declaracion Vectores
+
+// Inicia Sentencias de Control If
+if_stmt: if_chain (ELSE_KW if_chain)* else_stmt? # IfStmt;
+
+if_chain: IF_KW expression LBRACE stmt* RBRACE   # IfChain;
+
+else_stmt: ELSE_KW LBRACE stmt* RBRACE           # ElseStmt;
+// Termina Sentencias de Control If
+
+// Inicia Sentencias de Control Switch
+switch_stmt:
+	SWITCH_KW expression LBRACE switch_case* default_case? RBRACE # SwitchStmt;
+
+switch_case: CASE_KW expression COLON stmt* # SwitchCase;
+
+default_case: DEFAULT_KW COLON stmt* # DefaultCase;
+// Termina Sentencias de Control Switch
+
+// Inicia Sentencias de Control While
+while_stmt: WHILE_KW expression LBRACE stmt* RBRACE # WhileStmt;
+// Termina Sentencia de Control While
+
+// Inicia Sentencias de Iteracion For
+for_stmt:
+    FOR_KW expression LBRACE stmt* RBRACE                                     # ForStmtCond
+    | FOR_KW assign_stmt SEMI expression SEMI assign_stmt LBRACE stmt* RBRACE # ForAssCond
+	| FOR_KW ID COMMA expression IN_KW (expression | range) LBRACE stmt* RBRACE                # ForStmt;
+
+range: expression DOT DOT DOT expression # NumericRange;
+// Termina Sentencias de Iteracion For
+
+// Inicia Sentencias de Transferencia
+transfer_stmt:
+	RETURN_KW expression?	# ReturnStmt
+	| BREAK_KW		        # BreakStmt
+	| CONTINUE_KW	        # ContinueStmt;
+// Termina Sentencias de Transferencia
+
+// Inicia Llamadas a funcion 
+// Ejemplo Println(5)
+func_call: id_pattern LPAREN arg_list? RPAREN # FuncCall;
+// Termina Llamadas a funcion
+
+// external names -> num: value, num2: value2
+arg_list: func_arg (COMMA func_arg)* # ArgList;
+
+func_arg: (ID)? (id_pattern | expression) # FuncArg; // 
+
+func_dcl:
+	FUNC ID LPAREN param_list? RPAREN (type)? LBRACE stmt* RBRACE # FuncDecl;
+
+param_list: func_param (COMMA func_param)* # ParamList;
+func_param: ID type                        # FuncParam;
+
+// Inicia Estructuras de control
+strct_dcl: STR ID LBRACE struct_prop* RBRACE # StructDecl;
+
+struct_prop:
+	var_type ID (COLON type)? (ASSIGN expression)?	# StructAttr
+    ;
+
+struct_vector: LBRACK ID RBRACK LPAREN RPAREN       # StructVector
+    ;
+// Termina Estructuras de control

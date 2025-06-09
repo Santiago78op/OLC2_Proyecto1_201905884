@@ -3,27 +3,31 @@ grammar VLangParser;
 // Reglas Lexicas
 
 // Palabras clave
-MUT      : 'mut';
-FUNC     : 'func';
-STR      : 'struct';
+MUT   : 'mut';
+FUNC  : 'func';
 
-// Control de flujo
+// Estructuras
+STR         : 'struct';
+SLICE_TYPE  : 'slice';
+
+// Control de flujo - wk => keyWord
 IF_KW       : 'if';
 ELSE_KW     : 'else';
 SWITCH_KW   : 'switch';
 CASE_KW     : 'case';
 DEFAULT_KW  : 'default';
 FOR_KW      : 'for';
-WHILE_KW    : 'while';
+IN_KW       : 'in';
 BREAK_KW    : 'break';
 CONTINUE_KW : 'continue';
 RETURN_KW   : 'return';
+
 
 INT_TYPE    : 'int';
 FLOAT_TYPE  : 'float64';
 STRING_TYPE : 'string';
 BOOL_TYPE   : 'bool';
-SLICE_TYPE  : 'slice';
+RUNE_TYPE   : 'rune';
 
 
 // Operadores Aritmeticos
@@ -64,17 +68,21 @@ DOT      : '.';
 COMMA    : ',';
 
 
-// Identificadores y Literales
+// Literales
 fragment DIGIT : [0-9];
 fragment LETTER : [a-zA-Z];
 fragment UNDERSCORE : '_';
+fragment CHAR : [!-~];
 
 INT_LITERAL    : DIGIT+;
 FLOAT_LITERAL  : DIGIT+ '.' DIGIT+;
+CHAR_LITERAL   : CHAR; 
 STRING_LITERAL : '"' (~["\\\r\n] | EscapeSequence)* '"';
 BOOL_LITERAL   : 'true' | 'false';
 NIL_LITERAL    : 'nil';
-ID             : (LETTER | UNDERSCORE) (LETTER | DIGIT | UNDERSCORE)*;
+
+// Identificador
+ID : (LETTER | UNDERSCORE) (LETTER | DIGIT | UNDERSCORE)*;
 
 // Secuencia de escape
 fragment EscapeSequence

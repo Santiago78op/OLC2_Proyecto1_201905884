@@ -3,21 +3,33 @@ lexer grammar VLangLexer;
 // Reglas Lexicas
 
 // Palabras clave
-MUT      : 'mut';
-PRINT    : 'print';
-PRINTLN  : 'println';
-NIL      : 'nil';
+MUT   : 'mut';
+FUNC  : 'func';
 
-// Tipos Primitivos
+// Estructuras
+STR         : 'struct';
+SLICE_TYPE  : 'slice';
+
+// Control de flujo - wk => keyWord
+IF_KW       : 'if';
+ELSE_KW     : 'else';
+SWITCH_KW   : 'switch';
+CASE_KW     : 'case';
+DEFAULT_KW  : 'default';
+FOR_KW      : 'for';
+WHILE_KW    : 'while';
+IN_KW       : 'in';
+BREAK_KW    : 'break';
+CONTINUE_KW : 'continue';
+RETURN_KW   : 'return';
+
+
 INT_TYPE    : 'int';
 FLOAT_TYPE  : 'float64';
 STRING_TYPE : 'string';
 BOOL_TYPE   : 'bool';
-SLICE_TYPE  : 'slice';
+RUNE_TYPE   : 'rune';
 
-// Literales
-TRUE     : 'true';
-FALSE    : 'false';
 
 // Operadores Aritmeticos
 PLUS     : '+';
@@ -47,18 +59,33 @@ NOT      : '!';
 // Delimitadores
 LPAREN   : '(';
 RPAREN   : ')';
+LBRACE   : '{';
+RBRACE   : '}';
+LBRACK   : '[';
+RBRACK   : ']';
+SEMI     : ';';
+COLON    : ':';
+DOT      : '.';
 COMMA    : ',';
 
+NEWLINE : '\n';
 
-// Identificadores y Literales
+
+// Literales
 fragment DIGIT : [0-9];
 fragment LETTER : [a-zA-Z];
 fragment UNDERSCORE : '_';
+fragment CHAR : [!-~];
 
 INT_LITERAL    : DIGIT+;
 FLOAT_LITERAL  : DIGIT+ '.' DIGIT+;
+CHAR_LITERAL   : CHAR; 
 STRING_LITERAL : '"' (~["\\\r\n] | EscapeSequence)* '"';
-ID             : (LETTER | UNDERSCORE) (LETTER | DIGIT | UNDERSCORE)*;
+BOOL_LITERAL   : 'true' | 'false';
+NIL_LITERAL    : 'nil';
+
+// Identificador
+ID : (LETTER | UNDERSCORE) (LETTER | DIGIT | UNDERSCORE)*;
 
 // Secuencia de escape
 fragment EscapeSequence
