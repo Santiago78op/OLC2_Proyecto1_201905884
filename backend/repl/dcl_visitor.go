@@ -8,7 +8,7 @@ import (
 )
 
 type DclVisitor struct {
-	compiler.BaseVLangParserVisitor
+	compiler.BaseVLangGrammarVisitor
 	ScopeTrace  *ScopeTrace
 	ErrorTable  *ErrorTable
 	StructNames []string

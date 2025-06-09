@@ -41,7 +41,7 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Analisis Lexico
 	lexicalErrorListener := errors.NewLexicalErrorListener()
-	lexer := compiler.NewVLangParserLexer(antlr.NewInputStream(requestData.Code))
+	lexer := compiler.NewVLangLexer(antlr.NewInputStream(requestData.Code))
 
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(lexicalErrorListener)
@@ -49,7 +49,7 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	// New<Nombre de mi gramatica>(Stream)
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	// 3. Analisis Sintactico Parser + errores sintácticos
-	parser := compiler.NewVLangParserParser(stream)
+	parser := compiler.NewVLangGrammar(stream)
 	parser.BuildParseTrees = true
 
 	syntaxErrorListener := errors.NewSyntaxErrorListener(lexicalErrorListener.ErrorTable)
