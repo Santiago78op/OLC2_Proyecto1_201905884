@@ -72,8 +72,8 @@ func (v *ReplVisitor) VisitProgram(ctx *compiler.ProgContext) interface{} {
 
 func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 
-	if ctx.Declaration() != nil {
-		v.Visit(ctx.Declaration())
+	if ctx.Decl_stmt() != nil {
+		v.Visit(ctx.Decl_stmt())
 	} else {
 		log.Fatal("Statement not recognized: ", ctx.GetText())
 	}

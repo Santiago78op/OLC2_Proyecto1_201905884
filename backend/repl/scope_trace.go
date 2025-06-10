@@ -1,6 +1,9 @@
 package repl
 
 import (
+	"log"
+	"strings"
+
 	"github.com/antlr4-go/antlr/v4"
 	"main.go/value"
 )
@@ -129,7 +132,6 @@ func (s *BaseScopeTrace) GetVariable(name string) *Variable {
 	return nil
 }
 
-/*
 // searchObjectVariable busca una variable dentro de un objeto en el ámbito actual.
 func (s *BaseScopeTrace) searchObjectVariable(name string, lastObj value.IVOR) *Variable {
 	// Divide el nombre de la variable en partes usando el punto como separador
@@ -172,8 +174,8 @@ func (s *BaseScopeTrace) searchObjectVariable(name string, lastObj value.IVOR) *
 			lastObj = object
 		case *VectorValue:
 			lastObj = object.ObjectValue
-			default:
-				return nil // Si el objeto no es un ObjectValue o VectorValue, retorna nil
+		default:
+			return nil // Si el objeto no es un ObjectValue o VectorValue, retorna nil
 		}
 
 		return s.searchObjectVariable(strings.Join(parts[1:], "."), lastObj)
@@ -190,7 +192,6 @@ func (s *BaseScopeTrace) searchObjectVariable(name string, lastObj value.IVOR) *
 		return nil // Si no hay un objeto asociado, retorna nil
 	}
 }
-*/
 
 // Reset reinicializa el ámbito actual, eliminando todas las variables y funciones definidas en él.
 func (s *BaseScopeTrace) Reset() {
