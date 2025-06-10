@@ -1,9 +1,6 @@
 package repl
 
 import (
-	"log"
-	"strings"
-
 	"github.com/antlr4-go/antlr/v4"
 	"main.go/value"
 )
@@ -14,12 +11,14 @@ import (
 // rastrear el contexto de ejecución y la visibilidad de las variables y funciones
 // en diferentes niveles de anidamiento dentro del REPL.
 type BaseScopeTrace struct {
-	name       string                 // Nombre del ámbito
-	parent     *BaseScopeTrace        // Ámbito padre
-	children   []*BaseScopeTrace      // Ámbitos hijos
-	variables  map[string]*Variable   // Variables en el ámbito
-	functions  map[string]*value.IVOR // Funciones en el ámbito
-	IsMutating bool                   // Indica si el ámbito actual está en modo de mutación
+	name       string                // Nombre del ámbito
+	parent     *BaseScopeTrace       // Ámbito padre
+	children   []*BaseScopeTrace     // Ámbitos hijos
+	variables  map[string]*Variable  // Variables en el ámbito
+	functions  map[string]value.IVOR // Funciones en el ámbito
+	structs    map[string]*Struct    // Estructuras definidas en el ámbito
+	IsMutating bool                  // Indica si el ámbito actual está en modo de mutación
+	isStruct   bool                  // Indica si el ámbito actual es un ámbito de estructura
 }
 
 // Name devuelve el nombre del ámbito actual.
@@ -132,6 +131,7 @@ func (s *BaseScopeTrace) GetVariable(name string) *Variable {
 	return nil
 }
 
+/*
 // searchObjectVariable busca una variable dentro de un objeto en el ámbito actual.
 func (s *BaseScopeTrace) searchObjectVariable(name string, lastObj value.IVOR) *Variable {
 	// Divide el nombre de la variable en partes usando el punto como separador
@@ -192,12 +192,139 @@ func (s *BaseScopeTrace) searchObjectVariable(name string, lastObj value.IVOR) *
 		return nil // Si no hay un objeto asociado, retorna nil
 	}
 }
+*/
+
+func (s *BaseScopeTrace) AddFunction(name string, function value.IVOR) (bool, string) {
+	// Verifica si la función ya existe en el ámbito actual
+	if _, ok := s.functions[name]; ok {
+		return false, "La funcion " + name + " ya existe"
+	}
+
+	s.functions[name] = function
+
+	return true, ""
+}
+
+func (s *BaseScopeTrace) GetFunction(name string) (value.IVOR, string) {
+
+	// Verifica si referencia a una función de objeto/struct
+	/*
+		if strings.Contains(name, ".") {
+			return s.searchObjectFunction(name, nil)
+		}
+	*/
+
+	initialScope := s
+
+	for {
+		if function, ok := initialScope.functions[name]; ok {
+			return function, ""
+		}
+
+		if initialScope.parent == nil {
+			break
+		}
+
+		initialScope = initialScope.parent
+	}
+
+	return nil, "La funcion " + name + " no existe"
+}
+
+/*
+func (s *BaseScopeTrace) searchObjectFunction(name string, lastObj value.IVOR) (value.IVOR, string) {
+
+	// split name by dot
+	parts := strings.Split(name, ".")
+
+	if len(parts) == 0 {
+		log.Fatal("idk what u did, cant split by dot")
+		return nil, ""
+	}
+
+	if len(parts) == 1 {
+		obj, ok := lastObj.(*ObjectValue)
+
+		if ok {
+			return obj.InternalScope.GetFunction(name)
+		}
+
+		log.Fatal("idk what u did, cant convert to object")
+		return nil, ""
+	}
+
+	// then parts should be 2 or more
+
+	if lastObj == nil {
+		variable := s.GetVariable(parts[0])
+
+		if variable == nil {
+			return nil, "No se puede acceder a la propiedad " + parts[0]
+		}
+
+		obj := variable.Value
+
+		// obj must be an object/struct or vector
+
+		switch obj := obj.(type) {
+		case *ObjectValue:
+			lastObj = obj
+		case *VectorValue:
+			lastObj = obj.ObjectValue
+		default:
+			return nil, "La propiedad '" + variable.Name + "' de tipo " + obj.Type() + " no tiene propiedades"
+		}
+
+		return s.searchObjectFunction(strings.Join(parts[1:], "."), lastObj)
+	}
+
+	obj, ok := lastObj.(*ObjectValue)
+
+	if ok {
+		lastObj = obj.InternalScope.GetVariable(parts[0]).Value
+
+		return s.searchObjectFunction(strings.Join(parts[1:], "."), lastObj)
+	} else {
+		log.Fatal("idk what u did, cant convert to object")
+		return nil, ""
+	}
+}
+*/
+
+func (s *BaseScopeTrace) AddStruct(name string, structValue *Struct) (bool, string) {
+
+	if _, ok := s.structs[name]; ok {
+		return false, "La estructura " + name + " ya existe"
+	}
+
+	s.structs[name] = structValue
+	return true, ""
+}
+
+func (s *BaseScopeTrace) GetStruct(name string) (*Struct, string) {
+
+	initialScope := s
+
+	for {
+		if structValue, ok := initialScope.structs[name]; ok {
+			return structValue, ""
+		}
+
+		if initialScope.parent == nil {
+			break
+		}
+
+		initialScope = initialScope.parent
+	}
+
+	return nil, "La estructura " + name + " no existe"
+}
 
 // Reset reinicializa el ámbito actual, eliminando todas las variables y funciones definidas en él.
 func (s *BaseScopeTrace) Reset() {
-	s.variables = make(map[string]*Variable)   // Reinicializa el mapa de variables
-	s.functions = make(map[string]*value.IVOR) // Reinicializa el mapa de funciones
-	s.children = make([]*BaseScopeTrace, 0)    // Reinicializa los hijos del ámbito
+	s.variables = make(map[string]*Variable)  // Reinicializa el mapa de variables
+	s.functions = make(map[string]value.IVOR) // Reinicializa el mapa de funciones
+	s.children = make([]*BaseScopeTrace, 0)   // Reinicializa los hijos del ámbito
 }
 
 // IsMutatingScope verifica si el ámbito actual o alguno de sus padres está en modo de mutación.
@@ -223,80 +350,126 @@ func (s *BaseScopeTrace) IsMutatingScope() bool {
 // Este ámbito global es el punto de partida para todas las ejecuciones en el REPL.
 // Se inicializa con un nombre específico y un mapa vacío de variables y funciones.
 // Este ámbito es utilizado para almacenar variables y funciones globales que pueden ser accedidas desde cualquier parte del REPL.
-func NewGlobalScopeTrace() *BaseScopeTrace {
+func NewGlobalScope() *BaseScopeTrace {
 
 	// Falta registra la contruccion de funciones
+	funcs := make(map[string]value.IVOR)
+
+	for k, v := range DefaultBuiltInFunctions {
+		funcs[k] = v
+	}
 
 	// Crea un nuevo ámbito global con un nombre específico
 	return &BaseScopeTrace{
-		name:      "Global",
-		parent:    nil,
-		children:  make([]*BaseScopeTrace, 0),
+		name:      "global",
 		variables: make(map[string]*Variable),
+		children:  make([]*BaseScopeTrace, 0),
+		structs:   make(map[string]*Struct),
+		parent:    nil,
+		functions: funcs,
 	}
 }
 
-// NewLocalScopeTrace crea un nuevo ámbito local para el REPL.
+// NewCurrentScopeTrace crea un nuevo ámbito local para el REPL.
 // Este ámbito local es utilizado para almacenar variables y funciones que son
 // específicas de una ejecución o contexto particular dentro del REPL.
 // Se inicializa con un nombre específico y un mapa vacío de variables y funciones.
-func NewLocalScopeTrace(name string) *BaseScopeTrace {
+func NewCurrentScope(name string) *BaseScopeTrace {
 	return &BaseScopeTrace{
 		name:      name,
-		parent:    nil,
-		children:  make([]*BaseScopeTrace, 0),
 		variables: make(map[string]*Variable),
-		functions: make(map[string]*value.IVOR),
+		functions: make(map[string]value.IVOR),
+		children:  make([]*BaseScopeTrace, 0),
+		parent:    nil,
 	}
 }
 
 // ScopeTrace representa la traza de ejecución del REPL, que incluye el ámbito global y el ámbito local.
 type ScopeTrace struct {
-	GlobalScope *BaseScopeTrace // Ámbito global del REPL
-	LocalScope  *BaseScopeTrace // Ámbito local del REPL
+	GlobalScope  *BaseScopeTrace // Ámbito global del REPL
+	CurrentScope *BaseScopeTrace // Ámbito local del REPL
 }
 
 // PushScope crea un nuevo ámbito local dentro de la traza de ejecución del REPL.
 func (s *ScopeTrace) PushScope(name string) *BaseScopeTrace {
 
-	newScope := NewLocalScopeTrace(name)
-	s.LocalScope.AddChild(newScope)
-	s.LocalScope = newScope
+	newScope := NewCurrentScope(name)
+	s.CurrentScope.AddChild(newScope)
+	s.CurrentScope = newScope
 
-	return s.LocalScope
+	return s.CurrentScope
 }
 
 // PopScope elimina el ámbito local actual de la traza de ejecución del REPL,
 func (s *ScopeTrace) PopScope() {
-	s.LocalScope = s.LocalScope.Parent()
+	s.CurrentScope = s.CurrentScope.Parent()
 }
 
 // Reset reinicializa el ámbito local actual, estableciendo el ámbito local al ámbito global.
 func (s *ScopeTrace) Reset() {
-	s.LocalScope = s.GlobalScope
+	s.CurrentScope = s.GlobalScope
 }
 
 // AddVariable agrega una nueva variable al ámbito local actual de la traza de ejecución del REPL.
 func (s *ScopeTrace) AddVariable(name string, varType string, value value.IVOR, isConst bool, allowNil bool, token antlr.Token) (*Variable, string) {
-	return s.LocalScope.AddVariable(name, varType, value, isConst, allowNil, token)
+	return s.CurrentScope.AddVariable(name, varType, value, isConst, allowNil, token)
 }
 
 // GetVariable busca una variable por su nombre en el ámbito local actual de la traza de ejecución del REPL.
 func (s *ScopeTrace) GetVariable(name string) *Variable {
-	return s.LocalScope.GetVariable(name)
+	return s.CurrentScope.GetVariable(name)
+}
+
+// AddFunction agrega una nueva función al ámbito local actual de la traza de ejecución del REPL.
+func (s *ScopeTrace) AddFunction(name string, function value.IVOR) (bool, string) {
+	return s.CurrentScope.AddFunction(name, function)
+}
+
+// GetFunction busca una función por su nombre en el ámbito local actual de la traza de ejecución del REPL.
+func (s *ScopeTrace) GetFunction(name string) (value.IVOR, string) {
+	return s.CurrentScope.GetFunction(name)
 }
 
 // IsMutatingEnvironment verifica si el ámbito local actual o alguno de sus padres está en modo de mutación.
 func (s *ScopeTrace) IsMutatingEnvironment() bool {
-	return s.LocalScope.IsMutatingScope()
+	return s.CurrentScope.IsMutatingScope()
 }
 
 // NewScopeTrace crea una nueva traza de ejecución del REPL con un ámbito global y un ámbito local inicial.
 // Este ámbito local es el punto de partida para todas las ejecuciones en el REPL.
 func NewScopeTrace() *ScopeTrace {
-	globalScope := NewGlobalScopeTrace()
+	globalScope := NewGlobalScope()
 	return &ScopeTrace{
-		GlobalScope: globalScope,
-		LocalScope:  globalScope,
+		GlobalScope:  globalScope,
+		CurrentScope: globalScope,
+	}
+}
+
+func NewVectorScope() *BaseScopeTrace {
+	var scope = &BaseScopeTrace{
+		name:      "vector",
+		variables: make(map[string]*Variable),
+		children:  make([]*BaseScopeTrace, 0),
+		functions: make(map[string]value.IVOR),
+		parent:    nil,
+	}
+
+	// register object built-in functions
+
+	return scope
+}
+
+func NewStructScope() *BaseScopeTrace {
+
+	newGlobal := NewGlobalScope()
+
+	return &BaseScopeTrace{
+		name:      "struct",
+		variables: make(map[string]*Variable),
+		children:  make([]*BaseScopeTrace, 0),
+		functions: make(map[string]value.IVOR),
+		structs:   make(map[string]*Struct),
+		parent:    newGlobal,
+		isStruct:  true,
 	}
 }

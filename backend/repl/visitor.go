@@ -5,6 +5,7 @@ import (
 
 	"github.com/antlr4-go/antlr/v4"
 	compiler "main.go/grammar"
+	"main.go/value"
 )
 
 /*
@@ -74,6 +75,8 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 
 	if ctx.Decl_stmt() != nil {
 		v.Visit(ctx.Decl_stmt())
+	} else if ctx.Assign_stmt() != nil {
+		v.Visit(ctx.Assign_stmt())
 	} else {
 		log.Fatal("Statement not recognized: ", ctx.GetText())
 	}
@@ -81,8 +84,56 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 	return nil
 }
 
-func isDeclConst(lexval string) bool {
-	return lexval == "const"
+func isDeclMut(lexval string) bool {
+	return lexval == "mut"
+}
+
+func (v *ReplVisitor) VisitMulVarDecl(ctx *compiler.MutVarDeclContext) interface{} {
+	// mut num
+	isMut := isDeclMut(ctx.Var_type().GetText())
+
+	// Validar tipo de variable
+	if !isMut {
+		v.ErrorTable.NewSemanticError(ctx.Var_type().GetStart(), "Tipo de expresión no válido: "+ctx.Var_type().GetText())
+	}
+
+	exprName := ctx.ID().GetText()
+	exprType := ctx.Type_annotation().GetText()
+
+	// Validar expresión si existe
+	if ctx.Expression() != nil {
+
+		exprValue := v.Visit(ctx.Expression()).(value.IVOR)
+
+		// Validar tipo de expresión
+		if obj, ok := exprValue.(*ObjectValue); ok {
+			exprValue = obj.Copy()
+		}
+
+		// Valida si el tipo de expresión es igual al tipo de la variable
+		if !v.ValidType(exprType) {
+			v.ErrorTable.NewSemanticError(ctx.Type_annotation().GetStart(), "Tipo de expresión no válido: "+exprType)
+		}
+
+		variable, msg := v.ScopeTrace.AddVariable(exprName, exprType, exprValue, false, false, ctx.GetStart())
+
+		// Variable already exists
+		if variable == nil {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		}
+
+	} else {
+		// Si no hay expresión, se crea una variable sin valor
+		variable, msg := v.ScopeTrace.AddVariable(exprName, exprType, nil, isMut, false, ctx.GetStart())
+
+		// Variable already exists
+		if variable == nil {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		}
+	}
+
+	// Si es una variable mut, se agrega al scope actual
+	return nil
 }
 
 // Validar declaración de variables - Pendiente

@@ -123,7 +123,7 @@ func NewObjectValue(v *ReplVisitor, targetStruct string, targetToken antlr.Token
 		}
 
 		if !throwError {
-			throwError, msg = prop.Assign(assignValue, false)
+			throwError, msg = prop.AssignValue(assignValue, false)
 		}
 
 		if wasConst {
@@ -181,14 +181,4 @@ func NewObjectValue(v *ReplVisitor, targetStruct string, targetToken antlr.Token
 		v:             v,
 		t:             targetToken,
 	}
-}
-
-func IsArgValidForStruct(arg []*Argument) bool {
-	for _, a := range arg {
-
-		if a.Name == "" {
-			return false
-		}
-	}
-	return true
 }

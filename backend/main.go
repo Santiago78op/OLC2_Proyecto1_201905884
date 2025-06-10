@@ -46,7 +46,7 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(lexicalErrorListener)
 	// 2. Tokens
-	// New<Nombre de mi gramatica>(Stream)
+	// New<Nombre de mi gramatica>(Stream) < id, valor>  token
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	// 3. Analisis Sintactico Parser + errores sintácticos
 	parser := compiler.NewVLangGrammar(stream)
