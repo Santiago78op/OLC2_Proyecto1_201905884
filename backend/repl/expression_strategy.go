@@ -299,3 +299,10 @@ var divStrategy = BinaryStrategy{
 		},
 	},
 }
+
+var BinaryStrats = map[string]BinaryStrategy{
+	"+": addStrategy,
+	"-": subStrategy,
+	"*": mulStrategy,
+	"/": divStrategy,
+}

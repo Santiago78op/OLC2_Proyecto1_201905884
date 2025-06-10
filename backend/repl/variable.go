@@ -22,7 +22,8 @@ func (v *Variable) TypeValidation() (bool, string) {
 	// y si es asi, retorna true y un mensaje indicando que la variable no ha sido inicializada
 	// Ejemplo: mut x int;
 	if v.Value == value.DefaultUnInitializedValue {
-		return true, "Uninitialized variable"
+		v.Value = value.DefaultValue(v.Type, v.Value)
+		return true, ""
 	}
 
 	// Verifica si el valor de la variable es nulo
@@ -30,7 +31,7 @@ func (v *Variable) TypeValidation() (bool, string) {
 	// Ejemplo: mut x = nil;
 	if v.Value == value.DefaultNilValue {
 		if v.AllowNil {
-			return true, "Nil variable"
+			return true, ""
 		}
 	}
 

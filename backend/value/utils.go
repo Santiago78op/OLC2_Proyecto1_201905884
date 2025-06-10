@@ -34,3 +34,20 @@ func ImplicitCast(targetType string, value IVOR) (IVOR, bool) {
 	return nil, false
 
 }
+
+// DefaultValue devuelve un valor por defecto para un tipo dado
+func DefaultValue(targetType string, value IVOR) IVOR {
+	// Valores por defecto para tipos primitivos
+	switch targetType {
+	case IVOR_INT:
+		return &IntValue{InternalValue: 0}
+	case IVOR_FLOAT:
+		return &FloatValue{InternalValue: 0.0}
+	case IVOR_STRING:
+		return &StringValue{InternalValue: ""}
+	case IVOR_BOOL:
+		return &BoolValue{InternalValue: false}
+	default:
+		return DefaultUnInitializedValue
+	}
+}
