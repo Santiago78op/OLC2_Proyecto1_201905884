@@ -11,7 +11,7 @@ import (
 ReplVisitor es una estructura que implementa el visitor para el REPL (Read-Eval-Print Loop).
 */
 type ReplVisitor struct {
-	*compiler.BaseVLangParserVisitor
+	*compiler.BaseVLangGrammarVisitor
 	ScopeTrace *ScopeTrace
 	Console    *Console
 	CallStack  *CallStack
@@ -24,9 +24,9 @@ NewReplVisitor crea un nuevo ReplVisitor con el contexto proporcionado.
 */
 func NewReplVisitor(ctx *ReplContext) *ReplVisitor {
 	return &ReplVisitor{
-		BaseVLangParserVisitor: &compiler.BaseVLangParserVisitor{},
-		Console:                ctx.Console,
-		ErrorTable:             ctx.ErrorTable,
+		BaseVLangGrammarVisitor: &compiler.BaseVLangGrammarVisitor{},
+		Console:                 ctx.Console,
+		ErrorTable:              ctx.ErrorTable,
 		// Structs:            make(map[string]*Struct),
 	}
 }
