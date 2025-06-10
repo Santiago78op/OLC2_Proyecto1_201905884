@@ -426,6 +426,9 @@ func (v *ReplVisitor) VisitFuncCall(ctx *compiler.FuncCallContext) interface{} {
 
 	args := make([]*Argument, 0)
 	if ctx.Arg_list() != nil {
+		// Visualizar lo que tiene Arg_list
+		fmt.Printf("🔹 Visitando Arg_list: %s\n", ctx.Arg_list().GetText())
+		// Como buscaria Arg_list en el visitor -> Ejemplo VisitArgList(ctx.Arg_list())
 		args = v.Visit(ctx.Arg_list()).([]*Argument)
 	}
 
@@ -476,6 +479,8 @@ func (v *ReplVisitor) VisitArgList(ctx *compiler.ArgListContext) interface{} {
 	args := make([]*Argument, 0)
 
 	for _, arg := range ctx.AllFunc_arg() {
+		// Visualizar lo que tiene arg
+		fmt.Printf("🔹 Visitando FuncArg: %s\n", arg.GetText())
 		args = append(args, v.Visit(arg).(*Argument))
 	}
 
