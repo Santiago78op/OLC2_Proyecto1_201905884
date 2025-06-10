@@ -7,7 +7,7 @@ type ReplContext struct {
 	// The scope is the current scope of the REPL
 	ScopeTrace *ScopeTrace
 	// The call stack is the stack of breakable, continueable and returnable items
-	// CallStack *CallStack
+	CallStack *CallStack
 	// Error table is the table of errors
 	ErrorTable *ErrorTable
 }

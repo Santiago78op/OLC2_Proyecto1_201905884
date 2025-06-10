@@ -299,3 +299,152 @@ var divStrategy = BinaryStrategy{
 		},
 	},
 }
+
+var BinaryStrats = map[string]BinaryStrategy{
+	"+": addStrategy,
+	"-": subStrategy,
+	"*": mulStrategy,
+	"/": divStrategy,
+}
+
+// UnaryStrats
+// UnaryStrats
+
+type UnaryValidation struct {
+	Type       string // allowed type
+	Conversion conversionFunc
+	Eval       evalFunc
+}
+
+type UnaryStrategy struct {
+	Name        string
+	Validations []UnaryValidation
+	DefaultEval evalFunc
+}
+
+func (s *UnaryStrategy) Validate(val value.IVOR) (bool, string, value.IVOR) {
+
+	if val.Type() == value.IVOR_NIL {
+		return false, "No es posible realizar operaciones con valores nulos", value.DefaultNilValue
+	}
+
+	for _, valid := range s.Validations {
+
+		if valid.Type == val.Type() {
+
+			if valid.Conversion != nil {
+				val = valid.Conversion(val)
+			}
+
+			if valid.Eval != nil {
+				return valid.Eval(val, nil)
+			}
+
+			return s.DefaultEval(val, nil)
+		}
+
+	}
+
+	msg := "No es posible realizar la operación '" + s.Name + "' con el tipo '" + val.Type() + "'"
+
+	return false, msg, value.DefaultNilValue
+}
+
+// * Not
+
+var notStrategy = UnaryStrategy{
+	Name:        "!",
+	DefaultEval: nil,
+	Validations: []UnaryValidation{
+		{
+			Type:       value.IVOR_BOOL,
+			Conversion: nil,
+			Eval: func(i1, i2 value.IVOR) (bool, string, value.IVOR) {
+				return true, "", &value.BoolValue{
+					InternalValue: !i1.(*value.BoolValue).InternalValue,
+				}
+			},
+		},
+	},
+}
+
+// * Minus
+
+var minusStrategy = UnaryStrategy{
+	Name:        "-",
+	DefaultEval: nil,
+	Validations: []UnaryValidation{
+		{
+			Type:       value.IVOR_INT,
+			Conversion: nil,
+			Eval: func(i1, i2 value.IVOR) (bool, string, value.IVOR) {
+				return true, "", &value.IntValue{
+					InternalValue: -i1.(*value.IntValue).InternalValue,
+				}
+			},
+		},
+		{
+			Type:       value.IVOR_FLOAT,
+			Conversion: nil,
+			Eval: func(i1, i2 value.IVOR) (bool, string, value.IVOR) {
+				return true, "", &value.FloatValue{
+					InternalValue: -i1.(*value.FloatValue).InternalValue,
+				}
+			},
+		},
+	},
+}
+
+var UnaryStrats = map[string]UnaryStrategy{
+	"!": notStrategy,
+	"-": minusStrategy,
+}
+
+// * And
+
+var andEarlyReturnStrategy = UnaryStrategy{
+	Name: "&&",
+	Validations: []UnaryValidation{
+		{
+			Type:       value.IVOR_BOOL,
+			Conversion: nil,
+			Eval: func(i1, i2 value.IVOR) (bool, string, value.IVOR) {
+
+				if !i1.(*value.BoolValue).InternalValue {
+					return true, "", &value.BoolValue{
+						InternalValue: false,
+					}
+				}
+
+				return false, "", nil
+			},
+		},
+	},
+}
+
+// * Or
+
+var orEarlyReturnStrategy = UnaryStrategy{
+	Name: "||",
+	Validations: []UnaryValidation{
+		{
+			Type:       value.IVOR_BOOL,
+			Conversion: nil,
+			Eval: func(i1, i2 value.IVOR) (bool, string, value.IVOR) {
+
+				if i1.(*value.BoolValue).InternalValue {
+					return true, "", &value.BoolValue{
+						InternalValue: true,
+					}
+				}
+
+				return false, "", nil
+			},
+		},
+	},
+}
+
+var EarlyReturnStrats = map[string]UnaryStrategy{
+	"&&": andEarlyReturnStrategy,
+	"||": orEarlyReturnStrategy,
+}

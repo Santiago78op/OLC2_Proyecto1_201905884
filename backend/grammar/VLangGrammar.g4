@@ -52,7 +52,7 @@ assign_stmt:
     ) expression                                  # AugmentedAssignmentDecl
     ;
 
-id_pattern
+id_pattern // (a.a)
     : ID (DOT ID)*                                # IdPattern
     ;
 // Termina Asignacion de Variables
@@ -166,7 +166,7 @@ transfer_stmt:
 // Termina Sentencias de Transferencia
 
 // Inicia Llamadas a funcion 
-// Ejemplo Println(5)
+// Ejemplo Println(5)  
 func_call: id_pattern LPAREN arg_list? RPAREN # FuncCall;
 // Termina Llamadas a funcion
 
@@ -174,9 +174,10 @@ func_call: id_pattern LPAREN arg_list? RPAREN # FuncCall;
 block_ind: LBRACE stmt* RBRACE # BlockInd;
 // Termina Bloques de codigo
 
-// external names -> variable int, num2 float
+// external names -> variable int, num2 float, 5
 arg_list: func_arg (COMMA func_arg)* # ArgList;
 
+// 5
 func_arg: (ID)? (id_pattern | expression) # FuncArg; // 
 
 func_dcl:
