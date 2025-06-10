@@ -116,10 +116,6 @@ func NewObjectValue(v *ReplVisitor, targetStruct string, targetToken antlr.Token
 				throwError = true
 			}
 
-			// create the pointer
-			assignValue = &PointerValue{
-				AssocVariable: arg.VariableRef,
-			}
 		}
 
 		if !throwError {

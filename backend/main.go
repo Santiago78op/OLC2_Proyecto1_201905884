@@ -12,18 +12,17 @@ import (
 	"github.com/rs/cors"
 
 	// Importa el paquete de pruebas que contiene la lógica de ejecución
-	Test "main.go/Test"
+
 	"main.go/errors"
 	compiler "main.go/grammar"
 	"main.go/repl"
 )
 
 type executionResult struct {
-	Success  bool   `json:"success"`
-	Code     string `json:"code"`
-	Result   string `json:"result"`
-	Error    string `json:"error,omitempty"`
-	Duration string `json:"duration"`
+	Success bool         `json:"success"`
+	Errors  []repl.Error `json:"errors"`
+	Output  string       `json:"output"`
+	CSTSvg  string       `json:"cstSvg"`
 }
 
 func executeCode(w http.ResponseWriter, r *http.Request) {
@@ -38,6 +37,9 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
+
+	fmt.Println("Received code for execution:")
+	fmt.Println(requestData.Code)
 
 	// 1. Analisis Lexico
 	lexicalErrorListener := errors.NewLexicalErrorListener()
@@ -66,25 +68,29 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	dclVisitor.Visit(tree)
 
 	replVisitor := repl.NewVisitor(dclVisitor)
-
 	replVisitor.Visit(tree)
 
-	startTime := time.Now()
-	// Simulate code execution (replace with actual execution logic)
-	result, err := Test.TestingRun(requestData.Code)
+	cstReport := ""
 
-	duration := time.Since(startTime)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("Error executing code: %s", err.Error()), http.StatusInternalServerError)
-		return
-	}
+	intepretationEndTime := time.Now()
+
+	startTime := time.Now()
+
+	reportEndTime := time.Now()
+
+	fmt.Println("Interpretation finished")
+
+	fmt.Println("Interpretation time:", intepretationEndTime.Sub(startTime))
+	fmt.Println("Total (with report) time:", reportEndTime.Sub(intepretationEndTime))
+	fmt.Println("")
+
+	// Imprimir Output
+	fmt.Println("Output:", replVisitor.Console.GetOutput())
 
 	executionResult := executionResult{
-		Success:  true,
-		Code:     requestData.Code,
-		Result:   result,
-		Error:    "",
-		Duration: duration.String(),
+		Success: true,
+		Output:  replVisitor.Console.GetOutput(),
+		CSTSvg:  cstReport,
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(executionResult)

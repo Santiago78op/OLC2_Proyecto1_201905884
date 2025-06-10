@@ -14,36 +14,29 @@ import (
 ReplVisitor es una estructura que implementa el visitor para el REPL (Read-Eval-Print Loop).
 */
 type ReplVisitor struct {
-	*compiler.BaseVLangGrammarVisitor
-	ScopeTrace *ScopeTrace
-	Console    *Console
-	CallStack  *CallStack
-	ErrorTable *ErrorTable
-	// Structs map[string]*Struct
-}
-
-/*
-NewReplVisitor crea un nuevo ReplVisitor con el contexto proporcionado.
-*/
-func NewReplVisitor(ctx *ReplContext) *ReplVisitor {
-	return &ReplVisitor{
-		BaseVLangGrammarVisitor: &compiler.BaseVLangGrammarVisitor{},
-		Console:                 ctx.Console,
-		ErrorTable:              ctx.ErrorTable,
-		// Structs:            make(map[string]*Struct),
-	}
+	compiler.BaseVLangGrammarVisitor
+	ScopeTrace  *ScopeTrace
+	CallStack   *CallStack
+	Console     *Console
+	ErrorTable  *ErrorTable
+	StructNames []string
 }
 
 func NewVisitor(dclVisitor *DclVisitor) *ReplVisitor {
 	return &ReplVisitor{
-		ErrorTable: dclVisitor.ErrorTable,
-		Console:    NewConsole(),
+		ScopeTrace:  dclVisitor.ScopeTrace,
+		ErrorTable:  dclVisitor.ErrorTable,
+		StructNames: dclVisitor.StructNames,
+		CallStack:   NewCallStack(),
+		Console:     NewConsole(),
 	}
 }
 
 func (v *ReplVisitor) GetReplContext() *ReplContext {
 	return &ReplContext{
 		Console:    v.Console,
+		ScopeTrace: v.ScopeTrace,
+		CallStack:  v.CallStack,
 		ErrorTable: v.ErrorTable,
 	}
 }
@@ -310,6 +303,7 @@ func (v *ReplVisitor) VisitIntLiteral(ctx *compiler.IntLiteralContext) interface
 
 }
 
+// literal Float
 func (v *ReplVisitor) VisitFloatLiteral(ctx *compiler.FloatLiteralContext) interface{} {
 
 	floatVal, _ := strconv.ParseFloat(ctx.GetText(), 64)
@@ -320,6 +314,7 @@ func (v *ReplVisitor) VisitFloatLiteral(ctx *compiler.FloatLiteralContext) inter
 
 }
 
+// literal String
 func (v *ReplVisitor) VisitStringLiteral(ctx *compiler.StringLiteralContext) interface{} {
 
 	// remove quotes
@@ -345,6 +340,7 @@ func (v *ReplVisitor) VisitStringLiteral(ctx *compiler.StringLiteralContext) int
 
 }
 
+// literal Bool
 func (v *ReplVisitor) VisitBoolLiteral(ctx *compiler.BoolLiteralContext) interface{} {
 
 	boolVal, _ := strconv.ParseBool(ctx.GetText())
@@ -355,6 +351,163 @@ func (v *ReplVisitor) VisitBoolLiteral(ctx *compiler.BoolLiteralContext) interfa
 
 }
 
+// literal Nil
 func (v *ReplVisitor) VisitNilLiteral(ctx *compiler.NilLiteralContext) interface{} {
 	return value.DefaultNilValue
+}
+
+// literal en Exp
+func (v *ReplVisitor) VisitLiteralExp(ctx *compiler.LiteralExprContext) interface{} {
+	return v.Visit(ctx.Literal())
+}
+
+// Expresiones con parentesis
+func (v *ReplVisitor) VisitParenExp(ctx *compiler.ParensExprContext) interface{} {
+	return v.Visit(ctx.Expression())
+}
+
+// Funciones con expresiones
+func (v *ReplVisitor) VisitFuncCallExp(ctx *compiler.FuncCallExprContext) interface{} {
+	return v.Visit(ctx.Func_call())
+}
+
+func (v *ReplVisitor) VisitBinaryExp(ctx *compiler.BinaryExprContext) interface{} {
+
+	op := ctx.GetOp().GetText()
+	left := v.Visit(ctx.GetLeft()).(value.IVOR)
+
+	earlyCheck, ok := EarlyReturnStrats[op]
+
+	if ok {
+		ok, _, result := earlyCheck.Validate(left)
+
+		if ok {
+			return result
+		}
+	}
+
+	right := v.Visit(ctx.GetRight()).(value.IVOR)
+
+	strat, ok := BinaryStrats[op]
+
+	if !ok {
+		log.Fatal("Binary operator not found")
+	}
+
+	ok, msg, result := strat.Validate(left, right)
+
+	if !ok {
+		v.ErrorTable.NewSemanticError(ctx.GetOp(), msg)
+		return value.DefaultNilValue
+	}
+
+	return result
+}
+
+func (v *ReplVisitor) VisitFuncCall(ctx *compiler.FuncCallContext) interface{} {
+
+	// find if its a func or constructor of a struct
+
+	canditateName := v.Visit(ctx.Id_pattern()).(string)
+	funcObj, msg1 := v.ScopeTrace.GetFunction(canditateName)
+	structObj, msg2 := v.ScopeTrace.GlobalScope.GetStruct(canditateName)
+
+	if funcObj == nil && structObj == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg1+msg2)
+		return value.DefaultNilValue
+	}
+
+	args := make([]*Argument, 0)
+	if ctx.Arg_list() != nil {
+		args = v.Visit(ctx.Arg_list()).([]*Argument)
+	}
+
+	/*
+		// struct has priority over func
+		if structObj != nil {
+			if IsArgValidForStruct(args) {
+				return NewObjectValue(v, canditateName, ctx.Id_pattern().GetStart(), args, false)
+			} else {
+				v.ErrorTable.NewSemanticError(ctx.GetStart(), "Si bien "+canditateName+" es un struct, no se puede llamar a su constructor con los argumentos especificados. Ni tampoco es una funcion.")
+				return value.DefaultNilValue
+			}
+		}*/
+
+	switch funcObj := funcObj.(type) {
+	case *BuiltInFunction:
+		returnValue, ok, msg := funcObj.Exec(v.GetReplContext(), args)
+
+		if !ok {
+
+			if msg != "" {
+				v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+			}
+
+			return value.DefaultNilValue
+
+		}
+
+		return returnValue
+
+	case *Function:
+		funcObj.Exec(v, args, ctx.GetStart())
+		return funcObj.ReturnValue
+
+	case *ObjectBuiltInFunction:
+		funcObj.Exec(v, args, ctx.GetStart())
+		return funcObj.ReturnValue
+
+	default:
+		log.Fatal("Function type not found")
+	}
+
+	return value.DefaultNilValue
+}
+
+func (v *ReplVisitor) VisitArgList(ctx *compiler.ArgListContext) interface{} {
+
+	args := make([]*Argument, 0)
+
+	for _, arg := range ctx.AllFunc_arg() {
+		args = append(args, v.Visit(arg).(*Argument))
+	}
+
+	return args
+
+}
+
+func (v *ReplVisitor) VisitFuncArg(ctx *compiler.FuncArgContext) interface{} {
+
+	argName := ""
+	passByReference := false
+
+	var argValue value.IVOR = value.DefaultNilValue
+	var argVariableRef *Variable = nil
+
+	if ctx.Id_pattern() != nil {
+		// Because is a reference to a variable, the treatment is a bit different
+		argName = ctx.Id_pattern().GetText()
+		argVariableRef = v.ScopeTrace.GetVariable(argName)
+
+		if argVariableRef != nil {
+			argValue = argVariableRef.Value
+		} else {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+argName+" no encontrada")
+		}
+	} else {
+		argValue = v.Visit(ctx.Expression()).(value.IVOR)
+	}
+
+	if ctx.ID() != nil {
+		argName = ctx.ID().GetText()
+	}
+
+	return &Argument{
+		Name:            argName,
+		Value:           argValue,
+		PassByReference: passByReference,
+		Token:           ctx.GetStart(),
+		VariableRef:     argVariableRef,
+	}
+
 }

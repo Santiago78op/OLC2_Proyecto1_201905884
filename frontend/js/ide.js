@@ -135,11 +135,10 @@ class IDEController {
 
             // Mostrar salida del programa
             if (result.output && result.output.length > 0) {
-                result.output.forEach(line => {
-                    this.addConsoleMessage(line, 'output');
-                });
+                // Si output es string, mostrarlo como un solo mensaje
+                this.addConsoleMessage(result.output, 'output');
             }
-
+            // ...existing code...
             this.updateStatusMessage('Ejecución exitosa');
         } else {
             this.addConsoleMessage('❌ Ejecución falló con errores', 'error');
