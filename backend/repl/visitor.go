@@ -1,6 +1,7 @@
 package repl
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -46,23 +47,27 @@ func (v *ReplVisitor) ValidType(_type string) bool {
 }
 
 func (v *ReplVisitor) Visit(tree antlr.ParseTree) interface{} {
+	fmt.Printf("🔹 ReplVisitor.Visit llamado con: %T\n", tree)
 
 	switch val := tree.(type) {
 	case *antlr.ErrorNodeImpl:
+		fmt.Printf("❌ ERROR NODE en ReplVisitor: %s\n", val.GetText())
 		log.Fatal(val.GetText())
 		return nil
 	default:
+		fmt.Printf("🔹 ReplVisitor aceptando tree\n")
 		return tree.Accept(v)
 	}
-
 }
 
 func (v *ReplVisitor) VisitProgram(ctx *compiler.ProgContext) interface{} {
+	fmt.Printf("🎯 ¡ENTRANDO A ReplVisitor.VisitProgram!\n")
+	fmt.Printf("🔹 Número de statements: %d\n", len(ctx.AllStmt()))
 
-	for _, stmt := range ctx.AllStmt() {
+	for i, stmt := range ctx.AllStmt() {
+		fmt.Printf("🔹 Procesando statement %d: %s\n", i, stmt.GetText())
 		v.Visit(stmt)
 	}
-
 	return nil
 }
 
@@ -72,6 +77,8 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 		v.Visit(ctx.Decl_stmt())
 	} else if ctx.Assign_stmt() != nil {
 		v.Visit(ctx.Assign_stmt())
+	} else if ctx.Func_call() != nil {
+		v.Visit(ctx.Func_call())
 	} else {
 		log.Fatal("Statement not recognized: ", ctx.GetText())
 	}

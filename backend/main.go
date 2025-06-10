@@ -43,7 +43,7 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Analisis Lexico
 	lexicalErrorListener := errors.NewLexicalErrorListener()
-	lexer := compiler.NewVLangLexer(antlr.NewInputStream(requestData.Code))
+	lexer := compiler.NewVLangLexer(antlr.NewInputStream(string(requestData.Code)))
 
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(lexicalErrorListener)
@@ -63,6 +63,12 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	// En tu gramatica tienes el axioma, o simbolo inicial
 	// Este es el que deberas agregar como parte del parser.
 	tree := parser.Prog() // Aquí se debe llamar al método adecuado según tu gramática
+
+	// ✅ VERIFICACIONES CRÍTICAS
+	fmt.Printf("🔹 Tree creado: %T\n", tree)
+	fmt.Printf("🔹 Tree es nil: %v\n", tree == nil)
+	fmt.Printf("🔹 Tree text: %s\n", tree.GetText())
+	fmt.Printf("🔹 Errores en ErrorTable: %d\n", len(syntaxErrorListener.ErrorTable.Errors))
 
 	dclVisitor := repl.NewDclVisitor(syntaxErrorListener.ErrorTable)
 	dclVisitor.Visit(tree)
