@@ -4,7 +4,7 @@ parser grammar VLangGrammar;
 options { tokenVocab = VLangLexer; }
 
 // Program entry point
-prog: (stmt)* EOF?;
+program: (stmt)* EOF?;
 
 // Demilitador del lenguaje -> indica el final de una sentencia
 delim: NEWLINE?;

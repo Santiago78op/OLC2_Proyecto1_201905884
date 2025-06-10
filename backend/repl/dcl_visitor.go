@@ -38,7 +38,7 @@ func (v *DclVisitor) Visit(tree antlr.ParseTree) interface{} {
 	}
 }
 
-func (v *DclVisitor) VisitProgram(ctx *compiler.ProgContext) interface{} {
+func (v *DclVisitor) VisitProgram(ctx *compiler.ProgramContext) interface{} {
 	fmt.Printf("🔹 DclVisitor.VisitProgram EJECUTADO\n")
 	fmt.Printf("🔹 Número de statements: %d\n", len(ctx.AllStmt()))
 

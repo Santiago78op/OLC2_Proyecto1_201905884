@@ -52,7 +52,7 @@ func vlanggrammarParserInit() {
 		"LINE_COMMENT", "BLOCK_COMMENT", "WS",
 	}
 	staticData.RuleNames = []string{
-		"prog", "delim", "stmt", "decl_stmt", "type_annotation", "var_type",
+		"program", "delim", "stmt", "decl_stmt", "type_annotation", "var_type",
 		"assign_stmt", "id_pattern", "literal", "expression", "vect_expr", "vect_item",
 		"vect_prop", "vect_func", "repeating", "type", "vector_type", "matrix_type",
 		"aux_matrix_type", "if_stmt", "if_chain", "else_stmt", "switch_stmt",
@@ -378,7 +378,7 @@ const (
 
 // VLangGrammar rules.
 const (
-	VLangGrammarRULE_prog            = 0
+	VLangGrammarRULE_program         = 0
 	VLangGrammarRULE_delim           = 1
 	VLangGrammarRULE_stmt            = 2
 	VLangGrammarRULE_decl_stmt       = 3
@@ -419,8 +419,8 @@ const (
 	VLangGrammarRULE_struct_vector   = 38
 )
 
-// IProgContext is an interface to support dynamic dispatch.
-type IProgContext interface {
+// IProgramContext is an interface to support dynamic dispatch.
+type IProgramContext interface {
 	antlr.ParserRuleContext
 
 	// GetParser returns the parser.
@@ -431,43 +431,43 @@ type IProgContext interface {
 	Stmt(i int) IStmtContext
 	EOF() antlr.TerminalNode
 
-	// IsProgContext differentiates from other interfaces.
-	IsProgContext()
+	// IsProgramContext differentiates from other interfaces.
+	IsProgramContext()
 }
 
-type ProgContext struct {
+type ProgramContext struct {
 	antlr.BaseParserRuleContext
 	parser antlr.Parser
 }
 
-func NewEmptyProgContext() *ProgContext {
-	var p = new(ProgContext)
+func NewEmptyProgramContext() *ProgramContext {
+	var p = new(ProgramContext)
 	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = VLangGrammarRULE_prog
+	p.RuleIndex = VLangGrammarRULE_program
 	return p
 }
 
-func InitEmptyProgContext(p *ProgContext) {
+func InitEmptyProgramContext(p *ProgramContext) {
 	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = VLangGrammarRULE_prog
+	p.RuleIndex = VLangGrammarRULE_program
 }
 
-func (*ProgContext) IsProgContext() {}
+func (*ProgramContext) IsProgramContext() {}
 
-func NewProgContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ProgContext {
-	var p = new(ProgContext)
+func NewProgramContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *ProgramContext {
+	var p = new(ProgramContext)
 
 	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
 
 	p.parser = parser
-	p.RuleIndex = VLangGrammarRULE_prog
+	p.RuleIndex = VLangGrammarRULE_program
 
 	return p
 }
 
-func (s *ProgContext) GetParser() antlr.Parser { return s.parser }
+func (s *ProgramContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *ProgContext) AllStmt() []IStmtContext {
+func (s *ProgramContext) AllStmt() []IStmtContext {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
@@ -488,7 +488,7 @@ func (s *ProgContext) AllStmt() []IStmtContext {
 	return tst
 }
 
-func (s *ProgContext) Stmt(i int) IStmtContext {
+func (s *ProgramContext) Stmt(i int) IStmtContext {
 	var t antlr.RuleContext
 	j := 0
 	for _, ctx := range s.GetChildren() {
@@ -508,43 +508,43 @@ func (s *ProgContext) Stmt(i int) IStmtContext {
 	return t.(IStmtContext)
 }
 
-func (s *ProgContext) EOF() antlr.TerminalNode {
+func (s *ProgramContext) EOF() antlr.TerminalNode {
 	return s.GetToken(VLangGrammarEOF, 0)
 }
 
-func (s *ProgContext) GetRuleContext() antlr.RuleContext {
+func (s *ProgramContext) GetRuleContext() antlr.RuleContext {
 	return s
 }
 
-func (s *ProgContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+func (s *ProgramContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
 	return antlr.TreesStringTree(s, ruleNames, recog)
 }
 
-func (s *ProgContext) EnterRule(listener antlr.ParseTreeListener) {
+func (s *ProgramContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(VLangGrammarListener); ok {
-		listenerT.EnterProg(s)
+		listenerT.EnterProgram(s)
 	}
 }
 
-func (s *ProgContext) ExitRule(listener antlr.ParseTreeListener) {
+func (s *ProgramContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(VLangGrammarListener); ok {
-		listenerT.ExitProg(s)
+		listenerT.ExitProgram(s)
 	}
 }
 
-func (s *ProgContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+func (s *ProgramContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case VLangGrammarVisitor:
-		return t.VisitProg(s)
+		return t.VisitProgram(s)
 
 	default:
 		return t.VisitChildren(s)
 	}
 }
 
-func (p *VLangGrammar) Prog() (localctx IProgContext) {
-	localctx = NewProgContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 0, VLangGrammarRULE_prog)
+func (p *VLangGrammar) Program() (localctx IProgramContext) {
+	localctx = NewProgramContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 0, VLangGrammarRULE_program)
 	var _la int
 
 	p.EnterOuterAlt(localctx, 1)

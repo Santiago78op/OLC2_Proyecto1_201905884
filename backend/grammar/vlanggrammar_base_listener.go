@@ -20,11 +20,11 @@ func (s *BaseVLangGrammarListener) EnterEveryRule(ctx antlr.ParserRuleContext) {
 // ExitEveryRule is called when any rule is exited.
 func (s *BaseVLangGrammarListener) ExitEveryRule(ctx antlr.ParserRuleContext) {}
 
-// EnterProg is called when production prog is entered.
-func (s *BaseVLangGrammarListener) EnterProg(ctx *ProgContext) {}
+// EnterProgram is called when production program is entered.
+func (s *BaseVLangGrammarListener) EnterProgram(ctx *ProgramContext) {}
 
-// ExitProg is called when production prog is exited.
-func (s *BaseVLangGrammarListener) ExitProg(ctx *ProgContext) {}
+// ExitProgram is called when production program is exited.
+func (s *BaseVLangGrammarListener) ExitProgram(ctx *ProgramContext) {}
 
 // EnterDelim is called when production delim is entered.
 func (s *BaseVLangGrammarListener) EnterDelim(ctx *DelimContext) {}

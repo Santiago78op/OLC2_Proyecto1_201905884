@@ -60,7 +60,7 @@ func (v *ReplVisitor) Visit(tree antlr.ParseTree) interface{} {
 	}
 }
 
-func (v *ReplVisitor) VisitProgram(ctx *compiler.ProgContext) interface{} {
+func (v *ReplVisitor) VisitProgram(ctx *compiler.ProgramContext) interface{} {
 	fmt.Printf("🎯 ¡ENTRANDO A ReplVisitor.VisitProgram!\n")
 	fmt.Printf("🔹 Número de statements: %d\n", len(ctx.AllStmt()))
 

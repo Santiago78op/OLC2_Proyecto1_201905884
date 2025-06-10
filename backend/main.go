@@ -62,7 +62,7 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	// 4. Árbol sintáctico
 	// En tu gramatica tienes el axioma, o simbolo inicial
 	// Este es el que deberas agregar como parte del parser.
-	tree := parser.Prog() // Aquí se debe llamar al método adecuado según tu gramática
+	tree := parser.Program() // Aquí se debe llamar al método adecuado según tu gramática
 
 	// ✅ VERIFICACIONES CRÍTICAS
 	fmt.Printf("🔹 Tree creado: %T\n", tree)

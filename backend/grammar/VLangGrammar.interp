@@ -121,7 +121,7 @@ BLOCK_COMMENT
 WS
 
 rule names:
-prog
+program
 delim
 stmt
 decl_stmt
