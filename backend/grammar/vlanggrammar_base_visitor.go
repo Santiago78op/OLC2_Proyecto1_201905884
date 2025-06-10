@@ -207,6 +207,10 @@ func (v *BaseVLangGrammarVisitor) VisitFuncCall(ctx *FuncCallContext) interface{
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitBlockInd(ctx *BlockIndContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitArgList(ctx *ArgListContext) interface{} {
 	return v.VisitChildren(ctx)
 }

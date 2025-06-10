@@ -321,6 +321,12 @@ func (s *BaseVLangGrammarListener) EnterFuncCall(ctx *FuncCallContext) {}
 // ExitFuncCall is called when production FuncCall is exited.
 func (s *BaseVLangGrammarListener) ExitFuncCall(ctx *FuncCallContext) {}
 
+// EnterBlockInd is called when production BlockInd is entered.
+func (s *BaseVLangGrammarListener) EnterBlockInd(ctx *BlockIndContext) {}
+
+// ExitBlockInd is called when production BlockInd is exited.
+func (s *BaseVLangGrammarListener) ExitBlockInd(ctx *BlockIndContext) {}
+
 // EnterArgList is called when production ArgList is entered.
 func (s *BaseVLangGrammarListener) EnterArgList(ctx *ArgListContext) {}
 

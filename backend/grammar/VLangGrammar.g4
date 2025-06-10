@@ -20,6 +20,7 @@ stmt:
     | func_call delim
     | vect_func delim
     | func_dcl
+    | block_ind delim
     | strct_dcl
     ;
 
@@ -169,7 +170,11 @@ transfer_stmt:
 func_call: id_pattern LPAREN arg_list? RPAREN # FuncCall;
 // Termina Llamadas a funcion
 
-// external names -> num: value, num2: value2
+// Inicia Bloques de codigo
+block_ind: LBRACE stmt* RBRACE # BlockInd;
+// Termina Bloques de codigo
+
+// external names -> variable int, num2 float
 arg_list: func_arg (COMMA func_arg)* # ArgList;
 
 func_arg: (ID)? (id_pattern | expression) # FuncArg; // 

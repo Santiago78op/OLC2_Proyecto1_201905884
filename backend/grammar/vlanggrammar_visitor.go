@@ -157,6 +157,9 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#FuncCall.
 	VisitFuncCall(ctx *FuncCallContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#BlockInd.
+	VisitBlockInd(ctx *BlockIndContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#ArgList.
 	VisitArgList(ctx *ArgListContext) interface{}
 

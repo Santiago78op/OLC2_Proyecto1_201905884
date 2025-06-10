@@ -157,6 +157,9 @@ type VLangGrammarListener interface {
 	// EnterFuncCall is called when entering the FuncCall production.
 	EnterFuncCall(c *FuncCallContext)
 
+	// EnterBlockInd is called when entering the BlockInd production.
+	EnterBlockInd(c *BlockIndContext)
+
 	// EnterArgList is called when entering the ArgList production.
 	EnterArgList(c *ArgListContext)
 
@@ -330,6 +333,9 @@ type VLangGrammarListener interface {
 
 	// ExitFuncCall is called when exiting the FuncCall production.
 	ExitFuncCall(c *FuncCallContext)
+
+	// ExitBlockInd is called when exiting the BlockInd production.
+	ExitBlockInd(c *BlockIndContext)
 
 	// ExitArgList is called when exiting the ArgList production.
 	ExitArgList(c *ArgListContext)
