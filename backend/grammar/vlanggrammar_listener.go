@@ -7,8 +7,8 @@ import "github.com/antlr4-go/antlr/v4"
 type VLangGrammarListener interface {
 	antlr.ParseTreeListener
 
-	// EnterProg is called when entering the prog production.
-	EnterProg(c *ProgContext)
+	// EnterProgram is called when entering the program production.
+	EnterProgram(c *ProgramContext)
 
 	// EnterDelim is called when entering the delim production.
 	EnterDelim(c *DelimContext)
@@ -184,8 +184,8 @@ type VLangGrammarListener interface {
 	// EnterStructVector is called when entering the StructVector production.
 	EnterStructVector(c *StructVectorContext)
 
-	// ExitProg is called when exiting the prog production.
-	ExitProg(c *ProgContext)
+	// ExitProgram is called when exiting the program production.
+	ExitProgram(c *ProgramContext)
 
 	// ExitDelim is called when exiting the delim production.
 	ExitDelim(c *DelimContext)

@@ -7,8 +7,8 @@ import "github.com/antlr4-go/antlr/v4"
 type VLangGrammarVisitor interface {
 	antlr.ParseTreeVisitor
 
-	// Visit a parse tree produced by VLangGrammar#prog.
-	VisitProg(ctx *ProgContext) interface{}
+	// Visit a parse tree produced by VLangGrammar#program.
+	VisitProgram(ctx *ProgramContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#delim.
 	VisitDelim(ctx *DelimContext) interface{}

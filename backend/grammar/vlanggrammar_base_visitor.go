@@ -7,7 +7,7 @@ type BaseVLangGrammarVisitor struct {
 	*antlr.BaseParseTreeVisitor
 }
 
-func (v *BaseVLangGrammarVisitor) VisitProg(ctx *ProgContext) interface{} {
+func (v *BaseVLangGrammarVisitor) VisitProgram(ctx *ProgramContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

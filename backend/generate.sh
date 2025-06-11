@@ -15,8 +15,8 @@ if [ ! -f "grammar/VLangLexer.g4" ]; then
     exit 1
 fi
 
-if [ ! -f "grammar/VLangParser.g4" ]; then
-    echo "[ERROR] No se encuentra grammar/VLangParser.g4"
+if [ ! -f "grammar/VLangGrammar.g4" ]; then
+    echo "[ERROR] No se encuentra grammar/VLangGrammar.g4"
     exit 1
 fi
 
