@@ -44,6 +44,12 @@ func (s *BaseVLangGrammarListener) EnterMutVarDecl(ctx *MutVarDeclContext) {}
 // ExitMutVarDecl is called when production MutVarDecl is exited.
 func (s *BaseVLangGrammarListener) ExitMutVarDecl(ctx *MutVarDeclContext) {}
 
+// EnterValueDecl is called when production ValueDecl is entered.
+func (s *BaseVLangGrammarListener) EnterValueDecl(ctx *ValueDeclContext) {}
+
+// ExitValueDecl is called when production ValueDecl is exited.
+func (s *BaseVLangGrammarListener) ExitValueDecl(ctx *ValueDeclContext) {}
+
 // EnterVarAssDecl is called when production VarAssDecl is entered.
 func (s *BaseVLangGrammarListener) EnterVarAssDecl(ctx *VarAssDeclContext) {}
 

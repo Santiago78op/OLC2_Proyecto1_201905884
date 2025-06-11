@@ -31,8 +31,9 @@ stmt:
 // Ejemplo: Mut variable_1 int = 10
 // Ejemplo: Mut variable_2 int 
 decl_stmt: 
-    var_type ID type (ASSIGN expression)?   # MutVarDecl
-    | ID type ASSIGN expression  # VarAssDecl
+    var_type ID type ASSIGN expression  # MutVarDecl
+    | var_type ID ASSIGN expression     # ValueDecl 
+    | ID type ASSIGN expression         # VarAssDecl
     ;
 
 // Inicia Declaracion de Vector

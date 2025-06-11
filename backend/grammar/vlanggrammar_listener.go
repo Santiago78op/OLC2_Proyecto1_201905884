@@ -19,6 +19,9 @@ type VLangGrammarListener interface {
 	// EnterMutVarDecl is called when entering the MutVarDecl production.
 	EnterMutVarDecl(c *MutVarDeclContext)
 
+	// EnterValueDecl is called when entering the ValueDecl production.
+	EnterValueDecl(c *ValueDeclContext)
+
 	// EnterVarAssDecl is called when entering the VarAssDecl production.
 	EnterVarAssDecl(c *VarAssDeclContext)
 
@@ -195,6 +198,9 @@ type VLangGrammarListener interface {
 
 	// ExitMutVarDecl is called when exiting the MutVarDecl production.
 	ExitMutVarDecl(c *MutVarDeclContext)
+
+	// ExitValueDecl is called when exiting the ValueDecl production.
+	ExitValueDecl(c *ValueDeclContext)
 
 	// ExitVarAssDecl is called when exiting the VarAssDecl production.
 	ExitVarAssDecl(c *VarAssDeclContext)
