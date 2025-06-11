@@ -47,6 +47,7 @@ func (v *ReplVisitor) ValidType(_type string) bool {
 }
 
 func (v *ReplVisitor) Visit(tree antlr.ParseTree) interface{} {
+	fmt.Printf("-------------------------------------------\n")
 	fmt.Printf("🔹 ReplVisitor.Visit llamado con: %T\n", tree)
 
 	switch val := tree.(type) {
@@ -294,6 +295,7 @@ func (v *ReplVisitor) VisitArithmeticAssign(ctx *compiler.AugmentedAssignmentDec
 
 // Id parents
 func (v *ReplVisitor) VisitIdPattern(ctx *compiler.IdPatternContext) interface{} {
+	fmt.Print("El valor de IdPattern es: " + ctx.GetText() + "\n")
 	return ctx.GetText()
 }
 
@@ -365,6 +367,7 @@ func (v *ReplVisitor) VisitNilLiteral(ctx *compiler.NilLiteralContext) interface
 
 // literal en Exp
 func (v *ReplVisitor) VisitLiteralExp(ctx *compiler.LiteralExprContext) interface{} {
+	fmt.Print("El valor de LiteralExp es: " + ctx.GetText() + "\n")
 	return v.Visit(ctx.Literal())
 }
 
@@ -507,7 +510,15 @@ func (v *ReplVisitor) VisitFuncArg(ctx *compiler.FuncArgContext) interface{} {
 			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+argName+" no encontrada")
 		}
 	} else {
-		argValue = v.Visit(ctx.Expression()).(value.IVOR)
+		val := v.Visit(ctx.Expression())
+		fmt.Printf("Tipo retornado por v.Visit(ctx.Expression()): %T\n", val)
+		ivor, ok := val.(value.IVOR)
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "El argumento no es un valor válido")
+			argValue = value.DefaultNilValue
+		} else {
+			argValue = ivor
+		}
 	}
 
 	if ctx.ID() != nil {
