@@ -80,7 +80,7 @@ fragment CHAR : [!-~];
 INT_LITERAL    : DIGIT+;
 FLOAT_LITERAL  : DIGIT+ '.' DIGIT+;
 CHAR_LITERAL   : CHAR; 
-STRING_LITERAL : '"' (~["\\\r\n] | EscapeSequence)* '"';
+STRING_LITERAL: '"' (~["\r\n\\] | ESC_SEQ)* '"';
 BOOL_LITERAL   : 'true' | 'false';
 NIL_LITERAL    : 'nil';
 
@@ -88,11 +88,7 @@ NIL_LITERAL    : 'nil';
 ID : (LETTER | UNDERSCORE) (LETTER | DIGIT | UNDERSCORE)*;
 
 // Secuencia de escape
-fragment EscapeSequence
-    : '\\' [btnfr"'\\]
-    | '\\' 'n'
-    | '\\' 'r'
-    | '\\' 't'
+fragment ESC_SEQ: '\\' [btnfr"'\\]
     ;
 
 // Commentarios
