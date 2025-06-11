@@ -53,7 +53,7 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 
 	// 1. Analisis Lexico
 	lexicalErrorListener := errors.NewLexicalErrorListener()
-	lexer := compiler.NewVLangLexer(antlr.NewInputStream("print(25))"))
+	lexer := compiler.NewVLangLexer(antlr.NewInputStream(codeString))
 
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(lexicalErrorListener)
