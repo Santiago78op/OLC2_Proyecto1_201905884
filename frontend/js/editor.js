@@ -27,7 +27,7 @@ class CodeEditor {
             monaco.languages.setMonarchTokensProvider('vlancherry', {
                 tokenizer: {
                     root: [
-                        [/\b(var|if|else|while|for|function|return|print|int|string|bool|true|false|and|or|not|null)\b/, 'keyword'],
+                        [/\b(mut|if|else|while|for|function|return|print|int|string|bool|true|false|and|or|not|nil)\b/, 'keyword'],
                         [/\b\d+(\.\d+)?\b/, 'number'],
                         [/"([^"\\\\]|\\\\.)*"/, 'string'],
                         [/'([^'\\\\]|\\\\.)*'/, 'string'],
