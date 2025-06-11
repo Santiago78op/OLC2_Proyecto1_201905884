@@ -94,44 +94,29 @@ func isDeclConst(lexval string) bool {
 
 // Ejemplo: Mut variable_1 int = 10
 // Ejemplo: Mut variable_2 int
-func (v *ReplVisitor) VisitMulVarDecl(ctx *compiler.MutVarDeclContext) interface{} {
+func (v *ReplVisitor) VisitMutVarDecl(ctx *compiler.MutVarDeclContext) interface{} {
 
 	// Si hubiera constantes se validan aquí
 	// isConst := isDeclConst(ctx.Var_type().GetText())
 	isConst := false
 
 	// Obtenemos el context de la declaración MutVarDecl
-	exprName := ctx.ID().GetText()
-	exprType := v.Visit(ctx.Type_()).(string)
+	varName := ctx.ID().GetText()
+	varType := v.Visit(ctx.Type_()).(string)
+	varValue := v.Visit(ctx.Expression()).(value.IVOR)
 
-	// Validar expresión si existe
-	if ctx.Expression() != nil {
-
-		exprValue := v.Visit(ctx.Expression()).(value.IVOR)
-
-		// Validar tipo de expresión
-		if obj, ok := exprValue.(*ObjectValue); ok {
-			exprValue = obj.Copy()
-		}
-
-		variable, msg := v.ScopeTrace.AddVariable(exprName, exprType, exprValue, isConst, false, ctx.GetStart())
-
-		// Si la variable ya existe, se lanza un error
-		if variable == nil {
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
-		}
-
-	} else {
-		// Si no hay expresión, se crea una variable sin valor
-		variable, msg := v.ScopeTrace.AddVariable(exprName, exprType, value.DefaultUnInitializedValue, isConst, false, ctx.GetStart())
-
-		// Variable already exists
-		if variable == nil {
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
-		}
+	// copy object
+	if obj, ok := varValue.(*ObjectValue); ok {
+		varValue = obj.Copy()
 	}
 
-	// Si es una variable mut, se agrega al scope actual
+	variable, msg := v.ScopeTrace.AddVariable(varName, varType, varValue, isConst, false, ctx.GetStart())
+
+	// Variable already exists
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+	}
+
 	return nil
 }
 
