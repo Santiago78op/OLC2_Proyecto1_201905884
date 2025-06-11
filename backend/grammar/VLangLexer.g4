@@ -80,7 +80,7 @@ fragment CHAR : [!-~];
 INT_LITERAL    : DIGIT+;
 FLOAT_LITERAL  : DIGIT+ '.' DIGIT+;
 CHAR_LITERAL   : CHAR; 
-STRING_LITERAL : '"' (~["\\\r\n] | EscapeSequence)* '"';
+STRING_LITERAL : '"' (~["\r\n\\] | EscapeSequence)* '"';
 BOOL_LITERAL   : 'true' | 'false';
 NIL_LITERAL    : 'nil';
 

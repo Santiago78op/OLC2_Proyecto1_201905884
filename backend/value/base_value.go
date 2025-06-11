@@ -5,7 +5,7 @@ package value
 const (
 	IVOR_INT              = "int"
 	IVOR_FLOAT            = "float64"
-	IVOR_STRING           = "string"
+	IVOR_STRING           = "String"
 	IVOR_BOOL             = "bool"
 	IVOR_CHARACTER        = "rune"
 	IVOR_NIL              = "nil"

@@ -47,6 +47,7 @@ func (v *ReplVisitor) ValidType(_type string) bool {
 }
 
 func (v *ReplVisitor) Visit(tree antlr.ParseTree) interface{} {
+	fmt.Printf("----------------------------------------------\n")
 	fmt.Printf("🔹 ReplVisitor.Visit llamado con: %T\n", tree)
 
 	switch val := tree.(type) {
@@ -64,8 +65,8 @@ func (v *ReplVisitor) VisitProgram(ctx *compiler.ProgramContext) interface{} {
 	fmt.Printf("🎯 ¡ENTRANDO A ReplVisitor.VisitProgram!\n")
 	fmt.Printf("🔹 Número de statements: %d\n", len(ctx.AllStmt()))
 
-	for i, stmt := range ctx.AllStmt() {
-		fmt.Printf("🔹 Procesando statement %d: %s\n", i, stmt.GetText())
+	for _, stmt := range ctx.AllStmt() {
+		fmt.Printf("🔹 Procesando statement %d: %s\n", 0, stmt.GetText())
 		v.Visit(stmt)
 	}
 	return nil
@@ -365,6 +366,7 @@ func (v *ReplVisitor) VisitNilLiteral(ctx *compiler.NilLiteralContext) interface
 
 // literal en Exp
 func (v *ReplVisitor) VisitLiteralExp(ctx *compiler.LiteralExprContext) interface{} {
+	fmt.Printf("🔹 Visitando LiteralExp: %s\n", ctx.Literal().GetText())
 	return v.Visit(ctx.Literal())
 }
 
@@ -507,7 +509,7 @@ func (v *ReplVisitor) VisitFuncArg(ctx *compiler.FuncArgContext) interface{} {
 			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+argName+" no encontrada")
 		}
 	} else {
-		argValue = v.Visit(ctx.Expression()).(value.IVOR)
+		v.Visit(ctx.Expression())
 	}
 
 	if ctx.ID() != nil {
