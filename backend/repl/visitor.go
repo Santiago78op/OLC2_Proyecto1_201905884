@@ -120,6 +120,32 @@ func (v *ReplVisitor) VisitMutVarDecl(ctx *compiler.MutVarDeclContext) interface
 	return nil
 }
 
+func (v *ReplVisitor) VisitValueDecl(ctx *compiler.ValueDeclContext) interface{} {
+
+	isConst := isDeclConst(ctx.Var_type().GetText())
+	varName := ctx.ID().GetText()
+	varValue := v.Visit(ctx.Expression()).(value.IVOR)
+	varType := varValue.Type()
+
+	if varType == "[]" {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede inferir el tipo de un vector vacio '"+varName+"'")
+		return nil
+	}
+
+	// copy object
+	if obj, ok := varValue.(*ObjectValue); ok {
+		varValue = obj.Copy()
+	}
+
+	variable, msg := v.ScopeTrace.AddVariable(varName, varType, varValue, isConst, false, ctx.GetStart())
+
+	// Variable already exists
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+	}
+	return nil
+}
+
 // Ejemplo: variable_1 int = 10
 func (v *ReplVisitor) VisitVarDecl(ctx *compiler.VarAssDeclContext) interface{} {
 
