@@ -8,7 +8,7 @@ program: (stmt)* EOF?
     ;
 
 // Demilitador del lenguaje -> indica el final de una sentencia
-delim: EOF
+delim: NEWLINE | EOF
     ;
 
 // Sentencias
