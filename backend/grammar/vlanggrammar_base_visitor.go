@@ -23,6 +23,10 @@ func (v *BaseVLangGrammarVisitor) VisitMutVarDecl(ctx *MutVarDeclContext) interf
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitValueDecl(ctx *ValueDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitVarAssDecl(ctx *VarAssDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }

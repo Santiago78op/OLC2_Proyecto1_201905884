@@ -19,6 +19,9 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#MutVarDecl.
 	VisitMutVarDecl(ctx *MutVarDeclContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#ValueDecl.
+	VisitValueDecl(ctx *ValueDeclContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#VarAssDecl.
 	VisitVarAssDecl(ctx *VarAssDeclContext) interface{}
 
