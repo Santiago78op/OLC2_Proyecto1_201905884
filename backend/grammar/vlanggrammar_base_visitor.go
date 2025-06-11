@@ -27,7 +27,23 @@ func (v *BaseVLangGrammarVisitor) VisitVarAssDecl(ctx *VarAssDeclContext) interf
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseVLangGrammarVisitor) VisitType_annotation(ctx *Type_annotationContext) interface{} {
+func (v *BaseVLangGrammarVisitor) VisitVectorItemLis(ctx *VectorItemLisContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitVectorItem(ctx *VectorItemContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitVectorProperty(ctx *VectorPropertyContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitVectorFuncCall(ctx *VectorFuncCallContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitRepeatingDecl(ctx *RepeatingDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -35,11 +51,31 @@ func (v *BaseVLangGrammarVisitor) VisitVar_type(ctx *Var_typeContext) interface{
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitType(ctx *TypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitVector_type(ctx *Vector_typeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitMatrix_type(ctx *Matrix_typeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitAux_matrix_type(ctx *Aux_matrix_typeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitAssignmentDecl(ctx *AssignmentDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseVLangGrammarVisitor) VisitAugmentedAssignmentDecl(ctx *AugmentedAssignmentDeclContext) interface{} {
+func (v *BaseVLangGrammarVisitor) VisitArgAddAssigDecl(ctx *ArgAddAssigDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitVectorAssign(ctx *VectorAssignContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -108,42 +144,6 @@ func (v *BaseVLangGrammarVisitor) VisitIdPatternExpr(ctx *IdPatternExprContext) 
 }
 
 func (v *BaseVLangGrammarVisitor) VisitFuncCallExpr(ctx *FuncCallExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitVectorItemLis(ctx *VectorItemLisContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitVectorItem(ctx *VectorItemContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitVectorProperty(ctx *VectorPropertyContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitVectorFuncCall(ctx *VectorFuncCallContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitRepeatingDecl(ctx *RepeatingDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitType(ctx *TypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitVector_type(ctx *Vector_typeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitMatrix_type(ctx *Matrix_typeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitAux_matrix_type(ctx *Aux_matrix_typeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

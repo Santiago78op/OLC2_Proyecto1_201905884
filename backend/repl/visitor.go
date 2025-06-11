@@ -102,7 +102,7 @@ func (v *ReplVisitor) VisitMulVarDecl(ctx *compiler.MutVarDeclContext) interface
 
 	// Obtenemos el context de la declaración MutVarDecl
 	exprName := ctx.ID().GetText()
-	exprType := v.Visit(ctx.Type_annotation()).(string)
+	exprType := v.Visit(ctx.Type_()).(string)
 
 	// Validar expresión si existe
 	if ctx.Expression() != nil {
@@ -144,7 +144,7 @@ func (v *ReplVisitor) VisitVarDecl(ctx *compiler.VarAssDeclContext) interface{} 
 
 	// Obtenemos el context de la declaración VarAssDecñ
 	exprName := ctx.ID().GetText()
-	exprType := v.Visit(ctx.Type_annotation()).(string)
+	exprType := v.Visit(ctx.Type_()).(string)
 
 	exprValue := v.Visit(ctx.Expression()).(value.IVOR)
 
@@ -248,7 +248,7 @@ func (v *ReplVisitor) VisitDirectAssign(ctx *compiler.AssignmentDeclContext) int
 
 }
 
-func (v *ReplVisitor) VisitArithmeticAssign(ctx *compiler.AugmentedAssignmentDeclContext) interface{} {
+func (v *ReplVisitor) VisitArithmeticAssign(ctx *compiler.ArgAddAssigDeclContext) interface{} {
 	varName := v.Visit(ctx.Id_pattern()).(string)
 
 	variable := v.ScopeTrace.GetVariable(varName)
@@ -366,7 +366,7 @@ func (v *ReplVisitor) VisitNilLiteral(ctx *compiler.NilLiteralContext) interface
 }
 
 // literal en Exp
-func (v *ReplVisitor) VisitLiteralExp(ctx *compiler.LiteralExprContext) interface{} {
+func (v *ReplVisitor) VisitLiteralExpr(ctx *compiler.LiteralExprContext) interface{} {
 	fmt.Print("El valor de LiteralExp es: " + ctx.GetText() + "\n")
 	return v.Visit(ctx.Literal())
 }

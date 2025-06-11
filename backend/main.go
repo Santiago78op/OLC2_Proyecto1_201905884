@@ -26,11 +26,11 @@ type executionResult struct {
 }
 
 func executeCode(w http.ResponseWriter, r *http.Request) {
+	// Receive code from the request body
 	w.Header().Set("Content-Type", "application/json")
 
-	// Receive code from the request body
 	var requestData struct {
-		Code string `json:"code"`
+		Code *string `json:"code"`
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
@@ -38,12 +38,22 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Desreferenciar el puntero para obtener el string
+	if requestData.Code == nil {
+		http.Error(w, "Code is required", http.StatusBadRequest)
+		return
+	}
+
+	// Desreferenciar el puntero para obtener el string
+	codeString := *requestData.Code
 	fmt.Println("Received code for execution:")
-	fmt.Println(requestData.Code)
+	fmt.Println(codeString)
+
+	//Pasar a string requestData.Code
 
 	// 1. Analisis Lexico
 	lexicalErrorListener := errors.NewLexicalErrorListener()
-	lexer := compiler.NewVLangLexer(antlr.NewInputStream(string(requestData.Code)))
+	lexer := compiler.NewVLangLexer(antlr.NewInputStream("print(\"hola\")"))
 
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(lexicalErrorListener)
@@ -100,6 +110,7 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(executionResult)
+
 }
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
