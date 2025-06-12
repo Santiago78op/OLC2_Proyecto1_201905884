@@ -128,7 +128,7 @@ func (v *ReplVisitor) VisitMutVarDecl(ctx *compiler.MutVarDeclContext) interface
 
 func (v *ReplVisitor) VisitValueDecl(ctx *compiler.ValueDeclContext) interface{} {
 
-	isConst := isDeclConst(ctx.Var_type().GetText())
+	isConst := true
 	varName := ctx.ID().GetText()
 	varValue := v.Visit(ctx.Expression()).(value.IVOR)
 	varType := varValue.Type()
@@ -223,7 +223,7 @@ func (v *ReplVisitor) VisitType(ctx *compiler.TypeContext) interface{} {
 // Falta el visit repeating
 // Falta todo de Vectores
 
-func (v *ReplVisitor) VisitDirectAssign(ctx *compiler.AssignmentDeclContext) interface{} {
+func (v *ReplVisitor) VisitAssignmentDecl(ctx *compiler.AssignmentDeclContext) interface{} {
 
 	varName := v.Visit(ctx.Id_pattern()).(string)
 	varValue := v.Visit(ctx.Expression()).(value.IVOR)
