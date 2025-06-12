@@ -83,8 +83,8 @@ fragment ESC_SEQ: '\\' [btnfr"'\\]
     ;
 
 // Commentarios
-LINE_COMMENT  : '//' ~[\r\n]* -> skip;
+LINE_COMMENT  : '//'.*? ('\n' | EOF) -> skip;
 BLOCK_COMMENT : '/*' .*? '*/' -> skip;
 
 // Espacios en blanco
-WS : [ \t\r\n]+ -> skip;
+WS : [ \t\r]+ -> skip;

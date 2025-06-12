@@ -71,7 +71,19 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Si en el requestData.Code viene \n al inicio, lo eliminamos hasta el primer carácter
 	codeString := requestData.Code
+	for len(codeString) > 0 && (codeString[0] == '\n' || codeString[0] == '\r') {
+		codeString = codeString[1:]
+	}
+
+	// ¡NO necesitas desescapar nada aquí!
+
+	fmt.Printf("✅ Código recibido exitosamente:\n%s\n", codeString)
+	fmt.Printf("🔹 Longitud del código: %d caracteres\n", len(codeString))
+
+	// ...existing code...
+
 	fmt.Printf("✅ Código recibido exitosamente:\n%s\n", codeString)
 	fmt.Printf("🔹 Longitud del código: %d caracteres\n", len(codeString))
 
