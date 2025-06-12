@@ -78,10 +78,14 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 		v.Visit(ctx.Decl_stmt())
 	} else if ctx.Assign_stmt() != nil {
 		v.Visit(ctx.Assign_stmt())
-	} else if ctx.If_stmt() != nil {
-		v.Visit(ctx.If_stmt())
 	} else if ctx.Func_call() != nil {
 		v.Visit(ctx.Func_call())
+	} else if ctx.If_stmt() != nil {
+		v.Visit(ctx.If_stmt())
+	} else if ctx.Switch_stmt() != nil {
+		v.Visit(ctx.Switch_stmt())
+	} else if ctx.For_stmt() != nil {
+		v.Visit(ctx.For_stmt())
 	} else {
 		log.Fatal("Statement not recognized: ", ctx.GetText())
 	}
@@ -153,7 +157,7 @@ func (v *ReplVisitor) VisitVarDecl(ctx *compiler.VarAssDeclContext) interface{} 
 
 	// Si hubiera constantes se validan aquí
 	// isConst := isDeclConst(ctx.Var_type().GetText())
-	isConst := true
+	isConst := false
 
 	// Obtenemos el context de la declaración VarAssDecñ
 	exprName := ctx.ID().GetText()
@@ -235,17 +239,8 @@ func (v *ReplVisitor) VisitDirectAssign(ctx *compiler.AssignmentDeclContext) int
 			varValue = obj.Copy()
 		}
 
-		// Si es un vector, se copia el valor
-		/*
-			if IsVectorType(varValue.Type()) {
-				varValue = varValue.Copy()
-			}
-		*/
-
-		// Si es una variable mut, se puede mutar
 		canMutate := true
 
-		// Si la variable es una propiedad, no se puede mutar
 		if v.ScopeTrace.CurrentScope.isStruct {
 			canMutate = v.ScopeTrace.IsMutatingEnvironment()
 		}
@@ -446,10 +441,9 @@ func (v *ReplVisitor) VisitBinaryExpr(ctx *compiler.BinaryExprContext) interface
 	}
 
 	//
-	right := v.Visit(ctx.GetRight())
+	right := v.Visit(ctx.GetRight()).(value.IVOR)
 
 	// Si right es un IVOR, lo convertimos a IVOR
-	rightValue, ok := right.(value.IVOR)
 
 	strat, ok := BinaryStrats[op]
 
@@ -457,7 +451,7 @@ func (v *ReplVisitor) VisitBinaryExpr(ctx *compiler.BinaryExprContext) interface
 		log.Fatal("Binary operator not found")
 	}
 
-	ok, msg, result := strat.Validate(left, rightValue)
+	ok, msg, result := strat.Validate(left, right)
 
 	if !ok {
 		v.ErrorTable.NewSemanticError(ctx.GetOp(), msg)
@@ -527,6 +521,120 @@ func (v *ReplVisitor) VisitElseStmt(ctx *compiler.ElseStmtContext) interface{} {
 	// Pop scope
 	v.ScopeTrace.PopScope()
 
+	return nil
+}
+
+func (v *ReplVisitor) VisitForStmtCond(ctx *compiler.ForStmtCondContext) interface{} {
+	condition := ctx.Expression()
+
+	forItem := &CallStackItem{ReturnValue: value.DefaultNilValue, Type: []string{BreakItem, ContinueItem}}
+	v.CallStack.Push(forItem)
+	v.ScopeTrace.PushScope("for_cond")
+
+	// Manejo de control de flujo con panic/recover
+	defer func() {
+		if item, ok := recover().(*CallStackItem); item != nil && ok {
+
+			// Si no es el for actual, propaga el panic hacia arriba
+			if item != forItem {
+				panic(item)
+			}
+
+			// Si es un continue, simplemente dejamos que siga el ciclo
+			if item.IsAction(ContinueItem) {
+				item.ResetAction()
+
+			}
+
+			// Si es un break, terminamos el for
+			if item.IsAction(BreakItem) {
+				// terminar el ciclo asd
+			}
+		}
+	}()
+
+	for {
+		condValue, ok := v.Visit(condition).(value.IVOR)
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Error evaluando la condición del for")
+			return nil
+		}
+
+		if condValue.Type() != value.IVOR_BOOL {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condición del for debe ser un booleano")
+			return nil
+		}
+
+		boolVal := condValue.Value().(bool)
+		if !boolVal {
+			break
+		}
+
+		for _, stmt := range ctx.AllStmt() {
+			v.Visit(stmt)
+			// no se necesita verificar break, continue ni return porque son manejados automáticamente por el panic/recover
+		}
+	}
+
+	v.ScopeTrace.PopScope()
+	v.CallStack.Clean(forItem)
+	return nil
+}
+
+func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface{} {
+	initAssign := ctx.Assign_stmt(0)
+	condition := ctx.Expression()
+	updateAssign := ctx.Assign_stmt(1)
+
+	v.ScopeTrace.PushScope("for_assignamet")
+	v.Visit(initAssign)
+
+	forItem := &CallStackItem{ReturnValue: value.DefaultNilValue, Type: []string{BreakItem, ContinueItem}}
+	v.CallStack.Push(forItem)
+
+	defer func() {
+		if item, ok := recover().(*CallStackItem); item != nil && ok {
+			if item != forItem {
+				panic(item)
+			}
+
+			if item.IsAction(ContinueItem) {
+				item.ResetAction()
+				// Sigue normalmente en la siguiente iteración
+			}
+
+			if item.IsAction(BreakItem) {
+				// Finaliza el bucle
+			}
+		}
+	}()
+
+	for {
+		condValue, ok := v.Visit(condition).(value.IVOR)
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Error evaluando la condición del for")
+			return nil
+		}
+
+		if condValue.Type() != value.IVOR_BOOL {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condición del for debe ser un booleano")
+			return nil
+		}
+
+		boolVal := condValue.Value().(bool)
+		if !boolVal {
+			break
+		}
+
+		for _, stmt := range ctx.AllStmt() {
+			v.Visit(stmt)
+		}
+
+		v.Visit(updateAssign)
+	}
+
+	v.ScopeTrace.PopScope()
+	v.CallStack.Clean(forItem)
 	return nil
 }
 
