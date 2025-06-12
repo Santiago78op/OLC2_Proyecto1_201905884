@@ -78,6 +78,8 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 		v.Visit(ctx.Decl_stmt())
 	} else if ctx.Assign_stmt() != nil {
 		v.Visit(ctx.Assign_stmt())
+	} else if ctx.If_stmt() != nil {
+		v.Visit(ctx.If_stmt())
 	} else if ctx.Func_call() != nil {
 		v.Visit(ctx.Func_call())
 	} else {
@@ -382,8 +384,22 @@ func (v *ReplVisitor) VisitLiteralExpr(ctx *compiler.LiteralExprContext) interfa
 	return v.Visit(ctx.Literal())
 }
 
+func (v *ReplVisitor) VisitIdPatternExpr(ctx *compiler.IdPatternExprContext) interface{} {
+	varName := ctx.Id_pattern().GetText()
+
+	variable := v.ScopeTrace.GetVariable(varName)
+
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+varName+" no encontrada")
+		return value.DefaultNilValue
+	}
+
+	// ? pointer
+	return variable.Value
+}
+
 // Expresiones con parentesis
-func (v *ReplVisitor) VisitParenExpr(ctx *compiler.ParensExprContext) interface{} {
+func (v *ReplVisitor) VisitParensExpr(ctx *compiler.ParensExprContext) interface{} {
 	fmt.Print("El valor de ParenExp es: " + ctx.GetText() + "\n")
 	return v.Visit(ctx.Expression())
 }
@@ -391,6 +407,27 @@ func (v *ReplVisitor) VisitParenExpr(ctx *compiler.ParensExprContext) interface{
 // Funciones con expresiones
 func (v *ReplVisitor) VisitFuncCallExp(ctx *compiler.FuncCallExprContext) interface{} {
 	return v.Visit(ctx.Func_call())
+}
+
+func (v *ReplVisitor) VisitUnaryExpr(ctx *compiler.UnaryExprContext) interface{} {
+
+	exp := v.Visit(ctx.Expression()).(value.IVOR)
+
+	strat, ok := UnaryStrats[ctx.GetOp().GetText()]
+
+	if !ok {
+		log.Fatal("Unary operator not found")
+	}
+
+	ok, msg, result := strat.Validate(exp)
+
+	if !ok {
+		v.ErrorTable.NewSemanticError(ctx.GetOp(), msg)
+		return value.DefaultNilValue
+	}
+
+	return result
+
 }
 
 func (v *ReplVisitor) VisitBinaryExpr(ctx *compiler.BinaryExprContext) interface{} {
@@ -428,6 +465,69 @@ func (v *ReplVisitor) VisitBinaryExpr(ctx *compiler.BinaryExprContext) interface
 	}
 
 	return result
+}
+
+func (v *ReplVisitor) VisitIfStmt(ctx *compiler.IfStmtContext) interface{} {
+
+	runChain := true
+
+	for _, ifStmt := range ctx.AllIf_chain() {
+
+		runChain = !v.Visit(ifStmt).(bool)
+
+		if !runChain {
+			break
+		}
+	}
+
+	if runChain && ctx.Else_stmt() != nil {
+		v.Visit(ctx.Else_stmt())
+	}
+
+	return nil
+}
+
+func (v *ReplVisitor) VisitIfChain(ctx *compiler.IfChainContext) interface{} {
+
+	condition := v.Visit(ctx.Expression()).(value.IVOR)
+
+	if condition.Type() != value.IVOR_BOOL {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condicion del if debe ser un booleano")
+		return false
+
+	}
+
+	if condition.(*value.BoolValue).InternalValue {
+
+		// Push scope
+		v.ScopeTrace.PushScope("if")
+
+		for _, stmt := range ctx.AllStmt() {
+			v.Visit(stmt)
+		}
+
+		// Pop scope
+		v.ScopeTrace.PopScope()
+
+		return true
+	}
+
+	return false
+}
+
+func (v *ReplVisitor) VisitElseStmt(ctx *compiler.ElseStmtContext) interface{} {
+
+	// Push scope
+	v.ScopeTrace.PushScope("else")
+
+	for _, stmt := range ctx.AllStmt() {
+		v.Visit(stmt)
+	}
+
+	// Pop scope
+	v.ScopeTrace.PopScope()
+
+	return nil
 }
 
 func (v *ReplVisitor) VisitFuncCall(ctx *compiler.FuncCallContext) interface{} {

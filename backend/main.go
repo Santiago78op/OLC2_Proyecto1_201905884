@@ -121,7 +121,7 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("")
 
 	// Imprimir Output
-	fmt.Println("Output:", replVisitor.Console.GetOutput())
+	fmt.Println("Output: \n", replVisitor.Console.GetOutput())
 
 	executionResult := executionResult{
 		Success: true,
