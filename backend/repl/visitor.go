@@ -79,7 +79,13 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 		v.Visit(ctx.Assign_stmt())
 	} else if ctx.Func_call() != nil {
 		v.Visit(ctx.Func_call())
-	} else {
+	} else if ctx.If_stmt() != nil {
+		v.Visit(ctx.If_stmt())
+	} else if ctx.Switch_stmt() != nil {
+		v.Visit(ctx.Switch_stmt())
+	}  else if ctx.For_stmt() != nil {
+		v.Visit(ctx.For_stmt())
+	}else {
 		log.Fatal("Statement not recognized: ", ctx.GetText())
 	}
 
@@ -522,4 +528,67 @@ func (v *ReplVisitor) VisitFuncArg(ctx *compiler.FuncArgContext) interface{} {
 		VariableRef:     argVariableRef,
 	}
 
+}
+
+func (v *ReplVisitor) VisitIfStmt(ctx *compiler.IfStmtContext) interface{} {
+
+	runChain := true
+
+	for _, ifStmt := range ctx.AllIf_chain() {
+
+		runChain = !v.Visit(ifStmt).(bool)
+
+		if !runChain {
+			break
+		}
+	}
+
+	if runChain && ctx.Else_stmt() != nil {
+		v.Visit(ctx.Else_stmt())
+	}
+
+	return nil
+}
+
+func (v *ReplVisitor) VisitIfChain(ctx *compiler.IfChainContext) interface{} {
+
+	condition := v.Visit(ctx.Expr()).(value.IVOR)
+
+	if condition.Type() != value.IVOR_BOOL {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condicion del if debe ser un booleano")
+		return false
+
+	}
+
+	if condition.(*value.BoolValue).InternalValue {
+
+		// Push scope
+		v.ScopeTrace.PushScope("if")
+
+		for _, stmt := range ctx.AllStmt() {
+			v.Visit(stmt)
+		}
+
+		// Pop scope
+		v.ScopeTrace.PopScope()
+
+		return true
+	}
+
+	return false
+}
+
+func (v *ReplVisitor) VisitElseStmt(ctx *compiler.ElseStmtContext) interface{} {
+
+	// Push scope
+	v.ScopeTrace.PushScope("else")
+
+	for _, stmt := range ctx.AllStmt() {
+		v.Visit(stmt)
+	}
+
+	// Pop scope
+	v.ScopeTrace.PopScope()
+
+	return nil
 }
