@@ -67,13 +67,11 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	// Verificar si el código está presente
 	if requestData.Code == "" {
 		fmt.Println("❌ Campo 'code' está vacío")
-		http.Error(w, "Code field is required and cannot be empty", http.StatusBadRequest)
+		http.Error(w, "Code field i		git pull --no-rebases required and cannot be empty", http.StatusBadRequest)
 		return
 	}
 
-	// Convertir el código a string
-	codeString := string(requestData.Code)
-
+	codeString := requestData.Code
 	fmt.Printf("✅ Código recibido exitosamente:\n%s\n", codeString)
 	fmt.Printf("🔹 Longitud del código: %d caracteres\n", len(codeString))
 
@@ -95,9 +93,6 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	parser.RemoveErrorListeners()
 	parser.SetErrorHandler(errors.NewCustomErrorStrategy())
 	parser.AddErrorListener(syntaxErrorListener)
-
-	fmt.Printf("Errores léxicos: %v\n", lexicalErrorListener.ErrorTable.Errors)
-	fmt.Printf("Errores sintácticos: %v\n", syntaxErrorListener.ErrorTable.Errors)
 
 	// 4. Árbol sintáctico
 	tree := parser.Program()
