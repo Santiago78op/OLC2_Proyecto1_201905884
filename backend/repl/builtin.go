@@ -58,7 +58,7 @@ func Print(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 		}
 	}
 
-	context.Console.Print(output)
+	context.Console.Print(output + "\n")
 
 	return value.DefaultNilValue, true, ""
 }

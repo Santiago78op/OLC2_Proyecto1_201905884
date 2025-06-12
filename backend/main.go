@@ -71,13 +71,25 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Si en el requestData.Code viene \n al inicio, lo eliminamos hasta el primer carácter
 	codeString := requestData.Code
+	for len(codeString) > 0 && (codeString[0] == '\n' || codeString[0] == '\r') {
+		codeString = codeString[1:]
+	}
+
+	// ¡NO necesitas desescapar nada aquí!
+
+	fmt.Printf("✅ Código recibido exitosamente:\n%s\n", codeString)
+	fmt.Printf("🔹 Longitud del código: %d caracteres\n", len(codeString))
+
+	// ...existing code...
+
 	fmt.Printf("✅ Código recibido exitosamente:\n%s\n", codeString)
 	fmt.Printf("🔹 Longitud del código: %d caracteres\n", len(codeString))
 
 	// 1. Análisis Léxico
 	lexicalErrorListener := errors.NewLexicalErrorListener()
-	lexer := compiler.NewVLangLexer(antlr.NewInputStream("print(10"))
+	lexer := compiler.NewVLangLexer(antlr.NewInputStream(codeString))
 
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(lexicalErrorListener)
@@ -121,7 +133,7 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("")
 
 	// Imprimir Output
-	fmt.Println("Output:", replVisitor.Console.GetOutput())
+	fmt.Println("Output: \n", replVisitor.Console.GetOutput())
 
 	executionResult := executionResult{
 		Success: true,

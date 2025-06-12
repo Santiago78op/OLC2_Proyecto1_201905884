@@ -8,7 +8,7 @@ program: (stmt)* EOF?
     ;
 
 // Demilitador del lenguaje -> indica el final de una sentencia
-delim: NEWLINE | EOF
+delim: NEWLINE? | EOF
     ;
 
 // Sentencias
@@ -165,7 +165,9 @@ while_stmt: WHILE_KW expression LBRACE stmt* RBRACE # WhileStmt;
 for_stmt:
     FOR_KW expression LBRACE stmt* RBRACE                                        # ForStmtCond
     | FOR_KW assign_stmt SEMI expression SEMI assign_stmt LBRACE stmt* RBRACE    # ForAssCond
-	| FOR_KW ID COMMA expression IN_KW (expression | range) LBRACE stmt* RBRACE  # ForStmt;
+
+	| FOR_KW ID COMMA expression IN_KW (expression | range) LBRACE stmt* RBRACE  # ForStmt ;
+
 
 range: expression DOT DOT DOT expression # NumericRange;
 // Termina Sentencias de Iteracion For

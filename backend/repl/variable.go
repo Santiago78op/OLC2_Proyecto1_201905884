@@ -74,12 +74,6 @@ func (v *Variable) AssignValue(val value.IVOR, isMutatingContext bool) (bool, st
 	// Asigna el valor a la variable
 	v.Value = val
 
-	// Realiza la validación de tipo
-	valid, msg := v.TypeValidation()
-	if !valid {
-		return false, msg
-	}
-
 	// Si la validación de tipo es exitosa, retorna v.Value.Type() == v.Type, "Variable assigned successfully"
 	return v.TypeValidation()
 }
