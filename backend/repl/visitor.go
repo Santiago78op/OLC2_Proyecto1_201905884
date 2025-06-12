@@ -758,3 +758,418 @@ func (v *ReplVisitor) VisitFuncArg(ctx *compiler.FuncArgContext) interface{} {
 	}
 
 }
+
+func (v *ReplVisitor) VisitIfStmt(ctx *compiler.IfStmtContext) interface{} {
+
+	runChain := true
+
+	for _, ifStmt := range ctx.AllIf_chain() {
+
+		runChain = !v.Visit(ifStmt).(bool)
+
+		if !runChain {
+			break
+		}
+	}
+
+	if runChain && ctx.Else_stmt() != nil {
+		v.Visit(ctx.Else_stmt())
+	}
+
+	return nil
+}
+
+func (v *ReplVisitor) VisitIfChain(ctx *compiler.IfChainContext) interface{} {
+
+	condition := v.Visit(ctx.Expression()).(value.IVOR)
+
+	if condition.Type() != value.IVOR_BOOL {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condicion del if debe ser un booleano")
+		return false
+
+	}
+
+	if condition.(*value.BoolValue).InternalValue {
+
+		// Push scope
+		v.ScopeTrace.PushScope("if")
+
+		for _, stmt := range ctx.AllStmt() {
+			v.Visit(stmt)
+		}
+
+		// Pop scope
+		v.ScopeTrace.PopScope()
+
+		return true
+	}
+
+	return false
+}
+
+func (v *ReplVisitor) VisitElseStmt(ctx *compiler.ElseStmtContext) interface{} {
+
+	// Push scope
+	v.ScopeTrace.PushScope("else")
+
+	for _, stmt := range ctx.AllStmt() {
+		v.Visit(stmt)
+	}
+
+	// Pop scope
+	v.ScopeTrace.PopScope()
+
+	return nil
+}
+
+func (v *ReplVisitor) VisitSwitchStmt(ctx *compiler.SwitchStmtContext) interface{} {
+
+	mainValue := v.Visit(ctx.Expression()).(value.IVOR)
+
+	v.ScopeTrace.PushScope("switch")
+
+	// Push break switchItem to call stack [breakable]
+	switchItem := &CallStackItem{
+		ReturnValue: value.DefaultNilValue,
+		Type: []string{
+			BreakItem,
+		},
+	}
+
+	v.CallStack.Push(switchItem)
+
+	// handle break statements from call stack
+	defer func() {
+
+		v.ScopeTrace.PopScope()       // pop switch scope
+		v.CallStack.Clean(switchItem) // clean item if it's still in call stack
+
+		if item, ok := recover().(*CallStackItem); item != nil && ok {
+
+			// Not a switch item, propagate panic
+			if item != switchItem {
+				panic(item)
+			}
+
+			return // break
+		}
+	}()
+
+	visited := false
+
+	// evaluate cases
+	for _, switchCase := range ctx.AllSwitch_case() {
+
+		caseValue := v.GetCaseValue(switchCase)
+
+		// ? use binary strat
+		if caseValue.Type() != mainValue.Type() {
+			// warning
+			continue
+		}
+
+		if caseValue.Value() == mainValue.Value() {
+			v.Visit(switchCase)
+			visited = true
+			break // implicit break
+		}
+
+	}
+
+	// evaluate default
+	if ctx.Default_case() != nil && !visited {
+		v.Visit(ctx.Default_case())
+	}
+
+	return nil
+}
+
+func (v *ReplVisitor) GetCaseValue(tree antlr.ParseTree) value.IVOR {
+
+	switch val := tree.(type) {
+	case *compiler.SwitchCaseContext:
+		return v.Visit(val.Expression()).(value.IVOR)
+	default:
+		return nil
+	}
+
+}
+
+func (v *ReplVisitor) VisitSwitchCase(ctx *compiler.SwitchCaseContext) interface{} {
+
+	// * all cases inside switch case will share the same scope
+
+	for _, stmt := range ctx.AllStmt() {
+		v.Visit(stmt)
+	}
+	return nil
+}
+
+func (v *ReplVisitor) VisitDefaultCase(ctx *compiler.DefaultCaseContext) interface{} {
+	for _, stmt := range ctx.AllStmt() {
+		v.Visit(stmt)
+	}
+	return nil
+}
+
+func (v *ReplVisitor) VisitForStmtCond(ctx *compiler.ForStmtCondContext) interface{} {
+	condition := ctx.Expression()
+
+	forItem := &CallStackItem{ReturnValue: value.DefaultNilValue, Type: []string{BreakItem, ContinueItem}}
+	v.CallStack.Push(forItem)
+	v.ScopeTrace.PushScope("for_cond")
+
+	// Manejo de control de flujo con panic/recover
+	defer func() {
+		if item, ok := recover().(*CallStackItem); item != nil && ok {
+
+			// Si no es el for actual, propaga el panic hacia arriba
+			if item != forItem {
+				panic(item)
+			}
+
+			// Si es un continue, simplemente dejamos que siga el ciclo
+			if item.IsAction(ContinueItem) {
+				item.ResetAction()
+
+			}
+
+			// Si es un break, terminamos el for
+			if item.IsAction(BreakItem) {
+				// terminar el ciclo asd
+			}
+		}
+	}()
+
+	for {
+		condValue, ok := v.Visit(condition).(value.IVOR)
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Error evaluando la condición del for")
+			return nil
+		}
+
+		if condValue.Type() != value.IVOR_BOOL {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condición del for debe ser un booleano")
+			return nil
+		}
+
+		boolVal := condValue.Value().(bool)
+		if !boolVal {
+			break
+		}
+
+		for _, stmt := range ctx.AllStmt() {
+			v.Visit(stmt)
+			// no se necesita verificar break, continue ni return porque son manejados automáticamente por el panic/recover
+		}
+	}
+
+	v.ScopeTrace.PopScope()
+	v.CallStack.Clean(forItem)
+	return nil
+}
+
+func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface{} {
+	initAssign := ctx.Assign_stmt(0)
+	condition := ctx.Expression()
+	updateAssign := ctx.Assign_stmt(1)
+
+	v.ScopeTrace.PushScope("for_assignamet")
+	v.Visit(initAssign)
+
+	forItem := &CallStackItem{ReturnValue: value.DefaultNilValue, Type: []string{BreakItem, ContinueItem}}
+	v.CallStack.Push(forItem)
+
+	defer func() {
+		if item, ok := recover().(*CallStackItem); item != nil && ok {
+			if item != forItem {
+				panic(item)
+			}
+
+			if item.IsAction(ContinueItem) {
+				item.ResetAction()
+				// Sigue normalmente en la siguiente iteración
+			}
+
+			if item.IsAction(BreakItem) {
+				// Finaliza el bucle
+			}
+		}
+	}()
+
+	for {
+		condValue, ok := v.Visit(condition).(value.IVOR)
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Error evaluando la condición del for")
+			return nil
+		}
+
+		if condValue.Type() != value.IVOR_BOOL {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condición del for debe ser un booleano")
+			return nil
+		}
+
+		boolVal := condValue.Value().(bool)
+		if !boolVal {
+			break
+		}
+
+		for _, stmt := range ctx.AllStmt() {
+			v.Visit(stmt)
+		}
+
+		v.Visit(updateAssign)
+	}
+
+	v.ScopeTrace.PopScope()
+	v.CallStack.Clean(forItem)
+	return nil
+}
+
+/*
+func (v *ReplVisitor) VisitForStmt(ctx *compiler.ForStmtContext) interface{} {
+
+	varName := ctx.ID().GetText()
+	var iterableItem *VectorValue = DefaultEmptyVectorValue
+
+	if ctx.Range_() != nil {
+		rangeItem, ok := v.Visit(ctx.Range_()).(*VectorValue)
+
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "El valor del rango debe ser un vector")
+			return nil
+		}
+
+		iterableItem = rangeItem
+	}
+
+	if ctx.Expr() != nil {
+		iterableValue := v.Visit(ctx.Expr()).(value.IVOR)
+
+		if IsVectorType(iterableValue.Type()) {
+			iterableItem = iterableValue.(*VectorValue)
+		} else if iterableValue.Type() == value.IVOR_STRING {
+			iterableItem = StringToVector(iterableValue.(*value.StringValue))
+		} else {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "El valor del rango debe ser un vector o una cadena")
+			return nil
+		}
+	}
+
+	if iterableItem.Size() == 0 {
+		return nil
+	}
+
+	// Push scope outer scope
+	outerForScope := v.ScopeTrace.PushScope("outer_for")
+
+	// create the associated variable to the iterable
+	iterableVariable, msg := outerForScope.AddVariable(varName, iterableItem.ItemType, iterableItem.Current(), true, false, ctx.ID().GetSymbol())
+
+	if iterableVariable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		log.Fatal("This should not happen")
+		return nil
+	}
+
+	// Push forItem to call stack [breakable, continuable]
+
+	forItem := &CallStackItem{
+		ReturnValue: value.DefaultNilValue,
+		Type: []string{
+			BreakItem,
+			ContinueItem,
+		},
+	}
+
+	v.CallStack.Push(forItem)
+
+	// Push inner for scope
+	innerForScope := v.ScopeTrace.PushScope("inner_for")
+
+	v.VisitInnerFor(ctx, outerForScope, innerForScope, forItem, iterableItem, iterableVariable)
+
+	iterableItem.Reset()
+	v.ScopeTrace.PopScope()    // pop inner for scope
+	v.ScopeTrace.PopScope()    // pop outer for scope
+	v.CallStack.Clean(forItem) // ? clean item if it's still in call stack
+
+	return nil
+}
+
+func (v *ReplVisitor) VisitInnerFor(ctx *compiler.ForStmtContext, outerForScope *BaseScope, innerForScope *BaseScope, forItem *CallStackItem, iterableItem *VectorValue, iterableVariable *Variable) {
+
+	// handle break and continue statements from call stack
+	defer func() {
+
+		// reset scope
+		innerForScope.Reset()
+		if item, ok := recover().(*CallStackItem); item != nil && ok {
+
+			// Not a for item, propagate panic
+			if item != forItem {
+				panic(item)
+			}
+
+			// Continue
+			if item.IsAction(ContinueItem) {
+				item.ResetAction()                                                                          // reset action, can be used again
+				iterableItem.Next()                                                                         // next item
+				v.VisitInnerFor(ctx, outerForScope, innerForScope, forItem, iterableItem, iterableVariable) // continue
+			}
+
+			// Break
+			if item.IsAction(BreakItem) {
+				return
+			}
+
+		}
+	}()
+
+	// iterableItem.Size()
+	for iterableItem.CurrentIndex < iterableItem.Size() {
+
+		// update variable value
+		iterableVariable.Value = iterableItem.Current()
+
+		for _, stmt := range ctx.AllStmt() {
+			v.Visit(stmt)
+		}
+
+		iterableItem.Next()
+		innerForScope.Reset()
+	}
+}
+
+func (v *ReplVisitor) VisitNumericRange(ctx *compiler.NumericRangeContext) interface{} {
+
+	leftExpr := v.Visit(ctx.Expr(0)).(value.IVOR)
+	rightExpr := v.Visit(ctx.Expr(1)).(value.IVOR)
+
+	if leftExpr.Type() != value.IVOR_INT || rightExpr.Type() != value.IVOR_INT {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Los valores de los rangos deben ser enteros")
+		return value.DefaultNilValue
+	}
+
+	left := leftExpr.(*value.IntValue).InternalValue
+	right := rightExpr.(*value.IntValue).InternalValue
+
+	if left > right {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El valor izquierdo del rango debe ser menor o igual al valor derecho")
+	}
+
+	var values []value.IVOR
+
+	for i := left; i <= right; i++ {
+		values = append(values, &value.IntValue{
+			InternalValue: i,
+		})
+	}
+
+	return &VectorValue{
+		InternalValue: values,
+		CurrentIndex:  0,
+		ItemType:      value.IVOR_INT,
+	}
+}
+*/
