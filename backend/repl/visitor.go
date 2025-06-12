@@ -47,6 +47,7 @@ func (v *ReplVisitor) ValidType(_type string) bool {
 }
 
 func (v *ReplVisitor) Visit(tree antlr.ParseTree) interface{} {
+	fmt.Printf("-------------------------------------------\n")
 	fmt.Printf("🔹 ReplVisitor.Visit llamado con: %T\n", tree)
 
 	switch val := tree.(type) {
@@ -99,44 +100,55 @@ func isDeclConst(lexval string) bool {
 
 // Ejemplo: Mut variable_1 int = 10
 // Ejemplo: Mut variable_2 int
-func (v *ReplVisitor) VisitMulVarDecl(ctx *compiler.MutVarDeclContext) interface{} {
+func (v *ReplVisitor) VisitMutVarDecl(ctx *compiler.MutVarDeclContext) interface{} {
 
 	// Si hubiera constantes se validan aquí
 	// isConst := isDeclConst(ctx.Var_type().GetText())
 	isConst := false
 
 	// Obtenemos el context de la declaración MutVarDecl
-	exprName := ctx.ID().GetText()
-	exprType := v.Visit(ctx.Type_annotation()).(string)
+	varName := ctx.ID().GetText()
+	varType := v.Visit(ctx.Type_()).(string)
+	varValue := v.Visit(ctx.Expression()).(value.IVOR)
 
-	// Validar expresión si existe
-	if ctx.Expression() != nil {
-
-		exprValue := v.Visit(ctx.Expression()).(value.IVOR)
-
-		// Validar tipo de expresión
-		if obj, ok := exprValue.(*ObjectValue); ok {
-			exprValue = obj.Copy()
-		}
-
-		variable, msg := v.ScopeTrace.AddVariable(exprName, exprType, exprValue, isConst, false, ctx.GetStart())
-
-		// Si la variable ya existe, se lanza un error
-		if variable == nil {
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
-		}
-
-	} else {
-		// Si no hay expresión, se crea una variable sin valor
-		variable, msg := v.ScopeTrace.AddVariable(exprName, exprType, value.DefaultUnInitializedValue, isConst, false, ctx.GetStart())
-
-		// Variable already exists
-		if variable == nil {
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
-		}
+	// copy object
+	if obj, ok := varValue.(*ObjectValue); ok {
+		varValue = obj.Copy()
 	}
 
-	// Si es una variable mut, se agrega al scope actual
+	variable, msg := v.ScopeTrace.AddVariable(varName, varType, varValue, isConst, false, ctx.GetStart())
+
+	// Variable already exists
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+	}
+
+	return nil
+}
+
+func (v *ReplVisitor) VisitValueDecl(ctx *compiler.ValueDeclContext) interface{} {
+
+	isConst := isDeclConst(ctx.Var_type().GetText())
+	varName := ctx.ID().GetText()
+	varValue := v.Visit(ctx.Expression()).(value.IVOR)
+	varType := varValue.Type()
+
+	if varType == "[]" {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede inferir el tipo de un vector vacio '"+varName+"'")
+		return nil
+	}
+
+	// copy object
+	if obj, ok := varValue.(*ObjectValue); ok {
+		varValue = obj.Copy()
+	}
+
+	variable, msg := v.ScopeTrace.AddVariable(varName, varType, varValue, isConst, false, ctx.GetStart())
+
+	// Variable already exists
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+	}
 	return nil
 }
 
@@ -149,7 +161,7 @@ func (v *ReplVisitor) VisitVarDecl(ctx *compiler.VarAssDeclContext) interface{} 
 
 	// Obtenemos el context de la declaración VarAssDecñ
 	exprName := ctx.ID().GetText()
-	exprType := v.Visit(ctx.Type_annotation()).(string)
+	exprType := v.Visit(ctx.Type_()).(string)
 
 	exprValue := v.Visit(ctx.Expression()).(value.IVOR)
 
@@ -253,7 +265,7 @@ func (v *ReplVisitor) VisitDirectAssign(ctx *compiler.AssignmentDeclContext) int
 
 }
 
-func (v *ReplVisitor) VisitArithmeticAssign(ctx *compiler.AugmentedAssignmentDeclContext) interface{} {
+func (v *ReplVisitor) VisitArithmeticAssign(ctx *compiler.ArgAddAssigDeclContext) interface{} {
 	varName := v.Visit(ctx.Id_pattern()).(string)
 
 	variable := v.ScopeTrace.GetVariable(varName)
@@ -300,6 +312,7 @@ func (v *ReplVisitor) VisitArithmeticAssign(ctx *compiler.AugmentedAssignmentDec
 
 // Id parents
 func (v *ReplVisitor) VisitIdPattern(ctx *compiler.IdPatternContext) interface{} {
+	fmt.Print("El valor de IdPattern es: " + ctx.GetText() + "\n")
 	return ctx.GetText()
 }
 
@@ -370,7 +383,8 @@ func (v *ReplVisitor) VisitNilLiteral(ctx *compiler.NilLiteralContext) interface
 }
 
 // literal en Exp
-func (v *ReplVisitor) VisitLiteralExp(ctx *compiler.LiteralExprContext) interface{} {
+func (v *ReplVisitor) VisitLiteralExpr(ctx *compiler.LiteralExprContext) interface{} {
+	fmt.Print("El valor de LiteralExp es: " + ctx.GetText() + "\n")
 	return v.Visit(ctx.Literal())
 }
 
@@ -513,7 +527,15 @@ func (v *ReplVisitor) VisitFuncArg(ctx *compiler.FuncArgContext) interface{} {
 			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+argName+" no encontrada")
 		}
 	} else {
-		argValue = v.Visit(ctx.Expression()).(value.IVOR)
+		val := v.Visit(ctx.Expression())
+		fmt.Printf("Tipo retornado por v.Visit(ctx.Expression()): %T\n", val)
+		ivor, ok := val.(value.IVOR)
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "El argumento no es un valor válido")
+			argValue = value.DefaultNilValue
+		} else {
+			argValue = ivor
+		}
 	}
 
 	if ctx.ID() != nil {
