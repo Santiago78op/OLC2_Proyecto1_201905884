@@ -383,7 +383,8 @@ func (v *ReplVisitor) VisitLiteralExpr(ctx *compiler.LiteralExprContext) interfa
 }
 
 // Expresiones con parentesis
-func (v *ReplVisitor) VisitParenExp(ctx *compiler.ParensExprContext) interface{} {
+func (v *ReplVisitor) VisitParenExpr(ctx *compiler.ParensExprContext) interface{} {
+	fmt.Print("El valor de ParenExp es: " + ctx.GetText() + "\n")
 	return v.Visit(ctx.Expression())
 }
 
@@ -407,7 +408,11 @@ func (v *ReplVisitor) VisitBinaryExpr(ctx *compiler.BinaryExprContext) interface
 		}
 	}
 
-	right := v.Visit(ctx.GetRight()).(value.IVOR)
+	//
+	right := v.Visit(ctx.GetRight())
+
+	// Si right es un IVOR, lo convertimos a IVOR
+	rightValue, ok := right.(value.IVOR)
 
 	strat, ok := BinaryStrats[op]
 
@@ -415,7 +420,7 @@ func (v *ReplVisitor) VisitBinaryExpr(ctx *compiler.BinaryExprContext) interface
 		log.Fatal("Binary operator not found")
 	}
 
-	ok, msg, result := strat.Validate(left, right)
+	ok, msg, result := strat.Validate(left, rightValue)
 
 	if !ok {
 		v.ErrorTable.NewSemanticError(ctx.GetOp(), msg)
