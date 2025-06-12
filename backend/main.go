@@ -71,7 +71,9 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	codeString := requestData.Code
+	// Convertir el código a string
+	codeString := string(requestData.Code)
+
 	fmt.Printf("✅ Código recibido exitosamente:\n%s\n", codeString)
 	fmt.Printf("🔹 Longitud del código: %d caracteres\n", len(codeString))
 
@@ -93,6 +95,9 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	parser.RemoveErrorListeners()
 	parser.SetErrorHandler(errors.NewCustomErrorStrategy())
 	parser.AddErrorListener(syntaxErrorListener)
+
+	fmt.Printf("Errores léxicos: %v\n", lexicalErrorListener.ErrorTable.Errors)
+	fmt.Printf("Errores sintácticos: %v\n", syntaxErrorListener.ErrorTable.Errors)
 
 	// 4. Árbol sintáctico
 	tree := parser.Program()
