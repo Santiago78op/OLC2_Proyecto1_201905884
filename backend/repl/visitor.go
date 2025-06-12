@@ -392,7 +392,7 @@ func (v *ReplVisitor) VisitFuncCallExp(ctx *compiler.FuncCallExprContext) interf
 	return v.Visit(ctx.Func_call())
 }
 
-func (v *ReplVisitor) VisitBinaryExp(ctx *compiler.BinaryExprContext) interface{} {
+func (v *ReplVisitor) VisitBinaryExpr(ctx *compiler.BinaryExprContext) interface{} {
 
 	op := ctx.GetOp().GetText()
 	left := v.Visit(ctx.GetLeft()).(value.IVOR)
