@@ -157,9 +157,6 @@ switch_case: CASE_KW expression COLON stmt* # SwitchCase;
 default_case: DEFAULT_KW COLON stmt* # DefaultCase;
 // Termina Sentencias de Control Switch
 
-// Inicia Sentencias de Control While
-while_stmt: WHILE_KW expression LBRACE stmt* RBRACE # WhileStmt;
-// Termina Sentencia de Control While
 
 // Inicia Sentencias de Iteracion For
 for_stmt:
