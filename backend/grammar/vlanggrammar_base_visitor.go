@@ -103,11 +103,23 @@ func (v *BaseVLangGrammarVisitor) VisitNilLiteral(ctx *NilLiteralContext) interf
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitIncremento(ctx *IncrementoContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitDecremento(ctx *DecrementoContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitRepeatingExpr(ctx *RepeatingExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseVLangGrammarVisitor) VisitVectorPropertyExpr(ctx *VectorPropertyExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitIncredecr(ctx *IncredecrContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

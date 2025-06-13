@@ -24,6 +24,10 @@ CONTINUE_KW : 'continue';
 RETURN_KW   : 'return';
 
 
+// Incremento y Decremento
+DEC     : '--';
+INC     : '++' ;
+
 // Operadores Aritmeticos
 PLUS     : '+';
 MINUS    : '-';

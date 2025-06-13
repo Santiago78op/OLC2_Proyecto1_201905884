@@ -79,11 +79,20 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#NilLiteral.
 	VisitNilLiteral(ctx *NilLiteralContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#incremento.
+	VisitIncremento(ctx *IncrementoContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#decremento.
+	VisitDecremento(ctx *DecrementoContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#RepeatingExpr.
 	VisitRepeatingExpr(ctx *RepeatingExprContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#VectorPropertyExpr.
 	VisitVectorPropertyExpr(ctx *VectorPropertyExprContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#incredecr.
+	VisitIncredecr(ctx *IncredecrContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#VectorItemExpr.
 	VisitVectorItemExpr(ctx *VectorItemExprContext) interface{}

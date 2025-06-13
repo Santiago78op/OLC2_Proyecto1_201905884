@@ -164,6 +164,18 @@ func (s *BaseVLangGrammarListener) EnterNilLiteral(ctx *NilLiteralContext) {}
 // ExitNilLiteral is called when production NilLiteral is exited.
 func (s *BaseVLangGrammarListener) ExitNilLiteral(ctx *NilLiteralContext) {}
 
+// EnterIncremento is called when production incremento is entered.
+func (s *BaseVLangGrammarListener) EnterIncremento(ctx *IncrementoContext) {}
+
+// ExitIncremento is called when production incremento is exited.
+func (s *BaseVLangGrammarListener) ExitIncremento(ctx *IncrementoContext) {}
+
+// EnterDecremento is called when production decremento is entered.
+func (s *BaseVLangGrammarListener) EnterDecremento(ctx *DecrementoContext) {}
+
+// ExitDecremento is called when production decremento is exited.
+func (s *BaseVLangGrammarListener) ExitDecremento(ctx *DecrementoContext) {}
+
 // EnterRepeatingExpr is called when production RepeatingExpr is entered.
 func (s *BaseVLangGrammarListener) EnterRepeatingExpr(ctx *RepeatingExprContext) {}
 
@@ -175,6 +187,12 @@ func (s *BaseVLangGrammarListener) EnterVectorPropertyExpr(ctx *VectorPropertyEx
 
 // ExitVectorPropertyExpr is called when production VectorPropertyExpr is exited.
 func (s *BaseVLangGrammarListener) ExitVectorPropertyExpr(ctx *VectorPropertyExprContext) {}
+
+// EnterIncredecr is called when production incredecr is entered.
+func (s *BaseVLangGrammarListener) EnterIncredecr(ctx *IncredecrContext) {}
+
+// ExitIncredecr is called when production incredecr is exited.
+func (s *BaseVLangGrammarListener) ExitIncredecr(ctx *IncredecrContext) {}
 
 // EnterVectorItemExpr is called when production VectorItemExpr is entered.
 func (s *BaseVLangGrammarListener) EnterVectorItemExpr(ctx *VectorItemExprContext) {}

@@ -79,11 +79,20 @@ type VLangGrammarListener interface {
 	// EnterNilLiteral is called when entering the NilLiteral production.
 	EnterNilLiteral(c *NilLiteralContext)
 
+	// EnterIncremento is called when entering the incremento production.
+	EnterIncremento(c *IncrementoContext)
+
+	// EnterDecremento is called when entering the decremento production.
+	EnterDecremento(c *DecrementoContext)
+
 	// EnterRepeatingExpr is called when entering the RepeatingExpr production.
 	EnterRepeatingExpr(c *RepeatingExprContext)
 
 	// EnterVectorPropertyExpr is called when entering the VectorPropertyExpr production.
 	EnterVectorPropertyExpr(c *VectorPropertyExprContext)
+
+	// EnterIncredecr is called when entering the incredecr production.
+	EnterIncredecr(c *IncredecrContext)
 
 	// EnterVectorItemExpr is called when entering the VectorItemExpr production.
 	EnterVectorItemExpr(c *VectorItemExprContext)
@@ -256,11 +265,20 @@ type VLangGrammarListener interface {
 	// ExitNilLiteral is called when exiting the NilLiteral production.
 	ExitNilLiteral(c *NilLiteralContext)
 
+	// ExitIncremento is called when exiting the incremento production.
+	ExitIncremento(c *IncrementoContext)
+
+	// ExitDecremento is called when exiting the decremento production.
+	ExitDecremento(c *DecrementoContext)
+
 	// ExitRepeatingExpr is called when exiting the RepeatingExpr production.
 	ExitRepeatingExpr(c *RepeatingExprContext)
 
 	// ExitVectorPropertyExpr is called when exiting the VectorPropertyExpr production.
 	ExitVectorPropertyExpr(c *VectorPropertyExprContext)
+
+	// ExitIncredecr is called when exiting the incredecr production.
+	ExitIncredecr(c *IncredecrContext)
 
 	// ExitVectorItemExpr is called when exiting the VectorItemExpr production.
 	ExitVectorItemExpr(c *VectorItemExprContext)

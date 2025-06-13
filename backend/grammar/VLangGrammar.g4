@@ -107,6 +107,12 @@ literal
     | NIL_LITERAL                                 # NilLiteral
     ;
 
+// Incremento y decremento
+incredecre
+    : ID INC    #incremento
+    | ID DEC    #decremento
+    ;
+
 // Inicio Expresiones
 expression
     : LPAREN expression RPAREN                       # ParensExpr 
@@ -118,6 +124,7 @@ expression
     | literal                                        # LiteralExpr
     | vect_expr                                      # VectorExpr
     | repeating                                      # RepeatingExpr
+    | incredecre                                     # incredecr
     | op = ( NOT | MINUS) expression                 # UnaryExpr
     | left = expression op = (
         MULT | DIV | MOD
@@ -160,10 +167,9 @@ while_stmt: WHILE_KW expression LBRACE stmt* RBRACE # WhileStmt;
 // Inicia Sentencias de Iteracion For
 for_stmt:
     FOR_KW expression LBRACE stmt* RBRACE                                        # ForStmtCond
-    | FOR_KW assign_stmt SEMI expression SEMI assign_stmt LBRACE stmt* RBRACE    # ForAssCond
+    | FOR_KW assign_stmt SEMI expression SEMI expression LBRACE stmt* RBRACE    # ForAssCond
 
 	| FOR_KW ID COMMA expression IN_KW (expression | range) LBRACE stmt* RBRACE  # ForStmt ;
-
 
 range: expression DOT DOT DOT expression # NumericRange;
 // Termina Sentencias de Iteracion For
