@@ -26,12 +26,6 @@ func (s *BaseVLangGrammarListener) EnterProgram(ctx *ProgramContext) {}
 // ExitProgram is called when production program is exited.
 func (s *BaseVLangGrammarListener) ExitProgram(ctx *ProgramContext) {}
 
-// EnterDelim is called when production delim is entered.
-func (s *BaseVLangGrammarListener) EnterDelim(ctx *DelimContext) {}
-
-// ExitDelim is called when production delim is exited.
-func (s *BaseVLangGrammarListener) ExitDelim(ctx *DelimContext) {}
-
 // EnterStmt is called when production stmt is entered.
 func (s *BaseVLangGrammarListener) EnterStmt(ctx *StmtContext) {}
 

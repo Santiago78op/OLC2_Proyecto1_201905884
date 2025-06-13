@@ -10,9 +10,6 @@ type VLangGrammarListener interface {
 	// EnterProgram is called when entering the program production.
 	EnterProgram(c *ProgramContext)
 
-	// EnterDelim is called when entering the delim production.
-	EnterDelim(c *DelimContext)
-
 	// EnterStmt is called when entering the stmt production.
 	EnterStmt(c *StmtContext)
 
@@ -189,9 +186,6 @@ type VLangGrammarListener interface {
 
 	// ExitProgram is called when exiting the program production.
 	ExitProgram(c *ProgramContext)
-
-	// ExitDelim is called when exiting the delim production.
-	ExitDelim(c *DelimContext)
 
 	// ExitStmt is called when exiting the stmt production.
 	ExitStmt(c *StmtContext)

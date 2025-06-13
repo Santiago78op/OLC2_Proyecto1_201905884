@@ -10,9 +10,6 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#program.
 	VisitProgram(ctx *ProgramContext) interface{}
 
-	// Visit a parse tree produced by VLangGrammar#delim.
-	VisitDelim(ctx *DelimContext) interface{}
-
 	// Visit a parse tree produced by VLangGrammar#stmt.
 	VisitStmt(ctx *StmtContext) interface{}
 
