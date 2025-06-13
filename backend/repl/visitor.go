@@ -130,7 +130,7 @@ func (v *ReplVisitor) VisitMutVarDecl(ctx *compiler.MutVarDeclContext) interface
 
 func (v *ReplVisitor) VisitValueDecl(ctx *compiler.ValueDeclContext) interface{} {
 
-	isConst := true
+	isConst := false
 	varName := ctx.ID().GetText()
 	varValue := v.Visit(ctx.Expression()).(value.IVOR)
 	varType := varValue.Type()
