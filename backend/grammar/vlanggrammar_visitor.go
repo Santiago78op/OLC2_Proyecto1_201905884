@@ -64,6 +64,9 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#VectorAssign.
 	VisitVectorAssign(ctx *VectorAssignContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#IncDecAssign.
+	VisitIncDecAssign(ctx *IncDecAssignContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#IdPattern.
 	VisitIdPattern(ctx *IdPatternContext) interface{}
 

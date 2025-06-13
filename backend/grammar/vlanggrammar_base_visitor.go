@@ -83,6 +83,10 @@ func (v *BaseVLangGrammarVisitor) VisitVectorAssign(ctx *VectorAssignContext) in
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitIncDecAssign(ctx *IncDecAssignContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitIdPattern(ctx *IdPatternContext) interface{} {
 	return v.VisitChildren(ctx)
 }

@@ -134,6 +134,12 @@ func (s *BaseVLangGrammarListener) EnterVectorAssign(ctx *VectorAssignContext) {
 // ExitVectorAssign is called when production VectorAssign is exited.
 func (s *BaseVLangGrammarListener) ExitVectorAssign(ctx *VectorAssignContext) {}
 
+// EnterIncDecAssign is called when production IncDecAssign is entered.
+func (s *BaseVLangGrammarListener) EnterIncDecAssign(ctx *IncDecAssignContext) {}
+
+// ExitIncDecAssign is called when production IncDecAssign is exited.
+func (s *BaseVLangGrammarListener) ExitIncDecAssign(ctx *IncDecAssignContext) {}
+
 // EnterIdPattern is called when production IdPattern is entered.
 func (s *BaseVLangGrammarListener) EnterIdPattern(ctx *IdPatternContext) {}
 

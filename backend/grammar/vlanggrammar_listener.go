@@ -64,6 +64,9 @@ type VLangGrammarListener interface {
 	// EnterVectorAssign is called when entering the VectorAssign production.
 	EnterVectorAssign(c *VectorAssignContext)
 
+	// EnterIncDecAssign is called when entering the IncDecAssign production.
+	EnterIncDecAssign(c *IncDecAssignContext)
+
 	// EnterIdPattern is called when entering the IdPattern production.
 	EnterIdPattern(c *IdPatternContext)
 
@@ -243,6 +246,9 @@ type VLangGrammarListener interface {
 
 	// ExitVectorAssign is called when exiting the VectorAssign production.
 	ExitVectorAssign(c *VectorAssignContext)
+
+	// ExitIncDecAssign is called when exiting the IncDecAssign production.
+	ExitIncDecAssign(c *IncDecAssignContext)
 
 	// ExitIdPattern is called when exiting the IdPattern production.
 	ExitIdPattern(c *IdPatternContext)
