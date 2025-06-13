@@ -226,7 +226,7 @@ func vlanggrammarParserInit() {
 		342, 1, 0, 0, 0, 340, 338, 1, 0, 0, 0, 340, 341, 1, 0, 0, 0, 341, 343,
 		1, 0, 0, 0, 342, 340, 1, 0, 0, 0, 343, 344, 5, 38, 0, 0, 344, 379, 1, 0,
 		0, 0, 345, 346, 5, 10, 0, 0, 346, 347, 3, 26, 13, 0, 347, 348, 5, 41, 0,
-		0, 348, 349, 3, 34, 17, 0, 349, 350, 5, 41, 0, 0, 350, 351, 3, 26, 13,
+		0, 348, 349, 3, 34, 17, 0, 349, 350, 5, 41, 0, 0, 350, 351, 3, 34, 17,
 		0, 351, 355, 5, 37, 0, 0, 352, 354, 3, 2, 1, 0, 353, 352, 1, 0, 0, 0, 354,
 		357, 1, 0, 0, 0, 355, 353, 1, 0, 0, 0, 355, 356, 1, 0, 0, 0, 356, 358,
 		1, 0, 0, 0, 357, 355, 1, 0, 0, 0, 358, 359, 5, 38, 0, 0, 359, 379, 1, 0,
@@ -7449,37 +7449,12 @@ func (s *ForAssCondContext) FOR_KW() antlr.TerminalNode {
 	return s.GetToken(VLangGrammarFOR_KW, 0)
 }
 
-func (s *ForAssCondContext) AllAssign_stmt() []IAssign_stmtContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(IAssign_stmtContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]IAssign_stmtContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(IAssign_stmtContext); ok {
-			tst[i] = t.(IAssign_stmtContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *ForAssCondContext) Assign_stmt(i int) IAssign_stmtContext {
+func (s *ForAssCondContext) Assign_stmt() IAssign_stmtContext {
 	var t antlr.RuleContext
-	j := 0
 	for _, ctx := range s.GetChildren() {
 		if _, ok := ctx.(IAssign_stmtContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
+			t = ctx.(antlr.RuleContext)
+			break
 		}
 	}
 
@@ -7498,12 +7473,37 @@ func (s *ForAssCondContext) SEMI(i int) antlr.TerminalNode {
 	return s.GetToken(VLangGrammarSEMI, i)
 }
 
-func (s *ForAssCondContext) Expression() IExpressionContext {
+func (s *ForAssCondContext) AllExpression() []IExpressionContext {
+	children := s.GetChildren()
+	len := 0
+	for _, ctx := range children {
+		if _, ok := ctx.(IExpressionContext); ok {
+			len++
+		}
+	}
+
+	tst := make([]IExpressionContext, len)
+	i := 0
+	for _, ctx := range children {
+		if t, ok := ctx.(IExpressionContext); ok {
+			tst[i] = t.(IExpressionContext)
+			i++
+		}
+	}
+
+	return tst
+}
+
+func (s *ForAssCondContext) Expression(i int) IExpressionContext {
 	var t antlr.RuleContext
+	j := 0
 	for _, ctx := range s.GetChildren() {
 		if _, ok := ctx.(IExpressionContext); ok {
-			t = ctx.(antlr.RuleContext)
-			break
+			if j == i {
+				t = ctx.(antlr.RuleContext)
+				break
+			}
+			j++
 		}
 	}
 
@@ -7848,7 +7848,7 @@ func (p *VLangGrammar) For_stmt() (localctx IFor_stmtContext) {
 		}
 		{
 			p.SetState(350)
-			p.Assign_stmt()
+			p.expression(0)
 		}
 		{
 			p.SetState(351)
