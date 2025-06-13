@@ -286,6 +286,60 @@ func (v *ReplVisitor) VisitAssignmentDecl(ctx *compiler.AssignmentDeclContext) i
 
 }
 
+func (v *ReplVisitor) VisitIncDecAssign(ctx *compiler.IncDecAssignContext) interface{} {
+
+	// Obtenemos el nombre de la variable
+	varName := v.Visit(ctx.Id_pattern()).(string)
+
+	// Buscamos la variable en el scope
+	variable := v.ScopeTrace.GetVariable(varName)
+
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+varName+" no encontrada")
+		return nil
+	}
+
+	// Validamos el tipo de dato (por ahora lo hacemos sólo para enteros)
+	if variable.Value.Type() != value.IVOR_INT {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Operador ++/-- solo permitido para enteros")
+		return nil
+	}
+
+	// Obtenemos el valor actual
+	currentValue := variable.Value.(*value.IntValue).InternalValue
+
+	// Verificamos qué operador es (INCREMENT o DECREMENT)
+	if ctx.GetOp().GetTokenType() == compiler.VLangGrammarINCREMENT {
+		currentValue += 1
+	} else if ctx.GetOp().GetTokenType() == compiler.VLangGrammarDECREMENT {
+		currentValue -= 1
+	} else {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Operador desconocido en incremento/decremento")
+		return nil
+	}
+
+	// Actualizamos el valor dentro de la variable
+	newValue := &value.IntValue{InternalValue: currentValue}
+
+	// Hacemos la asignación usando tu misma lógica de mutabilidad
+	canMutate := true
+
+	if v.ScopeTrace.CurrentScope.isStruct {
+		canMutate = v.ScopeTrace.IsMutatingEnvironment()
+	}
+
+	ok, msg := variable.AssignValue(newValue, canMutate)
+
+	if !ok {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+	}
+
+	// Debug opcional
+	fmt.Printf("[DEBUG] Aplicado %s a '%s' => Nuevo valor: %d\n", ctx.GetOp().GetText(), varName, currentValue)
+
+	return nil
+}
+
 func (v *ReplVisitor) VisitArithmeticAssign(ctx *compiler.ArgAddAssigDeclContext) interface{} {
 	varName := v.Visit(ctx.Id_pattern()).(string)
 
