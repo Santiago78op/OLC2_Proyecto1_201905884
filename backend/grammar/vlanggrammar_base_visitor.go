@@ -11,10 +11,6 @@ func (v *BaseVLangGrammarVisitor) VisitProgram(ctx *ProgramContext) interface{} 
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseVLangGrammarVisitor) VisitDelim(ctx *DelimContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseVLangGrammarVisitor) VisitStmt(ctx *StmtContext) interface{} {
 	return v.VisitChildren(ctx)
 }
