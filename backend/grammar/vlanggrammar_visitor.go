@@ -22,6 +22,9 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#VarAssDecl.
 	VisitVarAssDecl(ctx *VarAssDeclContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#ShortDecl.
+	VisitShortDecl(ctx *ShortDeclContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#VectorItemLis.
 	VisitVectorItemLis(ctx *VectorItemLisContext) interface{}
 
