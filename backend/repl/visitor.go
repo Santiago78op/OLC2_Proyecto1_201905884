@@ -381,6 +381,120 @@ func (v *ReplVisitor) VisitLiteralExpr(ctx *compiler.LiteralExprContext) interfa
 	return v.Visit(ctx.Literal())
 }
 
+// VisitIncredecr maneja las expresiones de incremento y decremento
+// Ejemplo: i++ o i-- dentro de una expresión
+func (v *ReplVisitor) VisitIncredecr(ctx *compiler.IncredecrContext) interface{} {
+	return v.Visit(ctx.Incredecre())
+}
+
+// VisitIncremento maneja el incremento (ID++)
+// Comportamiento: Post-incremento - retorna el valor actual, luego incrementa
+func (v *ReplVisitor) VisitIncremento(ctx *compiler.IncrementoContext) interface{} {
+	fmt.Printf("🔹 Visitando Incremento: %s\n", ctx.GetText())
+
+	// Obtener el nombre de la variable
+	varName := ctx.ID().GetText()
+
+	// Buscar la variable en el scope
+	variable := v.ScopeTrace.GetVariable(varName)
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable '"+varName+"' no encontrada")
+		return value.DefaultNilValue
+	}
+
+	// Verificar que la variable sea de tipo entero
+	if variable.Value.Type() != value.IVOR_INT {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El operador ++ solo puede aplicarse a variables de tipo int")
+		return value.DefaultNilValue
+	}
+
+	// Verificar que no sea constante
+	if variable.IsConst {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede incrementar una variable constante")
+		return value.DefaultNilValue
+	}
+
+	// Obtener el valor actual (para retornarlo - post-incremento)
+	currentValue := variable.Value.(*value.IntValue).InternalValue
+
+	// Crear el nuevo valor incrementado
+	newValue := &value.IntValue{
+		InternalValue: currentValue + 1,
+	}
+
+	// Verificar contexto de mutación (para propiedades de struct)
+	canMutate := true
+	if v.ScopeTrace.CurrentScope.isStruct {
+		canMutate = v.ScopeTrace.IsMutatingEnvironment()
+	}
+
+	// Asignar el nuevo valor a la variable
+	ok, msg := variable.AssignValue(newValue, canMutate)
+	if !ok {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		return value.DefaultNilValue
+	}
+
+	// Retornar el valor original (comportamiento post-incremento)
+	return &value.IntValue{
+		InternalValue: currentValue,
+	}
+}
+
+// VisitDecremento maneja el decremento (ID--)
+// Comportamiento: Post-decremento - retorna el valor actual, luego decrementa
+func (v *ReplVisitor) VisitDecremento(ctx *compiler.DecrementoContext) interface{} {
+	fmt.Printf("🔹 Visitando Decremento: %s\n", ctx.GetText())
+
+	// Obtener el nombre de la variable
+	varName := ctx.ID().GetText()
+
+	// Buscar la variable en el scope
+	variable := v.ScopeTrace.GetVariable(varName)
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable '"+varName+"' no encontrada")
+		return value.DefaultNilValue
+	}
+
+	// Verificar que la variable sea de tipo entero
+	if variable.Value.Type() != value.IVOR_INT {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El operador -- solo puede aplicarse a variables de tipo int")
+		return value.DefaultNilValue
+	}
+
+	// Verificar que no sea constante
+	if variable.IsConst {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede decrementar una variable constante")
+		return value.DefaultNilValue
+	}
+
+	// Obtener el valor actual (para retornarlo - post-decremento)
+	currentValue := variable.Value.(*value.IntValue).InternalValue
+
+	// Crear el nuevo valor decrementado
+	newValue := &value.IntValue{
+		InternalValue: currentValue - 1,
+	}
+
+	// Verificar contexto de mutación (para propiedades de struct)
+	canMutate := true
+	if v.ScopeTrace.CurrentScope.isStruct {
+		canMutate = v.ScopeTrace.IsMutatingEnvironment()
+	}
+
+	// Asignar el nuevo valor a la variable
+	ok, msg := variable.AssignValue(newValue, canMutate)
+	if !ok {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		return value.DefaultNilValue
+	}
+
+	// Retornar el valor original (comportamiento post-decremento)
+	return &value.IntValue{
+		InternalValue: currentValue,
+	}
+}
+
 func (v *ReplVisitor) VisitIdPatternExpr(ctx *compiler.IdPatternExprContext) interface{} {
 	varName := ctx.Id_pattern().GetText()
 
@@ -584,59 +698,87 @@ func (v *ReplVisitor) VisitForStmtCond(ctx *compiler.ForStmtCondContext) interfa
 }
 
 func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface{} {
-	initAssign := ctx.Assign_stmt(0)
-	condition := ctx.Expression()
-	updateAssign := ctx.Assign_stmt(1)
+	// Obtener las tres partes del for: inicialización, condición e incremento
+	initAssign := ctx.Assign_stmt()    // i = 0
+	condition := ctx.Expression(0)     // i < 5  (primera expresión)
+	incrementExpr := ctx.Expression(1) // i++    (segunda expresión)
 
-	v.ScopeTrace.PushScope("for_assignamet")
+	// Crear nuevo scope para el for
+	v.ScopeTrace.PushScope("for_assignment")
+
+	// Ejecutar la inicialización (i = 0)
 	v.Visit(initAssign)
 
-	forItem := &CallStackItem{ReturnValue: value.DefaultNilValue, Type: []string{BreakItem, ContinueItem}}
+	// Crear item para manejo de break/continue
+	forItem := &CallStackItem{
+		ReturnValue: value.DefaultNilValue,
+		Type:        []string{BreakItem, ContinueItem},
+	}
 	v.CallStack.Push(forItem)
 
+	// Defer para cleanup y manejo de control de flujo
 	defer func() {
+		v.ScopeTrace.PopScope()    // Limpiar scope
+		v.CallStack.Clean(forItem) // Limpiar call stack
+
+		// Manejo de panic/recover para break/continue
 		if item, ok := recover().(*CallStackItem); item != nil && ok {
+			// Si no es nuestro forItem, propagar panic hacia arriba
 			if item != forItem {
 				panic(item)
 			}
 
+			// Si es continue, se resetea la acción y continúa
 			if item.IsAction(ContinueItem) {
 				item.ResetAction()
-				// Sigue normalmente en la siguiente iteración
 			}
 
+			// Si es break, simplemente termina (no hace nada más)
 			if item.IsAction(BreakItem) {
-				// Finaliza el bucle
+				// El bucle termina naturalmente
 			}
 		}
 	}()
 
+	// Bucle principal
 	for {
-		condValue, ok := v.Visit(condition).(value.IVOR)
-		if !ok {
+		// Evaluar condición (i < 5)
+		condValue := v.Visit(condition)
+		if condValue == nil {
 			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Error evaluando la condición del for")
-			return nil
-		}
-
-		if condValue.Type() != value.IVOR_BOOL {
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condición del for debe ser un booleano")
-			return nil
-		}
-
-		boolVal := condValue.Value().(bool)
-		if !boolVal {
 			break
 		}
 
-		for _, stmt := range ctx.AllStmt() {
-			v.Visit(stmt)
+		condIVOR, ok := condValue.(value.IVOR)
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condición del for debe evaluar a un valor IVOR")
+			break
 		}
 
-		v.Visit(updateAssign)
+		// Verificar que la condición sea booleana
+		if condIVOR.Type() != value.IVOR_BOOL {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condición del for debe ser un booleano")
+			break
+		}
+
+		// Obtener valor booleano
+		boolVal := condIVOR.Value().(bool)
+		if !boolVal {
+			break // Condición falsa, salir del bucle
+		}
+
+		// Ejecutar cuerpo del bucle (println, suma = suma + i, etc.)
+		for _, stmt := range ctx.AllStmt() {
+			v.Visit(stmt)
+
+			// Verificar si hubo break/continue durante la ejecución del cuerpo
+			// Esto se maneja automáticamente por el panic/recover
+		}
+
+		// Ejecutar incremento (i++)
+		v.Visit(incrementExpr)
 	}
 
-	v.ScopeTrace.PopScope()
-	v.CallStack.Clean(forItem)
 	return nil
 }
 
