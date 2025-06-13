@@ -126,23 +126,12 @@ func (v *DclVisitor) VisitParamList(ctx *compiler.ParamListContext) interface{} 
 	return params
 }
 
-/*
 func (v *DclVisitor) VisitFuncParam(ctx *compiler.FuncParamContext) interface{} {
 
 	externName := ""
 	innerName := ""
 
-	// at least ID(0) is defined
-	// only 1 ID defined
-	if ctx.ID(1) == nil {
-		// innerName : type
-		// _ : type
-		innerName = ctx.ID(0).GetText()
-	} else {
-		// externName innerName : type
-		externName = ctx.ID(0).GetText()
-		innerName = ctx.ID(1).GetText()
-	}
+	innerName = ctx.ID().GetText()
 
 	passByReference := false
 
@@ -157,7 +146,6 @@ func (v *DclVisitor) VisitFuncParam(ctx *compiler.FuncParamContext) interface{} 
 	}
 
 }
-*/
 
 func (v *DclVisitor) VisitStructDecl(ctx *compiler.StructDeclContext) interface{} {
 	v.StructNames = append(v.StructNames, ctx.ID().GetText())

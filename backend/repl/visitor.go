@@ -80,6 +80,8 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 		v.Visit(ctx.Assign_stmt())
 	} else if ctx.Func_call() != nil {
 		v.Visit(ctx.Func_call())
+	} else if ctx.Func_dcl() != nil {
+		v.Visit(ctx.Func_dcl())
 	} else if ctx.If_stmt() != nil {
 		v.Visit(ctx.If_stmt())
 	} else if ctx.Switch_stmt() != nil {
@@ -755,6 +757,108 @@ func (v *ReplVisitor) VisitFuncArg(ctx *compiler.FuncArgContext) interface{} {
 		PassByReference: passByReference,
 		Token:           ctx.GetStart(),
 		VariableRef:     argVariableRef,
+	}
+
+}
+
+func (v *ReplVisitor) VisitFuncDecl(ctx *compiler.FuncDeclContext) interface{} {
+
+	if v.ScopeTrace.CurrentScope == v.ScopeTrace.GlobalScope {
+		// aready declared by dcl_visitor
+		return nil
+	}
+
+	if v.ScopeTrace.CurrentScope != v.ScopeTrace.GlobalScope && !v.ScopeTrace.CurrentScope.isStruct {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Las funciones solo pueden ser declaradas en el scope global o en un struct")
+	}
+
+	funcName := ctx.ID().GetText()
+
+	params := make([]*Param, 0)
+
+	if ctx.Param_list() != nil {
+		params = v.Visit(ctx.Param_list()).([]*Param)
+	}
+
+	if len(params) > 0 {
+
+		baseParamType := params[0].ParamType()
+
+		for _, param := range params {
+			if param.ParamType() != baseParamType {
+				v.ErrorTable.NewSemanticError(param.Token, "Todos los parametros de la funcion deben ser del mismo tipo")
+				return nil
+			}
+		}
+	}
+
+	returnType := value.IVOR_NIL
+	var returnTypeToken antlr.Token = nil
+
+	if ctx.Type_() != nil {
+		returnType = v.Visit(ctx.Type_()).(string)
+		returnTypeToken = ctx.Type_().GetStart()
+	}
+
+	body := ctx.AllStmt()
+
+	function := &Function{ // pointer ?
+		Name:            funcName,
+		Param:           params,
+		ReturnType:      returnType,
+		Body:            body,
+		DeclScope:       v.ScopeTrace.CurrentScope,
+		ReturnTypeToken: returnTypeToken,
+		Token:           ctx.GetStart(),
+	}
+
+	ok, msg := v.ScopeTrace.AddFunction(funcName, function)
+
+	if !ok {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		return nil
+	}
+
+	return function
+}
+
+func (v *ReplVisitor) VisitParamList(ctx *compiler.ParamListContext) interface{} {
+
+	params := make([]*Param, 0)
+
+	for _, param := range ctx.AllFunc_param() {
+		params = append(params, v.Visit(param).(*Param))
+	}
+
+	return params
+}
+
+func (v *ReplVisitor) VisitFuncParam(ctx *compiler.FuncParamContext) interface{} {
+
+	externName := ""
+	innerName := ""
+
+	// at least ID(0) is defined
+	// only 1 ID defined
+	if ctx.ID() == nil {
+		// innerName : type
+		// _ : type
+		innerName = ctx.ID().GetText()
+	} else {
+		// externName innerName : type
+		externName = ctx.ID().GetText()
+	}
+
+	passByReference := false
+
+	paramType := v.Visit(ctx.Type_()).(string)
+
+	return &Param{
+		ExternName:      externName,
+		InnerName:       innerName,
+		PassByReference: passByReference,
+		Type:            paramType,
+		Token:           ctx.GetStart(),
 	}
 
 }

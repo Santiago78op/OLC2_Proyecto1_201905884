@@ -32,7 +32,7 @@ var VLangGrammarParserStaticData struct {
 func vlanggrammarParserInit() {
 	staticData := &VLangGrammarParserStaticData
 	staticData.LiteralNames = []string{
-		"", "'mut'", "'func'", "'struct'", "'slice'", "'if'", "'else'", "'switch'",
+		"", "'mut'", "'fn'", "'struct'", "'slice'", "'if'", "'else'", "'switch'",
 		"'case'", "'default'", "'for'", "'while'", "'in'", "'break'", "'continue'",
 		"'return'", "'+'", "'-'", "'*'", "'/'", "'%'", "'='", "'+='", "'-='",
 		"'=='", "'!='", "'<'", "'<='", "'>'", "'>='", "'&&'", "'||'", "'!'",

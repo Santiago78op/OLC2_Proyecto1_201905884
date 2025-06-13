@@ -4,7 +4,7 @@ lexer grammar VLangLexer;
 
 // Palabras clave
 MUT   : 'mut';
-FUNC  : 'func';
+FUNC  : 'fn';
 
 // Estructuras
 STR         : 'struct';
