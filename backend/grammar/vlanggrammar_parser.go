@@ -220,10 +220,10 @@ func vlanggrammarParserInit() {
 		2, 1, 0, 329, 328, 1, 0, 0, 0, 330, 333, 1, 0, 0, 0, 331, 329, 1, 0, 0,
 		0, 331, 332, 1, 0, 0, 0, 332, 334, 1, 0, 0, 0, 333, 331, 1, 0, 0, 0, 334,
 		335, 5, 36, 0, 0, 335, 370, 1, 0, 0, 0, 336, 337, 5, 10, 0, 0, 337, 338,
-		3, 26, 13, 0, 338, 339, 5, 39, 0, 0, 339, 340, 3, 32, 16, 0, 340, 341,
-		5, 39, 0, 0, 341, 342, 3, 26, 13, 0, 342, 346, 5, 35, 0, 0, 343, 345, 3,
-		2, 1, 0, 344, 343, 1, 0, 0, 0, 345, 348, 1, 0, 0, 0, 346, 344, 1, 0, 0,
-		0, 346, 347, 1, 0, 0, 0, 347, 349, 1, 0, 0, 0, 348, 346, 1, 0, 0, 0, 349,
+		3, 4, 2, 0, 338, 339, 5, 39, 0, 0, 339, 340, 3, 32, 16, 0, 340, 341, 5,
+		39, 0, 0, 341, 342, 3, 26, 13, 0, 342, 346, 5, 35, 0, 0, 343, 345, 3, 2,
+		1, 0, 344, 343, 1, 0, 0, 0, 345, 348, 1, 0, 0, 0, 346, 344, 1, 0, 0, 0,
+		346, 347, 1, 0, 0, 0, 347, 349, 1, 0, 0, 0, 348, 346, 1, 0, 0, 0, 349,
 		350, 5, 36, 0, 0, 350, 370, 1, 0, 0, 0, 351, 352, 5, 10, 0, 0, 352, 353,
 		5, 48, 0, 0, 353, 354, 5, 42, 0, 0, 354, 355, 3, 32, 16, 0, 355, 358, 5,
 		12, 0, 0, 356, 359, 3, 32, 16, 0, 357, 359, 3, 50, 25, 0, 358, 356, 1,
@@ -7159,37 +7159,12 @@ func (s *ForAssCondContext) FOR_KW() antlr.TerminalNode {
 	return s.GetToken(VLangGrammarFOR_KW, 0)
 }
 
-func (s *ForAssCondContext) AllAssign_stmt() []IAssign_stmtContext {
-	children := s.GetChildren()
-	len := 0
-	for _, ctx := range children {
-		if _, ok := ctx.(IAssign_stmtContext); ok {
-			len++
-		}
-	}
-
-	tst := make([]IAssign_stmtContext, len)
-	i := 0
-	for _, ctx := range children {
-		if t, ok := ctx.(IAssign_stmtContext); ok {
-			tst[i] = t.(IAssign_stmtContext)
-			i++
-		}
-	}
-
-	return tst
-}
-
-func (s *ForAssCondContext) Assign_stmt(i int) IAssign_stmtContext {
+func (s *ForAssCondContext) Decl_stmt() IDecl_stmtContext {
 	var t antlr.RuleContext
-	j := 0
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IAssign_stmtContext); ok {
-			if j == i {
-				t = ctx.(antlr.RuleContext)
-				break
-			}
-			j++
+		if _, ok := ctx.(IDecl_stmtContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
 		}
 	}
 
@@ -7197,7 +7172,7 @@ func (s *ForAssCondContext) Assign_stmt(i int) IAssign_stmtContext {
 		return nil
 	}
 
-	return t.(IAssign_stmtContext)
+	return t.(IDecl_stmtContext)
 }
 
 func (s *ForAssCondContext) AllSEMI() []antlr.TerminalNode {
@@ -7222,6 +7197,22 @@ func (s *ForAssCondContext) Expression() IExpressionContext {
 	}
 
 	return t.(IExpressionContext)
+}
+
+func (s *ForAssCondContext) Assign_stmt() IAssign_stmtContext {
+	var t antlr.RuleContext
+	for _, ctx := range s.GetChildren() {
+		if _, ok := ctx.(IAssign_stmtContext); ok {
+			t = ctx.(antlr.RuleContext)
+			break
+		}
+	}
+
+	if t == nil {
+		return nil
+	}
+
+	return t.(IAssign_stmtContext)
 }
 
 func (s *ForAssCondContext) LBRACE() antlr.TerminalNode {
@@ -7534,7 +7525,7 @@ func (p *VLangGrammar) For_stmt() (localctx IFor_stmtContext) {
 		}
 		{
 			p.SetState(337)
-			p.Assign_stmt()
+			p.Decl_stmt()
 		}
 		{
 			p.SetState(338)
