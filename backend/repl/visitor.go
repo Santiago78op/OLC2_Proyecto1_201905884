@@ -258,7 +258,7 @@ func (v *ReplVisitor) VisitAssignmentDecl(ctx *compiler.AssignmentDeclContext) i
 
 }
 
-func (v *ReplVisitor) VisitArithmeticAssign(ctx *compiler.ArgAddAssigDeclContext) interface{} {
+func (v *ReplVisitor) VisitArgAddAssigDecl(ctx *compiler.ArgAddAssigDeclContext) interface{} {
 	varName := v.Visit(ctx.Id_pattern()).(string)
 
 	variable := v.ScopeTrace.GetVariable(varName)
