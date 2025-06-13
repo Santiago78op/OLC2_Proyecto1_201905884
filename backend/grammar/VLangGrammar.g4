@@ -7,22 +7,18 @@ options { tokenVocab = VLangLexer; }
 program: (stmt)* EOF?
     ;
 
-// Demilitador del lenguaje -> indica el final de una sentencia
-delim: NEWLINE? | EOF
-    ;
-
 // Sentencias
 stmt: 
-    decl_stmt delim
-    | assign_stmt delim
-    | block_ind delim
-    | transfer_stmt delim 
+    decl_stmt 
+    | assign_stmt 
+    | block_ind 
+    | transfer_stmt  
     | if_stmt
 	| switch_stmt
     | while_stmt
 	| for_stmt
-    | func_call delim
-    | vect_func delim
+    | func_call 
+    | vect_func 
     | func_dcl
     | strct_dcl
     ;
@@ -157,6 +153,9 @@ switch_case: CASE_KW expression COLON stmt* # SwitchCase;
 default_case: DEFAULT_KW COLON stmt* # DefaultCase;
 // Termina Sentencias de Control Switch
 
+// Inicia Sentencias de Control While
+while_stmt: WHILE_KW expression LBRACE stmt* RBRACE # WhileStmt;
+// Termina Sentencia de Control While
 
 // Inicia Sentencias de Iteracion For
 for_stmt:

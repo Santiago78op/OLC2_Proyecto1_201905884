@@ -61,8 +61,6 @@ COLON    : ':';
 DOT      : '.';
 COMMA    : ',';
 
-NEWLINE : '\n';
-
 
 // Literales
 fragment DIGIT : [0-9];
@@ -83,8 +81,6 @@ fragment ESC_SEQ: '\\' [btnfr"'\\]
     ;
 
 // Commentarios
-LINE_COMMENT  : '//'.*? ('\n' | EOF) -> skip;
-BLOCK_COMMENT : '/*' .*? '*/' -> skip;
-
-// Espacios en blanco
-WS : [ \t\r]+ -> skip;
+WS : [ \t\r\n]+ -> skip ;
+LINE_COMMENT  : '//' ~[\r\n]* -> skip ;
+BLOCK_COMMENT : '/*' .*? '*/' -> skip ;
