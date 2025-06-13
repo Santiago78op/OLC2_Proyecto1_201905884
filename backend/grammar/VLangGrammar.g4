@@ -82,14 +82,10 @@ aux_matrix_type: LBRACK matrix_type RBRACK
 // Inicia Asignacion de Variables
 // varSring = "Hola"
 assign_stmt:
-    id_pattern ASSIGN expression                  # AssignmentDecl
-    | id_pattern op = (
-        PLUS_ASSIGN | MINUS_ASSIGN
-    ) expression                                  # ArgAddAssigDecl
-    | vect_item op = ( 
-        PLUS_ASSIGN 
-        | MINUS_ASSIGN 
-        | ASSIGN) expression	                  # VectorAssign
+    id_pattern ASSIGN expression                                            # AssignmentDecl
+    | id_pattern op = ( PLUS_ASSIGN | MINUS_ASSIGN) expression              # ArgAddAssigDecl
+    | vect_item op = ( PLUS_ASSIGN | MINUS_ASSIGN  | ASSIGN) expression	    # VectorAssign
+    | id_pattern op = (INCREMENT | DECREMENT)                               # IncDecAssign
     ;
 
 id_pattern // (a.a)

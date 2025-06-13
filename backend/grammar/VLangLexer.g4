@@ -23,6 +23,9 @@ BREAK_KW    : 'break';
 CONTINUE_KW : 'continue';
 RETURN_KW   : 'return';
 
+// Operadores de incremento/decremento
+INCREMENT: '++';
+DECREMENT: '--';
 
 // Operadores Aritmeticos
 PLUS     : '+';
