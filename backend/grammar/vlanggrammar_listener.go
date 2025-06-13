@@ -7,11 +7,8 @@ import "github.com/antlr4-go/antlr/v4"
 type VLangGrammarListener interface {
 	antlr.ParseTreeListener
 
-	// EnterProg is called when entering the prog production.
-	EnterProg(c *ProgContext)
-
-	// EnterDelim is called when entering the delim production.
-	EnterDelim(c *DelimContext)
+	// EnterProgram is called when entering the program production.
+	EnterProgram(c *ProgramContext)
 
 	// EnterStmt is called when entering the stmt production.
 	EnterStmt(c *StmtContext)
@@ -19,20 +16,50 @@ type VLangGrammarListener interface {
 	// EnterMutVarDecl is called when entering the MutVarDecl production.
 	EnterMutVarDecl(c *MutVarDeclContext)
 
+	// EnterValueDecl is called when entering the ValueDecl production.
+	EnterValueDecl(c *ValueDeclContext)
+
 	// EnterVarAssDecl is called when entering the VarAssDecl production.
 	EnterVarAssDecl(c *VarAssDeclContext)
 
-	// EnterType_annotation is called when entering the type_annotation production.
-	EnterType_annotation(c *Type_annotationContext)
+	// EnterVectorItemLis is called when entering the VectorItemLis production.
+	EnterVectorItemLis(c *VectorItemLisContext)
+
+	// EnterVectorItem is called when entering the VectorItem production.
+	EnterVectorItem(c *VectorItemContext)
+
+	// EnterVectorProperty is called when entering the VectorProperty production.
+	EnterVectorProperty(c *VectorPropertyContext)
+
+	// EnterVectorFuncCall is called when entering the VectorFuncCall production.
+	EnterVectorFuncCall(c *VectorFuncCallContext)
+
+	// EnterRepeatingDecl is called when entering the RepeatingDecl production.
+	EnterRepeatingDecl(c *RepeatingDeclContext)
 
 	// EnterVar_type is called when entering the var_type production.
 	EnterVar_type(c *Var_typeContext)
 
+	// EnterType is called when entering the type production.
+	EnterType(c *TypeContext)
+
+	// EnterVector_type is called when entering the vector_type production.
+	EnterVector_type(c *Vector_typeContext)
+
+	// EnterMatrix_type is called when entering the matrix_type production.
+	EnterMatrix_type(c *Matrix_typeContext)
+
+	// EnterAux_matrix_type is called when entering the aux_matrix_type production.
+	EnterAux_matrix_type(c *Aux_matrix_typeContext)
+
 	// EnterAssignmentDecl is called when entering the AssignmentDecl production.
 	EnterAssignmentDecl(c *AssignmentDeclContext)
 
-	// EnterAugmentedAssignmentDecl is called when entering the AugmentedAssignmentDecl production.
-	EnterAugmentedAssignmentDecl(c *AugmentedAssignmentDeclContext)
+	// EnterArgAddAssigDecl is called when entering the ArgAddAssigDecl production.
+	EnterArgAddAssigDecl(c *ArgAddAssigDeclContext)
+
+	// EnterVectorAssign is called when entering the VectorAssign production.
+	EnterVectorAssign(c *VectorAssignContext)
 
 	// EnterIdPattern is called when entering the IdPattern production.
 	EnterIdPattern(c *IdPatternContext)
@@ -84,33 +111,6 @@ type VLangGrammarListener interface {
 
 	// EnterFuncCallExpr is called when entering the FuncCallExpr production.
 	EnterFuncCallExpr(c *FuncCallExprContext)
-
-	// EnterVectorItemLis is called when entering the VectorItemLis production.
-	EnterVectorItemLis(c *VectorItemLisContext)
-
-	// EnterVectorItem is called when entering the VectorItem production.
-	EnterVectorItem(c *VectorItemContext)
-
-	// EnterVectorProperty is called when entering the VectorProperty production.
-	EnterVectorProperty(c *VectorPropertyContext)
-
-	// EnterVectorFuncCall is called when entering the VectorFuncCall production.
-	EnterVectorFuncCall(c *VectorFuncCallContext)
-
-	// EnterRepeatingDecl is called when entering the RepeatingDecl production.
-	EnterRepeatingDecl(c *RepeatingDeclContext)
-
-	// EnterType is called when entering the type production.
-	EnterType(c *TypeContext)
-
-	// EnterVector_type is called when entering the vector_type production.
-	EnterVector_type(c *Vector_typeContext)
-
-	// EnterMatrix_type is called when entering the matrix_type production.
-	EnterMatrix_type(c *Matrix_typeContext)
-
-	// EnterAux_matrix_type is called when entering the aux_matrix_type production.
-	EnterAux_matrix_type(c *Aux_matrix_typeContext)
 
 	// EnterIfStmt is called when entering the IfStmt production.
 	EnterIfStmt(c *IfStmtContext)
@@ -184,11 +184,8 @@ type VLangGrammarListener interface {
 	// EnterStructVector is called when entering the StructVector production.
 	EnterStructVector(c *StructVectorContext)
 
-	// ExitProg is called when exiting the prog production.
-	ExitProg(c *ProgContext)
-
-	// ExitDelim is called when exiting the delim production.
-	ExitDelim(c *DelimContext)
+	// ExitProgram is called when exiting the program production.
+	ExitProgram(c *ProgramContext)
 
 	// ExitStmt is called when exiting the stmt production.
 	ExitStmt(c *StmtContext)
@@ -196,20 +193,50 @@ type VLangGrammarListener interface {
 	// ExitMutVarDecl is called when exiting the MutVarDecl production.
 	ExitMutVarDecl(c *MutVarDeclContext)
 
+	// ExitValueDecl is called when exiting the ValueDecl production.
+	ExitValueDecl(c *ValueDeclContext)
+
 	// ExitVarAssDecl is called when exiting the VarAssDecl production.
 	ExitVarAssDecl(c *VarAssDeclContext)
 
-	// ExitType_annotation is called when exiting the type_annotation production.
-	ExitType_annotation(c *Type_annotationContext)
+	// ExitVectorItemLis is called when exiting the VectorItemLis production.
+	ExitVectorItemLis(c *VectorItemLisContext)
+
+	// ExitVectorItem is called when exiting the VectorItem production.
+	ExitVectorItem(c *VectorItemContext)
+
+	// ExitVectorProperty is called when exiting the VectorProperty production.
+	ExitVectorProperty(c *VectorPropertyContext)
+
+	// ExitVectorFuncCall is called when exiting the VectorFuncCall production.
+	ExitVectorFuncCall(c *VectorFuncCallContext)
+
+	// ExitRepeatingDecl is called when exiting the RepeatingDecl production.
+	ExitRepeatingDecl(c *RepeatingDeclContext)
 
 	// ExitVar_type is called when exiting the var_type production.
 	ExitVar_type(c *Var_typeContext)
 
+	// ExitType is called when exiting the type production.
+	ExitType(c *TypeContext)
+
+	// ExitVector_type is called when exiting the vector_type production.
+	ExitVector_type(c *Vector_typeContext)
+
+	// ExitMatrix_type is called when exiting the matrix_type production.
+	ExitMatrix_type(c *Matrix_typeContext)
+
+	// ExitAux_matrix_type is called when exiting the aux_matrix_type production.
+	ExitAux_matrix_type(c *Aux_matrix_typeContext)
+
 	// ExitAssignmentDecl is called when exiting the AssignmentDecl production.
 	ExitAssignmentDecl(c *AssignmentDeclContext)
 
-	// ExitAugmentedAssignmentDecl is called when exiting the AugmentedAssignmentDecl production.
-	ExitAugmentedAssignmentDecl(c *AugmentedAssignmentDeclContext)
+	// ExitArgAddAssigDecl is called when exiting the ArgAddAssigDecl production.
+	ExitArgAddAssigDecl(c *ArgAddAssigDeclContext)
+
+	// ExitVectorAssign is called when exiting the VectorAssign production.
+	ExitVectorAssign(c *VectorAssignContext)
 
 	// ExitIdPattern is called when exiting the IdPattern production.
 	ExitIdPattern(c *IdPatternContext)
@@ -261,33 +288,6 @@ type VLangGrammarListener interface {
 
 	// ExitFuncCallExpr is called when exiting the FuncCallExpr production.
 	ExitFuncCallExpr(c *FuncCallExprContext)
-
-	// ExitVectorItemLis is called when exiting the VectorItemLis production.
-	ExitVectorItemLis(c *VectorItemLisContext)
-
-	// ExitVectorItem is called when exiting the VectorItem production.
-	ExitVectorItem(c *VectorItemContext)
-
-	// ExitVectorProperty is called when exiting the VectorProperty production.
-	ExitVectorProperty(c *VectorPropertyContext)
-
-	// ExitVectorFuncCall is called when exiting the VectorFuncCall production.
-	ExitVectorFuncCall(c *VectorFuncCallContext)
-
-	// ExitRepeatingDecl is called when exiting the RepeatingDecl production.
-	ExitRepeatingDecl(c *RepeatingDeclContext)
-
-	// ExitType is called when exiting the type production.
-	ExitType(c *TypeContext)
-
-	// ExitVector_type is called when exiting the vector_type production.
-	ExitVector_type(c *Vector_typeContext)
-
-	// ExitMatrix_type is called when exiting the matrix_type production.
-	ExitMatrix_type(c *Matrix_typeContext)
-
-	// ExitAux_matrix_type is called when exiting the aux_matrix_type production.
-	ExitAux_matrix_type(c *Aux_matrix_typeContext)
 
 	// ExitIfStmt is called when exiting the IfStmt production.
 	ExitIfStmt(c *IfStmtContext)

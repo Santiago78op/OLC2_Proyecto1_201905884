@@ -1,6 +1,7 @@
 package repl
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/antlr4-go/antlr/v4"
@@ -24,23 +25,27 @@ func NewDclVisitor(errorTable *ErrorTable) *DclVisitor {
 }
 
 func (v *DclVisitor) Visit(tree antlr.ParseTree) interface{} {
+	fmt.Printf("🔹 DclVisitor.Visit llamado con: %T\n", tree)
 
 	switch val := tree.(type) {
 	case *antlr.ErrorNodeImpl:
-		log.Fatal(val.GetText())
+		fmt.Printf("❌ ERROR NODE ENCONTRADO: %s\n", val.GetText())
+		log.Fatal(val.GetText()) // ⚠️ AQUÍ SE PUEDE ESTAR DETENIENDO
 		return nil
 	default:
+		fmt.Printf("🔹 Aceptando tree con visitor\n")
 		return tree.Accept(v)
 	}
-
 }
 
-func (v *DclVisitor) VisitProgram(ctx *compiler.ProgContext) interface{} {
+func (v *DclVisitor) VisitProgram(ctx *compiler.ProgramContext) interface{} {
+	fmt.Printf("🔹 DclVisitor.VisitProgram EJECUTADO\n")
+	fmt.Printf("🔹 Número de statements: %d\n", len(ctx.AllStmt()))
 
 	for _, stmt := range ctx.AllStmt() {
+		fmt.Printf("🔹 DclVisitor procesando stmt: %s\n", stmt.GetText())
 		v.Visit(stmt)
 	}
-
 	return nil
 }
 
@@ -119,6 +124,27 @@ func (v *DclVisitor) VisitParamList(ctx *compiler.ParamListContext) interface{} 
 	}
 
 	return params
+}
+
+func (v *DclVisitor) VisitFuncParam(ctx *compiler.FuncParamContext) interface{} {
+
+	externName := ""
+	innerName := ""
+
+	innerName = ctx.ID().GetText()
+
+	passByReference := false
+
+	paramType := ctx.Type_().GetText()
+
+	return &Param{
+		ExternName:      externName,
+		InnerName:       innerName,
+		PassByReference: passByReference,
+		Type:            paramType,
+		Token:           ctx.GetStart(),
+	}
+
 }
 
 func (v *DclVisitor) VisitStructDecl(ctx *compiler.StructDeclContext) interface{} {

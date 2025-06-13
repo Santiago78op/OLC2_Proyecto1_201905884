@@ -1,6 +1,9 @@
 package repl
 
 import (
+	"log"
+	"strings"
+
 	"github.com/antlr4-go/antlr/v4"
 	"main.go/value"
 )
@@ -98,11 +101,11 @@ func (s *BaseScopeTrace) AddVariable(name string, varType string, value value.IV
 func (s *BaseScopeTrace) GetVariable(name string) *Variable {
 
 	// Si el nombre contiene un punto, se asume que es una variable de objeto
-	/*
-		if strings.Contains(name, ".") {
-			return s.searchObjectVariable(name, nil)
-		}
-	*/
+
+	if strings.Contains(name, ".") {
+		return s.searchObjectVariable(name, nil)
+	}
+
 	// Busca la variable en el ámbito actual
 	initScope := s
 
@@ -131,68 +134,62 @@ func (s *BaseScopeTrace) GetVariable(name string) *Variable {
 	return nil
 }
 
-/*
-// searchObjectVariable busca una variable dentro de un objeto en el ámbito actual.
 func (s *BaseScopeTrace) searchObjectVariable(name string, lastObj value.IVOR) *Variable {
-	// Divide el nombre de la variable en partes usando el punto como separador
+
+	// split name by dot
 	parts := strings.Split(name, ".")
 
-	// Si no hay partes, retorna un error
 	if len(parts) == 0 {
-		log.Fatal("Error: No se puede buscar una variable sin partes en el nombre")
-		return nil // Si no hay partes, retorna nil
+		log.Fatal("idk what u did, cant split by dot")
+		return nil
 	}
 
-	// Si hay una sola parte, busca la variable en el ámbito actual
 	if len(parts) == 1 {
-		object, exist := lastObj.(*ObjectValue)
+		obj, ok := lastObj.(*ObjectValue)
 
-		if exist {
-			return object.InternalScope.GetVariable(name)
+		if ok {
+			return obj.InternalScope.GetVariable(name)
 		}
 
-		log.Fatal("Error: No se puede buscar una variable sin un objeto asociado")
-		return nil // Si no hay un objeto asociado, retorna nil
+		log.Fatal("idk what u did, cant convert to object")
+		return nil
 	}
 
-	// Si hay más de una parte.
+	// then parts should be 2 or more
 
 	if lastObj == nil {
-		// Si no hay un objeto asociado, busca la variable en el ámbito actual
 		variable := s.GetVariable(parts[0])
 
-		// Si la variable no existe, retorna nil
 		if variable == nil {
-			return nil // Si no hay un objeto asociado, retorna nil
+			return nil
 		}
 
-		// Asigna el valor de la variable como el objeto actual
-		object := variable.Value
+		obj := variable.Value
 
-		switch object := object.(type) {
+		// obj must be an object/struct or vector
+		switch obj := obj.(type) {
 		case *ObjectValue:
-			lastObj = object
+			lastObj = obj
 		case *VectorValue:
-			lastObj = object.ObjectValue
+			lastObj = obj.ObjectValue
 		default:
-			return nil // Si el objeto no es un ObjectValue o VectorValue, retorna nil
+			return nil
 		}
 
 		return s.searchObjectVariable(strings.Join(parts[1:], "."), lastObj)
 	}
 
-	object, exist := lastObj.(*ObjectValue)
+	obj, ok := lastObj.(*ObjectValue)
 
-	if exist {
-		lastObj = object.InternalScope.GetVariable(parts[0]).Value
+	if ok {
+		lastObj = obj.InternalScope.GetVariable(parts[0]).Value
 
 		return s.searchObjectVariable(strings.Join(parts[1:], "."), lastObj)
 	} else {
-		log.Fatal("Error: No se puede buscar una variable sin un objeto asociado")
-		return nil // Si no hay un objeto asociado, retorna nil
+		log.Fatal("idk what u did, cant convert to object")
+		return nil
 	}
 }
-*/
 
 func (s *BaseScopeTrace) AddFunction(name string, function value.IVOR) (bool, string) {
 	// Verifica si la función ya existe en el ámbito actual
@@ -207,12 +204,10 @@ func (s *BaseScopeTrace) AddFunction(name string, function value.IVOR) (bool, st
 
 func (s *BaseScopeTrace) GetFunction(name string) (value.IVOR, string) {
 
-	// Verifica si referencia a una función de objeto/struct
-	/*
-		if strings.Contains(name, ".") {
-			return s.searchObjectFunction(name, nil)
-		}
-	*/
+	// verify if is refering to and object/struct function
+	if strings.Contains(name, ".") {
+		return s.searchObjectFunction(name, nil)
+	}
 
 	initialScope := s
 
@@ -229,6 +224,64 @@ func (s *BaseScopeTrace) GetFunction(name string) (value.IVOR, string) {
 	}
 
 	return nil, "La funcion " + name + " no existe"
+}
+
+func (s *BaseScopeTrace) searchObjectFunction(name string, lastObj value.IVOR) (value.IVOR, string) {
+
+	// split name by dot
+	parts := strings.Split(name, ".")
+
+	if len(parts) == 0 {
+		log.Fatal("idk what u did, cant split by dot")
+		return nil, ""
+	}
+
+	if len(parts) == 1 {
+		obj, ok := lastObj.(*ObjectValue)
+
+		if ok {
+			return obj.InternalScope.GetFunction(name)
+		}
+
+		log.Fatal("idk what u did, cant convert to object")
+		return nil, ""
+	}
+
+	// then parts should be 2 or more
+
+	if lastObj == nil {
+		variable := s.GetVariable(parts[0])
+
+		if variable == nil {
+			return nil, "No se puede acceder a la propiedad " + parts[0]
+		}
+
+		obj := variable.Value
+
+		// obj must be an object/struct or vector
+
+		switch obj := obj.(type) {
+		case *ObjectValue:
+			lastObj = obj
+		case *VectorValue:
+			lastObj = obj.ObjectValue
+		default:
+			return nil, "La propiedad '" + variable.Name + "' de tipo " + obj.Type() + " no tiene propiedades"
+		}
+
+		return s.searchObjectFunction(strings.Join(parts[1:], "."), lastObj)
+	}
+
+	obj, ok := lastObj.(*ObjectValue)
+
+	if ok {
+		lastObj = obj.InternalScope.GetVariable(parts[0]).Value
+
+		return s.searchObjectFunction(strings.Join(parts[1:], "."), lastObj)
+	} else {
+		log.Fatal("idk what u did, cant convert to object")
+		return nil, ""
+	}
 }
 
 /*

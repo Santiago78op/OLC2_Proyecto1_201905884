@@ -116,6 +116,10 @@ func NewObjectValue(v *ReplVisitor, targetStruct string, targetToken antlr.Token
 				throwError = true
 			}
 
+			// create the pointer
+			assignValue = &PointerValue{
+				AssocVariable: arg.VariableRef,
+			}
 		}
 
 		if !throwError {
@@ -177,4 +181,14 @@ func NewObjectValue(v *ReplVisitor, targetStruct string, targetToken antlr.Token
 		v:             v,
 		t:             targetToken,
 	}
+}
+
+func IsArgValidForStruct(arg []*Argument) bool {
+	for _, a := range arg {
+
+		if a.Name == "" {
+			return false
+		}
+	}
+	return true
 }

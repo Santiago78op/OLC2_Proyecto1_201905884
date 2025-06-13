@@ -4,9 +4,8 @@
 
 package Test
 
-import (
-	"fmt"
-)
+/*
+
 
 // TestingRun es una función que simula la ejecución de pruebas de código.
 func TestingRun(code string) (string, error) {
@@ -16,7 +15,7 @@ func TestingRun(code string) (string, error) {
 		return "", fmt.Errorf("el código no puede estar vacío")
 	}
 
-	/* // 1. Análisis Léxico
+	// 1. Análisis Léxico
 	// Para verificar errores
 	//lexicalErrorListener := errors.NewLexicalErrorListener()
 	//
@@ -38,12 +37,12 @@ func TestingRun(code string) (string, error) {
 	evaluator := NewVLangVisitor()
 	resultado := evaluator.Visit(tree)
 
-	fmt.Printf("Resultado de la evaluación: %v\n", resultado) */
+	fmt.Printf("Resultado de la evaluación: %v\n", resultado)
 
 	return fmt.Sprintf("Código ejecutado: %s", code), nil
 }
 
-/*
+
 // Implementar visitor
 type VLangVisitor struct {
 	*compiler.BaseVLangParserVisitor
@@ -87,4 +86,5 @@ func (v *VLangVisitor) Visit(tree antlr.ParseTree) interface{} {
 	}
 
 }
+
 */
