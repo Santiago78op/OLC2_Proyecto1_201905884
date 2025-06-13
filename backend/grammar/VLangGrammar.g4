@@ -30,6 +30,7 @@ decl_stmt:
     var_type ID type ASSIGN expression  # MutVarDecl
     | var_type ID ASSIGN expression     # ValueDecl 
     | ID type ASSIGN expression         # VarAssDecl
+    | ID DEFINE expression              # ShortDecl
     ;
 
 // Inicia Declaracion de Vector

@@ -584,12 +584,12 @@ func (v *ReplVisitor) VisitForStmtCond(ctx *compiler.ForStmtCondContext) interfa
 }
 
 func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface{} {
-	initAssign := ctx.Assign_stmt(0)
+	initDecl := ctx.Decl_stmt()
 	condition := ctx.Expression()
-	updateAssign := ctx.Assign_stmt(1)
+	updateAssign := ctx.Assign_stmt()
 
 	v.ScopeTrace.PushScope("for_assignamet")
-	v.Visit(initAssign)
+	v.Visit(initDecl)
 
 	forItem := &CallStackItem{ReturnValue: value.DefaultNilValue, Type: []string{BreakItem, ContinueItem}}
 	v.CallStack.Push(forItem)

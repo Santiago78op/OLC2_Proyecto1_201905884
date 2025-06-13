@@ -32,6 +32,7 @@ DIV      : '/';
 MOD      : '%';
 
 // Operadores de Asignacion
+DEFINE      : ':=';
 ASSIGN      : '=';
 PLUS_ASSIGN : '+=';
 MINUS_ASSIGN: '-=';
