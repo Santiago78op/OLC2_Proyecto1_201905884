@@ -128,34 +128,6 @@ func (v *ReplVisitor) VisitMutVarDecl(ctx *compiler.MutVarDeclContext) interface
 	return nil
 }
 
-func (v *ReplVisitor) VisitShortDecl(ctx *compiler.ShortDeclContext) interface{} {
-
-	//  nombre de la variable
-	varName := ctx.ID().GetText()
-
-	//  expresión asignada
-	varValue := v.Visit(ctx.Expression()).(value.IVOR)
-
-	//  objeto, hacemos copia
-	if obj, ok := varValue.(*ObjectValue); ok {
-		varValue = obj.Copy()
-	}
-
-	varType := varValue.Type()
-
-	// se agrega al scope
-	variable, msg := v.ScopeTrace.AddVariable(varName, varType, varValue, false, false, ctx.GetStart())
-
-	// Validación de existencia de variable
-	if variable == nil {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
-	}
-
-	fmt.Printf("[DEBUG] Declaración corta: %s := %v (tipo: %v)\n", varName, varValue.Value(), varType)
-
-	return nil
-}
-
 func (v *ReplVisitor) VisitValueDecl(ctx *compiler.ValueDeclContext) interface{} {
 
 	isConst := false
@@ -664,21 +636,15 @@ func (v *ReplVisitor) VisitForStmtCond(ctx *compiler.ForStmtCondContext) interfa
 	v.CallStack.Clean(forItem)
 	return nil
 }
-
 func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface{} {
 
-	// Extraemos los nodos
-	initDecl := ctx.Decl_stmt()
+	initAssign := ctx.Assign_stmt(0)
 	condition := ctx.Expression()
-	updateAssign := ctx.Assign_stmt()
+	updateAssign := ctx.Assign_stmt(1)
 
-	// Creamos un nuevo scope para el for
 	v.ScopeTrace.PushScope("for_assignment")
+	v.Visit(initAssign)
 
-	// Ejecutamos la declaración inicial
-	v.Visit(initDecl)
-
-	// Creamos el item para soportar break/continue
 	forItem := &CallStackItem{
 		ReturnValue: value.DefaultNilValue,
 		Type:        []string{BreakItem, ContinueItem},
@@ -686,42 +652,45 @@ func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface
 	v.CallStack.Push(forItem)
 
 	defer func() {
-		v.ScopeTrace.PopScope()
-		v.CallStack.Clean(forItem)
-
 		if item, ok := recover().(*CallStackItem); item != nil && ok {
 			if item != forItem {
 				panic(item)
 			}
-			// Manejo de continue/break dentro del defer (sólo al final)
 			if item.IsAction(ContinueItem) {
 				item.ResetAction()
+			}
+			if item.IsAction(BreakItem) {
+				return
 			}
 		}
 	}()
 
 	for {
-		// Evaluamos la condición en cada iteración
-		condValue := v.Visit(condition).(value.IVOR)
+		condValue, ok := v.Visit(condition).(value.IVOR)
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Error evaluando la condición del for")
+			return nil
+		}
 
 		if condValue.Type() != value.IVOR_BOOL {
 			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condición del for debe ser un booleano")
 			return nil
 		}
 
-		if !condValue.Value().(bool) {
+		boolVal := condValue.Value().(bool)
+		if !boolVal {
 			break
 		}
 
-		// Ejecutamos el bloque de sentencias
 		for _, stmt := range ctx.AllStmt() {
 			v.Visit(stmt)
 		}
 
-		// Ejecutamos el incremento
 		v.Visit(updateAssign)
 	}
 
+	v.ScopeTrace.PopScope()
+	v.CallStack.Clean(forItem)
 	return nil
 }
 
@@ -735,7 +704,7 @@ func (v *ReplVisitor) VisitFuncCall(ctx *compiler.FuncCallContext) interface{} {
 
 	if funcObj == nil && structObj == nil {
 		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg1+msg2)
-		return value.DefaultNilValue
+		return value.DefaultNilValues
 	}
 
 	args := make([]*Argument, 0)
