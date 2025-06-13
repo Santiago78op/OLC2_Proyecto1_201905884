@@ -228,6 +228,9 @@ func (v *ReplVisitor) VisitAssignmentDecl(ctx *compiler.AssignmentDeclContext) i
 	varName := v.Visit(ctx.Id_pattern()).(string)
 	varValue := v.Visit(ctx.Expression()).(value.IVOR)
 
+	// Imprimir el valor que estás asignando
+	fmt.Printf("[DEBUG] Asignando variable '%s' con valor: %v (tipo: %v)\n", varName, varValue.Value(), varValue.Type())
+
 	variable := v.ScopeTrace.GetVariable(varName)
 
 	if variable == nil {
@@ -388,7 +391,7 @@ func (v *ReplVisitor) VisitIdPatternExpr(ctx *compiler.IdPatternExprContext) int
 		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+varName+" no encontrada")
 		return value.DefaultNilValue
 	}
-
+	fmt.Printf("[DEBUG] Accediendo variable '%s' con valor: %v (tipo: %v)\n", varName, variable.Value.Value(), variable.Value.Type())
 	// ? pointer
 	return variable.Value
 }
@@ -854,79 +857,60 @@ func (v *ReplVisitor) VisitDefaultCase(ctx *compiler.DefaultCaseContext) interfa
 }
 
 func (v *ReplVisitor) VisitForStmtCond(ctx *compiler.ForStmtCondContext) interface{} {
-	condition := v.Visit(ctx.Expression()).(value.IVOR)
-	// Push scope
-	whileScope := v.ScopeTrace.PushScope("for_cond")
+	condition := ctx.Expression()
 
-	// Push whileItem to call stack [breakable, continuable]
-	whileItem := &CallStackItem{
-		ReturnValue: value.DefaultNilValue,
-		Type: []string{
-			BreakItem,
-			ContinueItem,
-		},
-	}
+	forItem := &CallStackItem{ReturnValue: value.DefaultNilValue, Type: []string{BreakItem, ContinueItem}}
+	v.CallStack.Push(forItem)
+	v.ScopeTrace.PushScope("for_cond")
 
-	v.CallStack.Push(whileItem)
-
-	v.VisitInnerFor(ctx, condition, whileScope, whileItem)
-
-	v.ScopeTrace.PopScope()      // pop while scope
-	v.CallStack.Clean(whileItem) // clean item if it's still in call stack
-
-	return nil
-}
-
-func (v *ReplVisitor) VisitInnerFor(ctx *compiler.ForStmtCondContext, condition value.IVOR, ForScope *BaseScopeTrace, whileItem *CallStackItem) {
-
-	// ? use binary strat
-	if condition.Type() != value.IVOR_BOOL {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condicion del ciclo debe ser un booleano")
-		return
-	}
-
-	// reset scope
-	ForScope.Reset()
-
-	// handle break and continue statements from call stack
+	// Manejo de control de flujo con panic/recover
 	defer func() {
-
 		if item, ok := recover().(*CallStackItem); item != nil && ok {
 
-			// Not a while item, propagate panic
-			if item != whileItem {
+			// Si no es el for actual, propaga el panic hacia arriba
+			if item != forItem {
 				panic(item)
 			}
 
-			// Continue
+			// Si es un continue, simplemente dejamos que siga el ciclo
 			if item.IsAction(ContinueItem) {
-				item.ResetAction()                                   // reset action, can be used again
-				condition = v.Visit(ctx.Expression()).(value.IVOR)   // update condition
-				v.VisitInnerFor(ctx, condition, ForScope, whileItem) // continue
+				item.ResetAction()
 
-			} else if item.IsAction(BreakItem) {
-				// Break
-				return
+			}
+
+			// Si es un break, terminamos el for
+			if item.IsAction(BreakItem) {
+				// terminar el ciclo asd
 			}
 		}
 	}()
 
-	for condition.(*value.BoolValue).InternalValue {
+	for {
+		condValue, ok := v.Visit(condition).(value.IVOR)
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Error evaluando la condición del for")
+			return nil
+		}
+
+		if condValue.Type() != value.IVOR_BOOL {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condición del for debe ser un booleano")
+			return nil
+		}
+
+		boolVal := condValue.Value().(bool)
+		if !boolVal {
+			break
+		}
 
 		for _, stmt := range ctx.AllStmt() {
 			v.Visit(stmt)
+			// no se necesita verificar break, continue ni return porque son manejados automáticamente por el panic/recover
 		}
-
-		condition = v.Visit(ctx.Expression()).(value.IVOR)
-
-		if condition.Type() != value.IVOR_BOOL {
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La condicion del ciclo debe ser un booleano")
-			return
-		}
-
-		// reset scope
-		ForScope.Reset()
 	}
+
+	v.ScopeTrace.PopScope()
+	v.CallStack.Clean(forItem)
+	return nil
 }
 
 func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface{} {
