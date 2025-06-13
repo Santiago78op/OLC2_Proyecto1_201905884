@@ -50,12 +50,6 @@ func (s *BaseVLangGrammarListener) EnterVarAssDecl(ctx *VarAssDeclContext) {}
 // ExitVarAssDecl is called when production VarAssDecl is exited.
 func (s *BaseVLangGrammarListener) ExitVarAssDecl(ctx *VarAssDeclContext) {}
 
-// EnterShortDecl is called when production ShortDecl is entered.
-func (s *BaseVLangGrammarListener) EnterShortDecl(ctx *ShortDeclContext) {}
-
-// ExitShortDecl is called when production ShortDecl is exited.
-func (s *BaseVLangGrammarListener) ExitShortDecl(ctx *ShortDeclContext) {}
-
 // EnterVectorItemLis is called when production VectorItemLis is entered.
 func (s *BaseVLangGrammarListener) EnterVectorItemLis(ctx *VectorItemLisContext) {}
 

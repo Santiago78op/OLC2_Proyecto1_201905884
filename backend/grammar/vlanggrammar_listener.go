@@ -22,9 +22,6 @@ type VLangGrammarListener interface {
 	// EnterVarAssDecl is called when entering the VarAssDecl production.
 	EnterVarAssDecl(c *VarAssDeclContext)
 
-	// EnterShortDecl is called when entering the ShortDecl production.
-	EnterShortDecl(c *ShortDeclContext)
-
 	// EnterVectorItemLis is called when entering the VectorItemLis production.
 	EnterVectorItemLis(c *VectorItemLisContext)
 
@@ -204,9 +201,6 @@ type VLangGrammarListener interface {
 
 	// ExitVarAssDecl is called when exiting the VarAssDecl production.
 	ExitVarAssDecl(c *VarAssDeclContext)
-
-	// ExitShortDecl is called when exiting the ShortDecl production.
-	ExitShortDecl(c *ShortDeclContext)
 
 	// ExitVectorItemLis is called when exiting the VectorItemLis production.
 	ExitVectorItemLis(c *VectorItemLisContext)

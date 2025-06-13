@@ -27,10 +27,6 @@ func (v *BaseVLangGrammarVisitor) VisitVarAssDecl(ctx *VarAssDeclContext) interf
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseVLangGrammarVisitor) VisitShortDecl(ctx *ShortDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseVLangGrammarVisitor) VisitVectorItemLis(ctx *VectorItemLisContext) interface{} {
 	return v.VisitChildren(ctx)
 }
