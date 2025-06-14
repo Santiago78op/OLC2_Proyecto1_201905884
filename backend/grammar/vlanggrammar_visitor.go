@@ -22,6 +22,12 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#VarAssDecl.
 	VisitVarAssDecl(ctx *VarAssDeclContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#VarVectDecl.
+	VisitVarVectDecl(ctx *VarVectDeclContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#MutSliceDecl.
+	VisitMutSliceDecl(ctx *MutSliceDeclContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#VectorItemLis.
 	VisitVectorItemLis(ctx *VectorItemLisContext) interface{}
 
@@ -40,11 +46,11 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#var_type.
 	VisitVar_type(ctx *Var_typeContext) interface{}
 
-	// Visit a parse tree produced by VLangGrammar#type.
-	VisitType(ctx *TypeContext) interface{}
-
 	// Visit a parse tree produced by VLangGrammar#vector_type.
 	VisitVector_type(ctx *Vector_typeContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#type.
+	VisitType(ctx *TypeContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#matrix_type.
 	VisitMatrix_type(ctx *Matrix_typeContext) interface{}

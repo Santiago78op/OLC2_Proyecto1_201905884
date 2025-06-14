@@ -186,8 +186,42 @@ func (v *ReplVisitor) VisitVarDecl(ctx *compiler.VarAssDeclContext) interface{} 
 	return nil
 }
 
-func (v *ReplVisitor) VisitVectorItemList(ctx *compiler.VectorItemLisContext) interface{} {
+// Declaracion de vectores
+// Ejemplo: vector_1 []int = [1, 2, 3]
+// cibtexto VarVectDecl
+func (v *ReplVisitor) VisitVarVectDecl(ctx *compiler.VarVectDeclContext) interface{} {
+	// Si hubiera constantes se validan aquí
+	// isConst := isDeclConst(ctx.Var_type().GetText())
+	isConst := false // No se manejan constantes en vectores
 
+	// Obtenemos el context de la declaración VarVectDecl
+	varName := ctx.ID().GetText()
+	varType := v.Visit(ctx.Type_()).(string)
+	varValue := v.Visit(ctx.Vect_expr()).(value.IVOR)
+
+	// Validar tipo de variable
+	if obj, ok := varValue.(*ObjectValue); ok {
+		varValue = obj.Copy()
+	}
+
+	if IsVectorType(varValue.Type()) {
+		varValue = varValue.Copy()
+	}
+
+	variable, msg := v.ScopeTrace.AddVariable(varName, varType, varValue, isConst, false, ctx.GetStart())
+
+	// Variable already exists
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+	}
+
+	return nil
+}
+
+// Contextos VectorItemLis
+// Ejemplo: {1, 2, 3}
+func (v *ReplVisitor) VisitVectorItemLis(ctx *compiler.VectorItemLisContext) interface{} {
+	fmt.Printf("🔹 Visitando VectorItemLis: %s\n", ctx.GetText())
 	var vectorItems []value.IVOR
 
 	if len(ctx.AllExpression()) == 0 {
@@ -233,17 +267,19 @@ func (v *ReplVisitor) VisitType(ctx *compiler.TypeContext) interface{} {
 		return _type
 	}
 
-	/*
-		if IsVectorType(_type) {
-			// remove [ ]
-			internType := RemoveBrackets(_type)
-			if v.ValidType(internType) {
-				return _type
-			}
-
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), "El tipo "+internType+" no es valido para un vector")
-			return value.IVOR_NIL
+	if IsVectorType(_type) {
+		// remove [ ]
+		internType := RemoveBrackets(_type)
+		if v.ValidType(internType) {
+			return _type
 		}
+
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El tipo "+internType+" no es valido para un vector")
+		return value.IVOR_NIL
+	}
+
+	/*
+
 
 		if IsMatrixType(_type) {
 			// remove [[]]
@@ -554,9 +590,13 @@ func (v *ReplVisitor) VisitParensExpr(ctx *compiler.ParensExprContext) interface
 	return v.Visit(ctx.Expression())
 }
 
+// Expresiones con vectores
+func (v *ReplVisitor) VisitVectorExpr(ctx *compiler.VectorExprContext) interface{} {
+	return v.Visit(ctx.Vect_expr())
+}
+
 // Funciones con expresiones
 func (v *ReplVisitor) VisitFuncCallExpr(ctx *compiler.FuncCallExprContext) interface{} {
-	fmt.Printf("🔹 Visitando FuncCallExp: %s\n", ctx.GetText())
 	return v.Visit(ctx.Func_call())
 }
 
@@ -945,7 +985,7 @@ func (v *ReplVisitor) VisitArgList(ctx *compiler.ArgListContext) interface{} {
 }
 
 func (v *ReplVisitor) VisitFuncArg(ctx *compiler.FuncArgContext) interface{} {
-
+	fmt.Printf("🔹 Visitando FuncArg: %s\n", ctx.GetText())
 	argName := ""
 	passByReference := false
 

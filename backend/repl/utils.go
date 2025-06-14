@@ -22,17 +22,18 @@ func StringToVector(s *value.StringValue) *VectorValue {
 func IsVectorType(_type string) bool {
 
 	// Vector starts with only one [ and ends with only one ]
-	vectorPattern := "^\\[.*\\]$"
+	vectorPattern := "^\\{.*\\}$"
 
 	// Matrix starts with AT LEAST two [[ and ends with at least two ]]
-	matrixPattern := "^\\[\\[.*\\]\\](\\[.*\\]\\])*$"
+	//matrixPattern := "^\\[\\[.*\\]\\](\\[.*\\]\\])*$"
 
 	// match vector pattern but not matrix pattern
 
 	match, _ := regexp.MatchString(vectorPattern, _type)
-	match2, _ := regexp.MatchString(matrixPattern, _type)
+	//match2, _ := regexp.MatchString(matrixPattern, _type)
 
-	return match && !match2
+	//return match && !match2
+	return match
 }
 
 func RemoveBrackets(s string) string {

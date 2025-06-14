@@ -22,6 +22,12 @@ type VLangGrammarListener interface {
 	// EnterVarAssDecl is called when entering the VarAssDecl production.
 	EnterVarAssDecl(c *VarAssDeclContext)
 
+	// EnterVarVectDecl is called when entering the VarVectDecl production.
+	EnterVarVectDecl(c *VarVectDeclContext)
+
+	// EnterMutSliceDecl is called when entering the MutSliceDecl production.
+	EnterMutSliceDecl(c *MutSliceDeclContext)
+
 	// EnterVectorItemLis is called when entering the VectorItemLis production.
 	EnterVectorItemLis(c *VectorItemLisContext)
 
@@ -40,11 +46,11 @@ type VLangGrammarListener interface {
 	// EnterVar_type is called when entering the var_type production.
 	EnterVar_type(c *Var_typeContext)
 
-	// EnterType is called when entering the type production.
-	EnterType(c *TypeContext)
-
 	// EnterVector_type is called when entering the vector_type production.
 	EnterVector_type(c *Vector_typeContext)
+
+	// EnterType is called when entering the type production.
+	EnterType(c *TypeContext)
 
 	// EnterMatrix_type is called when entering the matrix_type production.
 	EnterMatrix_type(c *Matrix_typeContext)
@@ -208,6 +214,12 @@ type VLangGrammarListener interface {
 	// ExitVarAssDecl is called when exiting the VarAssDecl production.
 	ExitVarAssDecl(c *VarAssDeclContext)
 
+	// ExitVarVectDecl is called when exiting the VarVectDecl production.
+	ExitVarVectDecl(c *VarVectDeclContext)
+
+	// ExitMutSliceDecl is called when exiting the MutSliceDecl production.
+	ExitMutSliceDecl(c *MutSliceDeclContext)
+
 	// ExitVectorItemLis is called when exiting the VectorItemLis production.
 	ExitVectorItemLis(c *VectorItemLisContext)
 
@@ -226,11 +238,11 @@ type VLangGrammarListener interface {
 	// ExitVar_type is called when exiting the var_type production.
 	ExitVar_type(c *Var_typeContext)
 
-	// ExitType is called when exiting the type production.
-	ExitType(c *TypeContext)
-
 	// ExitVector_type is called when exiting the vector_type production.
 	ExitVector_type(c *Vector_typeContext)
+
+	// ExitType is called when exiting the type production.
+	ExitType(c *TypeContext)
 
 	// ExitMatrix_type is called when exiting the matrix_type production.
 	ExitMatrix_type(c *Matrix_typeContext)

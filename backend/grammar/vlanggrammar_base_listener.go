@@ -50,6 +50,18 @@ func (s *BaseVLangGrammarListener) EnterVarAssDecl(ctx *VarAssDeclContext) {}
 // ExitVarAssDecl is called when production VarAssDecl is exited.
 func (s *BaseVLangGrammarListener) ExitVarAssDecl(ctx *VarAssDeclContext) {}
 
+// EnterVarVectDecl is called when production VarVectDecl is entered.
+func (s *BaseVLangGrammarListener) EnterVarVectDecl(ctx *VarVectDeclContext) {}
+
+// ExitVarVectDecl is called when production VarVectDecl is exited.
+func (s *BaseVLangGrammarListener) ExitVarVectDecl(ctx *VarVectDeclContext) {}
+
+// EnterMutSliceDecl is called when production MutSliceDecl is entered.
+func (s *BaseVLangGrammarListener) EnterMutSliceDecl(ctx *MutSliceDeclContext) {}
+
+// ExitMutSliceDecl is called when production MutSliceDecl is exited.
+func (s *BaseVLangGrammarListener) ExitMutSliceDecl(ctx *MutSliceDeclContext) {}
+
 // EnterVectorItemLis is called when production VectorItemLis is entered.
 func (s *BaseVLangGrammarListener) EnterVectorItemLis(ctx *VectorItemLisContext) {}
 
@@ -86,17 +98,17 @@ func (s *BaseVLangGrammarListener) EnterVar_type(ctx *Var_typeContext) {}
 // ExitVar_type is called when production var_type is exited.
 func (s *BaseVLangGrammarListener) ExitVar_type(ctx *Var_typeContext) {}
 
-// EnterType is called when production type is entered.
-func (s *BaseVLangGrammarListener) EnterType(ctx *TypeContext) {}
-
-// ExitType is called when production type is exited.
-func (s *BaseVLangGrammarListener) ExitType(ctx *TypeContext) {}
-
 // EnterVector_type is called when production vector_type is entered.
 func (s *BaseVLangGrammarListener) EnterVector_type(ctx *Vector_typeContext) {}
 
 // ExitVector_type is called when production vector_type is exited.
 func (s *BaseVLangGrammarListener) ExitVector_type(ctx *Vector_typeContext) {}
+
+// EnterType is called when production type is entered.
+func (s *BaseVLangGrammarListener) EnterType(ctx *TypeContext) {}
+
+// ExitType is called when production type is exited.
+func (s *BaseVLangGrammarListener) ExitType(ctx *TypeContext) {}
 
 // EnterMatrix_type is called when production matrix_type is entered.
 func (s *BaseVLangGrammarListener) EnterMatrix_type(ctx *Matrix_typeContext) {}
