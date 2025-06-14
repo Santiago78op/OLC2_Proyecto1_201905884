@@ -142,7 +142,7 @@ func vlanggrammarParserInit() {
 		109, 125, 1, 0, 0, 0, 110, 111, 5, 50, 0, 0, 111, 112, 3, 20, 10, 0, 112,
 		113, 5, 23, 0, 0, 113, 114, 3, 34, 17, 0, 114, 125, 1, 0, 0, 0, 115, 116,
 		5, 50, 0, 0, 116, 117, 5, 23, 0, 0, 117, 118, 3, 20, 10, 0, 118, 119, 3,
-		6, 3, 0, 119, 125, 1, 0, 0, 0, 120, 121, 3, 16, 8, 0, 121, 122, 5, 50,
+		34, 17, 0, 119, 125, 1, 0, 0, 0, 120, 121, 3, 16, 8, 0, 121, 122, 5, 50,
 		0, 0, 122, 123, 3, 18, 9, 0, 123, 125, 1, 0, 0, 0, 124, 99, 1, 0, 0, 0,
 		124, 105, 1, 0, 0, 0, 124, 110, 1, 0, 0, 0, 124, 115, 1, 0, 0, 0, 124,
 		120, 1, 0, 0, 0, 125, 5, 1, 0, 0, 0, 126, 135, 5, 37, 0, 0, 127, 132, 3,
@@ -1413,10 +1413,10 @@ func (s *VarVectDeclContext) Type_() ITypeContext {
 	return t.(ITypeContext)
 }
 
-func (s *VarVectDeclContext) Vect_expr() IVect_exprContext {
+func (s *VarVectDeclContext) Expression() IExpressionContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IVect_exprContext); ok {
+		if _, ok := ctx.(IExpressionContext); ok {
 			t = ctx.(antlr.RuleContext)
 			break
 		}
@@ -1426,7 +1426,7 @@ func (s *VarVectDeclContext) Vect_expr() IVect_exprContext {
 		return nil
 	}
 
-	return t.(IVect_exprContext)
+	return t.(IExpressionContext)
 }
 
 func (s *VarVectDeclContext) EnterRule(listener antlr.ParseTreeListener) {
@@ -1574,7 +1574,7 @@ func (p *VLangGrammar) Decl_stmt() (localctx IDecl_stmtContext) {
 		}
 		{
 			p.SetState(118)
-			p.Vect_expr()
+			p.expression(0)
 		}
 
 	case 5:

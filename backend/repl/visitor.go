@@ -197,7 +197,7 @@ func (v *ReplVisitor) VisitVarVectDecl(ctx *compiler.VarVectDeclContext) interfa
 	// Obtenemos el context de la declaración VarVectDecl
 	varName := ctx.ID().GetText()
 	varType := v.Visit(ctx.Type_()).(string)
-	varValue := v.Visit(ctx.Vect_expr()).(value.IVOR)
+	varValue := v.Visit(ctx.Expression()).(value.IVOR)
 
 	// Validar tipo de variable
 	if obj, ok := varValue.(*ObjectValue); ok {
