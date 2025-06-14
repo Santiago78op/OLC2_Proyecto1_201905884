@@ -782,6 +782,51 @@ func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface
 	return nil
 }
 
+func (v *ReplVisitor) VisitReturnStmt(ctx *compiler.ReturnStmtContext) interface{} {
+
+	exits, item := v.CallStack.IsReturnEnv()
+
+	if !exits {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La sentencia return debe estar dentro de una funcion")
+		return nil
+	}
+
+	item.ReturnValue = value.DefaultNilValue
+	item.Action = ReturnItem
+
+	if ctx.Expression() != nil {
+		item.ReturnValue = v.Visit(ctx.Expression()).(value.IVOR)
+	}
+
+	panic(item)
+}
+
+func (v *ReplVisitor) VisitBreakStmt(ctx *compiler.BreakStmtContext) interface{} {
+
+	exits, item := v.CallStack.IsBreakEnv()
+
+	if !exits {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La sentencia break debe estar dentro de un ciclo o un switch")
+		return nil
+	}
+
+	item.Action = BreakItem
+	panic(item)
+}
+
+func (v *ReplVisitor) VisitContinueStmt(ctx *compiler.ContinueStmtContext) interface{} {
+
+	exits, item := v.CallStack.IsContinueEnv()
+
+	if !exits {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La sentencia continue debe estar dentro de un ciclo")
+		return nil
+	}
+
+	item.Action = ContinueItem
+	panic(item)
+}
+
 func (v *ReplVisitor) VisitFuncCall(ctx *compiler.FuncCallContext) interface{} {
 
 	// find if its a func or constructor of a struct
