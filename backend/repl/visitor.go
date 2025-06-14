@@ -1022,19 +1022,8 @@ func (v *ReplVisitor) VisitParamList(ctx *compiler.ParamListContext) interface{}
 
 func (v *ReplVisitor) VisitFuncParam(ctx *compiler.FuncParamContext) interface{} {
 
-	externName := ""
-	innerName := ""
-
-	// at least ID(0) is defined
-	// only 1 ID defined
-	if ctx.ID() == nil {
-		// innerName : type
-		// _ : type
-		innerName = ctx.ID().GetText()
-	} else {
-		// externName innerName : type
-		externName = ctx.ID().GetText()
-	}
+	externName := "_"
+	innerName := ctx.ID().GetText()
 
 	passByReference := false
 

@@ -128,10 +128,8 @@ func (v *DclVisitor) VisitParamList(ctx *compiler.ParamListContext) interface{} 
 
 func (v *DclVisitor) VisitFuncParam(ctx *compiler.FuncParamContext) interface{} {
 
-	externName := ""
-	innerName := ""
-
-	innerName = ctx.ID().GetText()
+	externName := "_"
+	innerName := ctx.ID().GetText()
 
 	passByReference := false
 

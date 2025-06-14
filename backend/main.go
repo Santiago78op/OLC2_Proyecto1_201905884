@@ -115,9 +115,12 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("🔹 Tree text: %s\n", tree.GetText())
 	fmt.Printf("🔹 Errores en ErrorTable: %d\n", len(syntaxErrorListener.ErrorTable.Errors))
 
+	// Esquema de funciones y estructuras declaradas en el codigo
 	dclVisitor := repl.NewDclVisitor(syntaxErrorListener.ErrorTable)
 	dclVisitor.Visit(tree)
 
+	// Procesa el contendifo de funciones y estructuras, procesar
+	// cualquiera codigo que nosea función o estructura
 	replVisitor := repl.NewVisitor(dclVisitor)
 	replVisitor.Visit(tree)
 

@@ -173,16 +173,16 @@ var DefaultBuiltInFunctions = map[string]*BuiltInFunction{
 		Name: "print",
 		Exec: Print,
 	},
-	"Int": {
-		Name: "Int",
+	"int": {
+		Name: "int",
 		Exec: Int,
 	},
-	"Float": {
-		Name: "Float",
+	"float": {
+		Name: "float",
 		Exec: Float,
 	},
-	"String": {
-		Name: "String",
+	"string": {
+		Name: "string",
 		Exec: String,
 	},
 }
