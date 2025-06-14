@@ -78,6 +78,8 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 		v.Visit(ctx.Decl_stmt())
 	} else if ctx.Assign_stmt() != nil {
 		v.Visit(ctx.Assign_stmt())
+	} else if ctx.Block_ind() != nil {
+		v.Visit(ctx.Block_ind())
 	} else if ctx.Transfer_stmt() != nil {
 		v.Visit(ctx.Transfer_stmt())
 	} else if ctx.Func_call() != nil {
@@ -1141,6 +1143,23 @@ func (v *ReplVisitor) VisitDefaultCase(ctx *compiler.DefaultCaseContext) interfa
 	for _, stmt := range ctx.AllStmt() {
 		v.Visit(stmt)
 	}
+	return nil
+}
+
+func (v *ReplVisitor) VisitBlockInd(ctx *compiler.BlockIndContext) interface{} {
+	fmt.Printf("🔹 Visitando BlockInd (bloque independiente): %s\n", ctx.GetText())
+
+	// Push scope para crear un nuevo ámbito local
+	v.ScopeTrace.PushScope("block")
+
+	// Ejecutar todas las sentencias dentro del bloque
+	for _, stmt := range ctx.AllStmt() {
+		v.Visit(stmt)
+	}
+
+	// Pop scope para restaurar el ámbito anterior
+	v.ScopeTrace.PopScope()
+
 	return nil
 }
 
