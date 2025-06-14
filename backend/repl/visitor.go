@@ -186,6 +186,41 @@ func (v *ReplVisitor) VisitVarDecl(ctx *compiler.VarAssDeclContext) interface{} 
 	return nil
 }
 
+func (v *ReplVisitor) VisitVectorItemList(ctx *compiler.VectorItemLisContext) interface{} {
+
+	var vectorItems []value.IVOR
+
+	if len(ctx.AllExpression()) == 0 {
+		return NewVectorValue(vectorItems, "[]", value.IVOR_ANY)
+	}
+
+	for _, item := range ctx.AllExpression() {
+		vectorItems = append(vectorItems, v.Visit(item).(value.IVOR))
+	}
+
+	var itemType = value.IVOR_NIL
+
+	if ctx.Expression(0) != nil {
+		itemType = vectorItems[0].Type()
+
+		for _, item := range vectorItems {
+			if item.Type() != itemType {
+				v.ErrorTable.NewSemanticError(ctx.GetStart(), "Todos los items de la coleccion deben ser del mismo tipo")
+				return value.DefaultNilValue
+			}
+		}
+	}
+
+	_type := "[" + itemType + "]"
+
+	if IsVectorType(_type) {
+		return NewVectorValue(vectorItems, _type, itemType)
+	}
+
+	v.ErrorTable.NewSemanticError(ctx.GetStart(), "Tipo "+_type+" no encontrado")
+	return value.DefaultNilValue
+}
+
 // Faltan Vectores aca Vector Item - vect_expr
 
 // VisitType es el visitor para el tipo de dato en la declaración de variables.

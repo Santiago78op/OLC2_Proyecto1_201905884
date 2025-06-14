@@ -29,18 +29,22 @@ stmt:
 decl_stmt: 
     var_type ID type ASSIGN expression  # MutVarDecl
     | var_type ID ASSIGN expression     # ValueDecl 
-    | ID type ASSIGN expression         # VarAssDecl
+    | ID type ASSIGN expression         # VarAssDecl    
+    | var_type ID vector_type           # MutSliceDecl // mut slice []int
     ;
 
 // Inicia Declaracion de Vector
+// {1,2,3,4}
 vect_expr:
-    LBRACK ( expression (COMMA expression)* )? RBRACK  # VectorItemLis
+    LBRACE ( expression (COMMA expression)* )? RBRACE  # VectorItemLis
     ;
 
 vect_item:
     id_pattern (LBRACE expression RBRACE)+   # VectorItem
     ;
 
+// llamada a un vector por medio de una propiedad
+// ejemplo: vector_1.id
 vect_prop:
     vect_item DOT id_pattern   # VectorProperty
     ;
@@ -59,13 +63,15 @@ var_type
     : MUT
     ;
 
+// Inicia Declaracion de Vectores
+// [] int, [] float, [] String, [] bool
+vector_type: LBRACK RBRACK ID
+    ;
+
 type: 
     ID 
     | vector_type 
     | matrix_type
-    ;
-
-vector_type: LBRACE ID RBRACK
     ;
 
 matrix_type: 
