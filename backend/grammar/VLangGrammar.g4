@@ -30,7 +30,7 @@ decl_stmt:
     var_type ID type ASSIGN expression  # MutVarDecl
     | var_type ID ASSIGN expression     # ValueDecl 
     | ID type ASSIGN expression         # VarAssDecl  
-    | ID ASSIGN type vect_expr          # VarVectDecl  // vector []int = {1,2,3,4}
+    | ID ASSIGN type expression         # VarVectDecl  // vector []int = {1,2,3,4}
     | var_type ID vector_type           # MutSliceDecl // mut slice []int
     ;
 

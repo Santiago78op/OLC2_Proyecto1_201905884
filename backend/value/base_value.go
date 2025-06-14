@@ -11,7 +11,7 @@ const (
 	IVOR_NIL              = "nil"
 	IVOR_BUILTIN_FUNCTION = "builtinFunction"
 	IVOR_FUNCTION         = "function"
-	IVOR_VECTOR           = "bector"
+	IVOR_VECTOR           = "vector"
 	IVOR_OBJECT           = "object"
 	IVOR_ANY              = "any"
 	IVOR_POINTER          = "pointer"
