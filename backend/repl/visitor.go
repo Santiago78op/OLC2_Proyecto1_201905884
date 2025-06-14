@@ -78,6 +78,8 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 		v.Visit(ctx.Decl_stmt())
 	} else if ctx.Assign_stmt() != nil {
 		v.Visit(ctx.Assign_stmt())
+	} else if ctx.Transfer_stmt() != nil {
+		v.Visit(ctx.Transfer_stmt())
 	} else if ctx.Func_call() != nil {
 		v.Visit(ctx.Func_call())
 	} else if ctx.Func_dcl() != nil {
@@ -516,7 +518,8 @@ func (v *ReplVisitor) VisitParensExpr(ctx *compiler.ParensExprContext) interface
 }
 
 // Funciones con expresiones
-func (v *ReplVisitor) VisitFuncCallExp(ctx *compiler.FuncCallExprContext) interface{} {
+func (v *ReplVisitor) VisitFuncCallExpr(ctx *compiler.FuncCallExprContext) interface{} {
+	fmt.Printf("🔹 Visitando FuncCallExp: %s\n", ctx.GetText())
 	return v.Visit(ctx.Func_call())
 }
 
@@ -1022,8 +1025,20 @@ func (v *ReplVisitor) VisitParamList(ctx *compiler.ParamListContext) interface{}
 
 func (v *ReplVisitor) VisitFuncParam(ctx *compiler.FuncParamContext) interface{} {
 
-	externName := "_"
-	innerName := ctx.ID().GetText()
+	externName := ""
+	innerName := ""
+
+	// at least ID(0) is defined
+	// only 1 ID defined
+	if ctx.ID() == nil {
+		// innerName : type
+		// _ : type
+		innerName = "_"
+	} else {
+		// externName innerName : type
+		externName = "_"
+		innerName = ctx.ID().GetText()
+	}
 
 	passByReference := false
 
