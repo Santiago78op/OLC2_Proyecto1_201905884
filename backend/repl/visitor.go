@@ -62,13 +62,13 @@ func (v *ReplVisitor) Visit(tree antlr.ParseTree) interface{} {
 }
 
 func (v *ReplVisitor) VisitProgram(ctx *compiler.ProgramContext) interface{} {
-	fmt.Printf("🎯 ¡ENTRANDO A ReplVisitor.VisitProgram!\n")
-	fmt.Printf("🔹 Número de statements: %d\n", len(ctx.AllStmt()))
+	log.Println("🎯 ¡ENTRANDO A ReplVisitor.VisitProgram!")
 
-	for i, stmt := range ctx.AllStmt() {
-		fmt.Printf("🔹 Procesando statement %d: %s\n", i, stmt.GetText())
+	for _, stmt := range ctx.AllStmt() {
+		log.Println("🔹 Procesando statement:", stmt.GetText())
 		v.Visit(stmt)
 	}
+
 	return nil
 }
 
@@ -88,8 +88,12 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 		v.Visit(ctx.Switch_stmt())
 	} else if ctx.For_stmt() != nil {
 		v.Visit(ctx.For_stmt())
+	} else if ctx.Strct_dcl() != nil {
+		v.Visit(ctx.Strct_dcl())
+	} else if ctx.Struct_instantiation() != nil {
+		v.Visit(ctx.Struct_instantiation())
 	} else {
-		log.Fatal("Statement not recognized: ", ctx.GetText())
+		log.Println("⚠️ Statement no reconocido:", ctx.GetText())
 	}
 
 	return nil
@@ -496,17 +500,28 @@ func (v *ReplVisitor) VisitDecremento(ctx *compiler.DecrementoContext) interface
 }
 
 func (v *ReplVisitor) VisitIdPatternExpr(ctx *compiler.IdPatternExprContext) interface{} {
-	varName := ctx.Id_pattern().GetText()
+	idParts := strings.Split(ctx.GetText(), ".")
+	base := idParts[0]
 
-	variable := v.ScopeTrace.GetVariable(varName)
-
+	variable := v.ScopeTrace.GetVariable(base)
 	if variable == nil {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+varName+" no encontrada")
-		return value.DefaultNilValue
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+base+" no encontrada")
+		return nil
 	}
 
-	// ? pointer
-	return variable.Value
+	val := variable.Value
+
+	for i := 1; i < len(idParts); i++ {
+		if structVal, ok := val.(*value.StructValue); ok {
+			field := idParts[i]
+			val = structVal.Instance.Fields[field]
+		} else {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Acceso inválido a campo "+idParts[i])
+			return nil
+		}
+	}
+
+	return val
 }
 
 // Expresiones con parentesis
@@ -1242,3 +1257,120 @@ func (v *ReplVisitor) VisitNumericRange(ctx *compiler.NumericRangeContext) inter
 	}
 }
 */
+
+// Structs
+func (v *ReplVisitor) VisitStructDecl(ctx *compiler.StructDeclContext) interface{} {
+	if v.ScopeTrace.CurrentScope != v.ScopeTrace.GlobalScope {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Los structs solo pueden ser declaradas en el scope global")
+		return nil
+	}
+
+	structAdded, msg := v.ScopeTrace.GlobalScope.AddStruct(ctx.ID().GetText(), &Struct{
+		Name:   ctx.ID().GetText(),
+		Fields: ctx.AllStruct_prop(),
+		Token:  ctx.GetStart(),
+	})
+
+	if !structAdded {
+		v.ErrorTable.NewSemanticError(ctx.ID().GetSymbol(), msg)
+	}
+
+	return nil
+}
+
+func (v *ReplVisitor) VisitStructAttr(ctx *compiler.StructAttrContext) interface{} {
+	varName := ctx.ID().GetText()
+	explicitType := ""
+	finalType := ""
+	var varValue value.IVOR = value.DefaultUnInitializedValue
+
+	if ctx.Type_() != nil {
+		explicitType = v.Visit(ctx.Type_()).(string)
+		finalType = explicitType
+	} else {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Los atributos de un struct deben tener tipo explícito")
+		return nil
+	}
+
+	variable, msg := v.ScopeTrace.AddVariable(varName, finalType, varValue, true, true, ctx.ID().GetSymbol())
+
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+	}
+
+	return nil
+}
+
+type StructInstance struct {
+	StructName string
+	Fields     map[string]value.IVOR
+}
+
+func (v *ReplVisitor) VisitStructInstantiationExpr(ctx *compiler.Struct_instantiationContext) interface{} {
+	idToken := ctx.ID()
+	if idToken == nil {
+		log.Println("❌ Error: no se pudo obtener el ID del struct")
+		return nil
+	}
+	structName := idToken.GetText()
+	log.Printf("Nombre del struct a instanciar: %s\n", structName)
+
+	params := ctx.Struct_param_list()
+	fieldsMap := make(map[string]value.IVOR)
+
+	if params != nil {
+		i := 0
+		for {
+			paramCtx := params.Struct_param(i)
+			if paramCtx == nil {
+				break
+			}
+			paramName := paramCtx.ID().GetText()
+			exprValue := v.Visit(paramCtx.Expression()).(value.IVOR)
+			log.Printf("Param: %s = %v\n", paramName, exprValue)
+			fieldsMap[paramName] = exprValue
+			i++
+		}
+	}
+
+	structValue := &value.StructValue{
+		Instance: &value.StructInstance{
+			StructName: structName,
+			Fields:     fieldsMap,
+		},
+	}
+
+	log.Println("Instancia creada correctamente:", structValue.ToString())
+	return structValue
+}
+
+func (v *ReplVisitor) VisitStruct_param(ctx *compiler.Struct_paramContext) interface{} {
+	fieldName := ctx.ID().GetText()
+	val := v.Visit(ctx.Expression()).(value.IVOR)
+
+	return &StructFieldValue{
+		Name:  fieldName,
+		Value: val,
+	}
+}
+
+type StructFieldValue struct {
+	Name  string
+	Value value.IVOR
+}
+
+// func (v *ReplVisitor) VisitStructFunc(ctx *compiler.StructFuncContext) interface{} {
+
+// 	funcDcl := v.Visit(ctx.Func_dcl())
+
+// 	if ctx.MUTATING_KW() != nil {
+// 		structFunc, ok := funcDcl.(*Function)
+
+// 		if !ok {
+// 			return nil
+// 		}
+// 		structFunc.IsMutating = true
+// 	}
+
+// 	return nil
+// }

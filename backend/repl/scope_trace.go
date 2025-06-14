@@ -24,6 +24,10 @@ type BaseScopeTrace struct {
 	isStruct   bool                  // Indica si el ámbito actual es un ámbito de estructura
 }
 
+func (b *BaseScopeTrace) GetStructs() map[string]*Struct {
+	return b.structs
+}
+
 // Name devuelve el nombre del ámbito actual.
 func (s *BaseScopeTrace) Name() string {
 	return s.name

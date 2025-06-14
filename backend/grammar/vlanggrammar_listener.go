@@ -88,17 +88,26 @@ type VLangGrammarListener interface {
 	// EnterRepeatingExpr is called when entering the RepeatingExpr production.
 	EnterRepeatingExpr(c *RepeatingExprContext)
 
-	// EnterVectorPropertyExpr is called when entering the VectorPropertyExpr production.
-	EnterVectorPropertyExpr(c *VectorPropertyExprContext)
-
 	// EnterIncredecr is called when entering the incredecr production.
 	EnterIncredecr(c *IncredecrContext)
 
-	// EnterVectorItemExpr is called when entering the VectorItemExpr production.
-	EnterVectorItemExpr(c *VectorItemExprContext)
-
 	// EnterBinaryExpr is called when entering the BinaryExpr production.
 	EnterBinaryExpr(c *BinaryExprContext)
+
+	// EnterStructInstantiationExpr is called when entering the StructInstantiationExpr production.
+	EnterStructInstantiationExpr(c *StructInstantiationExprContext)
+
+	// EnterUnaryExpr is called when entering the UnaryExpr production.
+	EnterUnaryExpr(c *UnaryExprContext)
+
+	// EnterIdPatternExpr is called when entering the IdPatternExpr production.
+	EnterIdPatternExpr(c *IdPatternExprContext)
+
+	// EnterVectorPropertyExpr is called when entering the VectorPropertyExpr production.
+	EnterVectorPropertyExpr(c *VectorPropertyExprContext)
+
+	// EnterVectorItemExpr is called when entering the VectorItemExpr production.
+	EnterVectorItemExpr(c *VectorItemExprContext)
 
 	// EnterParensExpr is called when entering the ParensExpr production.
 	EnterParensExpr(c *ParensExprContext)
@@ -111,12 +120,6 @@ type VLangGrammarListener interface {
 
 	// EnterVectorExpr is called when entering the VectorExpr production.
 	EnterVectorExpr(c *VectorExprContext)
-
-	// EnterUnaryExpr is called when entering the UnaryExpr production.
-	EnterUnaryExpr(c *UnaryExprContext)
-
-	// EnterIdPatternExpr is called when entering the IdPatternExpr production.
-	EnterIdPatternExpr(c *IdPatternExprContext)
 
 	// EnterFuncCallExpr is called when entering the FuncCallExpr production.
 	EnterFuncCallExpr(c *FuncCallExprContext)
@@ -189,6 +192,15 @@ type VLangGrammarListener interface {
 
 	// EnterStructAttr is called when entering the StructAttr production.
 	EnterStructAttr(c *StructAttrContext)
+
+	// EnterStruct_instantiation is called when entering the struct_instantiation production.
+	EnterStruct_instantiation(c *Struct_instantiationContext)
+
+	// EnterStruct_param_list is called when entering the struct_param_list production.
+	EnterStruct_param_list(c *Struct_param_listContext)
+
+	// EnterStruct_param is called when entering the struct_param production.
+	EnterStruct_param(c *Struct_paramContext)
 
 	// EnterStructVector is called when entering the StructVector production.
 	EnterStructVector(c *StructVectorContext)
@@ -274,17 +286,26 @@ type VLangGrammarListener interface {
 	// ExitRepeatingExpr is called when exiting the RepeatingExpr production.
 	ExitRepeatingExpr(c *RepeatingExprContext)
 
-	// ExitVectorPropertyExpr is called when exiting the VectorPropertyExpr production.
-	ExitVectorPropertyExpr(c *VectorPropertyExprContext)
-
 	// ExitIncredecr is called when exiting the incredecr production.
 	ExitIncredecr(c *IncredecrContext)
 
-	// ExitVectorItemExpr is called when exiting the VectorItemExpr production.
-	ExitVectorItemExpr(c *VectorItemExprContext)
-
 	// ExitBinaryExpr is called when exiting the BinaryExpr production.
 	ExitBinaryExpr(c *BinaryExprContext)
+
+	// ExitStructInstantiationExpr is called when exiting the StructInstantiationExpr production.
+	ExitStructInstantiationExpr(c *StructInstantiationExprContext)
+
+	// ExitUnaryExpr is called when exiting the UnaryExpr production.
+	ExitUnaryExpr(c *UnaryExprContext)
+
+	// ExitIdPatternExpr is called when exiting the IdPatternExpr production.
+	ExitIdPatternExpr(c *IdPatternExprContext)
+
+	// ExitVectorPropertyExpr is called when exiting the VectorPropertyExpr production.
+	ExitVectorPropertyExpr(c *VectorPropertyExprContext)
+
+	// ExitVectorItemExpr is called when exiting the VectorItemExpr production.
+	ExitVectorItemExpr(c *VectorItemExprContext)
 
 	// ExitParensExpr is called when exiting the ParensExpr production.
 	ExitParensExpr(c *ParensExprContext)
@@ -297,12 +318,6 @@ type VLangGrammarListener interface {
 
 	// ExitVectorExpr is called when exiting the VectorExpr production.
 	ExitVectorExpr(c *VectorExprContext)
-
-	// ExitUnaryExpr is called when exiting the UnaryExpr production.
-	ExitUnaryExpr(c *UnaryExprContext)
-
-	// ExitIdPatternExpr is called when exiting the IdPatternExpr production.
-	ExitIdPatternExpr(c *IdPatternExprContext)
 
 	// ExitFuncCallExpr is called when exiting the FuncCallExpr production.
 	ExitFuncCallExpr(c *FuncCallExprContext)
@@ -375,6 +390,15 @@ type VLangGrammarListener interface {
 
 	// ExitStructAttr is called when exiting the StructAttr production.
 	ExitStructAttr(c *StructAttrContext)
+
+	// ExitStruct_instantiation is called when exiting the struct_instantiation production.
+	ExitStruct_instantiation(c *Struct_instantiationContext)
+
+	// ExitStruct_param_list is called when exiting the struct_param_list production.
+	ExitStruct_param_list(c *Struct_param_listContext)
+
+	// ExitStruct_param is called when exiting the struct_param production.
+	ExitStruct_param(c *Struct_paramContext)
 
 	// ExitStructVector is called when exiting the StructVector production.
 	ExitStructVector(c *StructVectorContext)

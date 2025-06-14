@@ -21,6 +21,7 @@ stmt:
     | vect_func 
     | func_dcl
     | strct_dcl
+    | struct_instantiation
     ;
 
 // Inicia Declaracion de variable
@@ -140,6 +141,7 @@ expression
     ) right = expression                             # BinaryExpr
     | left = expression op = AND right = expression  # BinaryExpr
     | left = expression op = OR right = expression   # BinaryExpr
+    | struct_instantiation                           # StructInstantiationExpr
     ;
 // Terminan Expresiones
 
@@ -203,11 +205,24 @@ param_list: func_param (COMMA func_param)* # ParamList;
 func_param: ID type                        # FuncParam;
 
 // Inicia Estructuras de control
-strct_dcl: STR ID LBRACE struct_prop* RBRACE # StructDecl;
+strct_dcl: STR ID LBRACE struct_prop+ RBRACE # StructDecl;
 
 struct_prop:
-	var_type ID (COLON type)? (ASSIGN expression)?	# StructAttr
+    type ID SEMI # StructAttr
+;
+
+struct_instantiation
+    : ID LBRACE struct_param_list? RBRACE
     ;
+
+struct_param_list
+    : struct_param (',' struct_param)* ','?
+    ;
+
+struct_param
+    : ID ':' expression
+    ;
+
 
 struct_vector: LBRACK ID RBRACK LPAREN RPAREN       # StructVector
     ;

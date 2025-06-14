@@ -88,17 +88,26 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#RepeatingExpr.
 	VisitRepeatingExpr(ctx *RepeatingExprContext) interface{}
 
-	// Visit a parse tree produced by VLangGrammar#VectorPropertyExpr.
-	VisitVectorPropertyExpr(ctx *VectorPropertyExprContext) interface{}
-
 	// Visit a parse tree produced by VLangGrammar#incredecr.
 	VisitIncredecr(ctx *IncredecrContext) interface{}
 
-	// Visit a parse tree produced by VLangGrammar#VectorItemExpr.
-	VisitVectorItemExpr(ctx *VectorItemExprContext) interface{}
-
 	// Visit a parse tree produced by VLangGrammar#BinaryExpr.
 	VisitBinaryExpr(ctx *BinaryExprContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#StructInstantiationExpr.
+	VisitStructInstantiationExpr(ctx *StructInstantiationExprContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#UnaryExpr.
+	VisitUnaryExpr(ctx *UnaryExprContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#IdPatternExpr.
+	VisitIdPatternExpr(ctx *IdPatternExprContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#VectorPropertyExpr.
+	VisitVectorPropertyExpr(ctx *VectorPropertyExprContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#VectorItemExpr.
+	VisitVectorItemExpr(ctx *VectorItemExprContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#ParensExpr.
 	VisitParensExpr(ctx *ParensExprContext) interface{}
@@ -111,12 +120,6 @@ type VLangGrammarVisitor interface {
 
 	// Visit a parse tree produced by VLangGrammar#VectorExpr.
 	VisitVectorExpr(ctx *VectorExprContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#UnaryExpr.
-	VisitUnaryExpr(ctx *UnaryExprContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#IdPatternExpr.
-	VisitIdPatternExpr(ctx *IdPatternExprContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#FuncCallExpr.
 	VisitFuncCallExpr(ctx *FuncCallExprContext) interface{}
@@ -189,6 +192,15 @@ type VLangGrammarVisitor interface {
 
 	// Visit a parse tree produced by VLangGrammar#StructAttr.
 	VisitStructAttr(ctx *StructAttrContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#struct_instantiation.
+	VisitStruct_instantiation(ctx *Struct_instantiationContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#struct_param_list.
+	VisitStruct_param_list(ctx *Struct_param_listContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#struct_param.
+	VisitStruct_param(ctx *Struct_paramContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#StructVector.
 	VisitStructVector(ctx *StructVectorContext) interface{}
