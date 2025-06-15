@@ -23,6 +23,8 @@ type ReplVisitor struct {
 	StructNames []string
 }
 
+var _ compiler.VLangGrammarVisitor = (*ReplVisitor)(nil)
+
 func NewVisitor(dclVisitor *DclVisitor) *ReplVisitor {
 	return &ReplVisitor{
 		ScopeTrace:  dclVisitor.ScopeTrace,
@@ -55,6 +57,8 @@ func (v *ReplVisitor) Visit(tree antlr.ParseTree) interface{} {
 		fmt.Printf("❌ ERROR NODE en ReplVisitor: %s\n", val.GetText())
 		log.Fatal(val.GetText())
 		return nil
+	case *compiler.FuncCallExprContext:
+		return v.VisitFuncCall(val.Func_call().(*compiler.FuncCallContext))
 	default:
 		fmt.Printf("🔹 ReplVisitor aceptando tree\n")
 		return tree.Accept(v)
@@ -132,12 +136,10 @@ func (v *ReplVisitor) VisitValueDecl(ctx *compiler.ValueDeclContext) interface{}
 
 	isConst := false
 	varName := ctx.ID().GetText()
-	fmt.Printf("[DEBUG] Iniciando ValueDecl para variable '%s'\n", varName)
 
 	varValue := v.Visit(ctx.Expression()).(value.IVOR)
 
 	varType := varValue.Type()
-	fmt.Printf("[DEBUG] Tipo inferido para '%s': %s\n", varName, varType)
 
 	if varType == "[]" {
 		v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede inferir el tipo de un vector vacio '"+varName+"'")
@@ -461,8 +463,7 @@ func (v *ReplVisitor) VisitParensExpr(ctx *compiler.ParensExprContext) interface
 }
 
 // Funciones con expresiones
-func (v *ReplVisitor) VisitFuncCallExp(ctx *compiler.FuncCallExprContext) interface{} {
-	fmt.Print("El valor de FuncCallExp es: " + ctx.GetText() + "\n")
+func (v *ReplVisitor) VisitFuncCallExpression(ctx *compiler.FuncCallExprContext) interface{} {
 	return v.Visit(ctx.Func_call())
 }
 

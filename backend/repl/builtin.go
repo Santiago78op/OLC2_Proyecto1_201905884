@@ -230,9 +230,6 @@ func TypeOf(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 	// Obtenemos el tipo directamente (ya es el nombre del tipo)
 	typeName := argValue.Type()
 
-	// Debug: imprimir el tipo en la consola interna del intérprete
-	context.Console.Print("[DEBUG] TypeOf: " + typeName)
-
 	return &value.StringValue{
 		InternalValue: typeName,
 	}, true, ""
