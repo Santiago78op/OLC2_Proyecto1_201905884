@@ -38,6 +38,41 @@ func (v *Variable) TypeValidation() (bool, string) {
 	if v.Type != v.Value.Type() {
 
 		// Falta validar Vectores
+		// vector type validation
+		if IsVectorType(v.Type) && IsVectorType(v.Value.Type()) {
+
+			// empty vector cast
+			if v.Value.Type() == "[]" {
+
+				// modify vector type
+				v.Value.(*VectorValue).ItemType = RemoveBrackets(v.Type)
+				v.Value.(*VectorValue).FullType = v.Type
+
+				return true, ""
+			}
+
+			// implicit vector conversion
+
+			targetType := RemoveBrackets(v.Type) // inner type
+			newConvertedItems := make([]value.IVOR, 0)
+
+			for _, item := range v.Value.(*VectorValue).InternalValue {
+				convertedValue, ok := value.ImplicitCast(targetType, item)
+
+				if !ok {
+					break
+				}
+				newConvertedItems = append(newConvertedItems, convertedValue)
+			}
+
+			if len(newConvertedItems) == len(v.Value.(*VectorValue).InternalValue) {
+				return true, ""
+			}
+
+			msg := "No se puede asignar un vector de tipo " + v.Value.Type() + " a una vector de tipo " + v.Type
+			v.Value = value.DefaultNilValue
+			return false, msg
+		}
 
 		// Trata de hacer una conversión implícita del valor al tipo de la variable
 		convertedValue, ok := value.ImplicitCast(v.Type, v.Value)
