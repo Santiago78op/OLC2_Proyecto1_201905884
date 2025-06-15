@@ -19,77 +19,53 @@ type Variable struct {
 func (v *Variable) TypeValidation() (bool, string) {
 
 	// Verifica sel valor sea igual a default uninitialized value
-	// y si es asi, retorna true y un mensaje indicando que la variable no ha sido inicializada
-	// Ejemplo: mut x int;
 	if v.Value == value.DefaultUnInitializedValue {
 		v.Value = value.DefaultValue(v.Type, v.Value)
 		return true, ""
 	}
 
 	// Verifica si el valor de la variable es nulo
-	// y si es asi, retorna true y un mensaje indicando que la variable es nula
-	// Ejemplo: mut x = nil;
 	if v.Value == value.DefaultNilValue {
 		if v.AllowNil {
 			return true, ""
 		}
 	}
 
-	if v.Type != v.Value.Type() {
+	// *** VALIDACIÓN ESPECÍFICA PARA VECTORES ***
+	if IsVectorType(v.Type) && IsVectorType(v.Value.Type()) {
+		// Extraer tipos de elementos para comparar
+		varItemType := RemoveBrackets(v.Type)           // ej: "int" de "[]int"
+		valueItemType := RemoveBrackets(v.Value.Type()) // ej: "int" de "[]int"
 
-		// Falta validar Vectores
-		// vector type validation
-		if IsVectorType(v.Type) && IsVectorType(v.Value.Type()) {
-
-			// empty vector cast
-			if v.Value.Type() == "[]" {
-
-				// modify vector type
-				v.Value.(*VectorValue).ItemType = RemoveBrackets(v.Type)
-				v.Value.(*VectorValue).FullType = v.Type
-
-				return true, ""
-			}
-
-			// implicit vector conversion
-
-			targetType := RemoveBrackets(v.Type) // inner type
-			newConvertedItems := make([]value.IVOR, 0)
-
-			for _, item := range v.Value.(*VectorValue).InternalValue {
-				convertedValue, ok := value.ImplicitCast(targetType, item)
-
-				if !ok {
-					break
-				}
-				newConvertedItems = append(newConvertedItems, convertedValue)
-			}
-
-			if len(newConvertedItems) == len(v.Value.(*VectorValue).InternalValue) {
-				return true, ""
-			}
-
-			msg := "No se puede asignar un vector de tipo " + v.Value.Type() + " a una vector de tipo " + v.Type
+		// Si los tipos de elementos coinciden, la asignación es válida
+		if varItemType == valueItemType {
+			return true, ""
+		} else {
+			msg := "Type mismatch: No se puede asignar un vector de tipo " + v.Value.Type() + " a una variable de tipo " + v.Type
 			v.Value = value.DefaultNilValue
 			return false, msg
 		}
+	}
 
-		// Trata de hacer una conversión implícita del valor al tipo de la variable
+	// *** VALIDACIÓN PARA VECTORES VACÍOS ***
+	if IsVectorType(v.Type) && v.Value.Type() == "[]" {
+		return true, ""
+	}
+
+	// Comparación de tipos exactos para otros casos
+	if v.Type != v.Value.Type() {
+		// Trata de hacer una conversión implícita
 		convertedValue, ok := value.ImplicitCast(v.Type, v.Value)
 
 		if !ok {
-			// Si la conversión falla, retorna false y un mensaje de error
-			// La variable obtine el valor de nil a no saber que tipo convertir
-			msg := "Type mismatch: No se puede asignar un valor al tipo: " + v.Value.Type() + " a una variable de tipo: " + v.Type
+			msg := "Type mismatch: No se puede asignar un valor de tipo " + v.Value.Type() + " a una variable de tipo " + v.Type
 			v.Value = value.DefaultNilValue
 			return false, msg
 		}
 
-		// Si la conversión es exitosa, actualiza el valor de la variable
 		v.Value = convertedValue
 	}
 
-	// Si todo está bien, retorna True y un mensaje de éxito
 	return true, ""
 }
 
