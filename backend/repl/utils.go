@@ -22,7 +22,8 @@ func StringToVector(s *value.StringValue) *VectorValue {
 func IsVectorType(_type string) bool {
 
 	// Vector starts with only one [ and ends with only one ]
-	vectorPattern := "^\\{.*\\}$"
+	// el verctorPattern ahora valida la espresion []tipo
+	vectorPattern := "^\\[\\](int|float|bool|string)"
 
 	// Matrix starts with AT LEAST two [[ and ends with at least two ]]
 	//matrixPattern := "^\\[\\[.*\\]\\](\\[.*\\]\\])*$"

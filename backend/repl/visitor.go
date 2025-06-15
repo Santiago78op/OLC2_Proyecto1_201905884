@@ -245,7 +245,7 @@ func (v *ReplVisitor) VisitVectorItemLis(ctx *compiler.VectorItemLisContext) int
 		}
 	}
 
-	_type := "[" + itemType + "]"
+	_type := "[" + "]" + itemType
 
 	if IsVectorType(_type) {
 		return NewVectorValue(vectorItems, _type, itemType)
