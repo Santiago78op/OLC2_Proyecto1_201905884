@@ -297,6 +297,76 @@ func (v *ReplVisitor) VisitType(ctx *compiler.TypeContext) interface{} {
 	return value.IVOR_NIL
 }
 
+func (v *ReplVisitor) VisitVector_type(ctx *compiler.Vector_typeContext) interface{} {
+	return ctx.GetText()
+}
+
+func (v *ReplVisitor) VisitVectorItem(ctx *compiler.VectorItemContext) interface{} {
+
+	varName := ctx.Id_pattern().GetText()
+
+	variable := v.ScopeTrace.GetVariable(varName)
+
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+varName+" no encontrada")
+		return nil
+	}
+
+	if !(IsVectorType(variable.Type)) {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La variable "+varName+" no es un vector o una matriz")
+		return nil
+	}
+
+	structType := value.IVOR_VECTOR
+
+	index := v.Visit(ctx.Expression(0)).(value.IVOR)
+
+	if len(ctx.AllExpression()) != 1 {
+		structType = value.IVOR_MATRIX
+	}
+
+	indexes := []int{}
+
+	for _, expr := range ctx.AllExpression() {
+
+		val := v.Visit(expr).(value.IVOR)
+
+		if val.Type() != value.IVOR_INT {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Los indices de acceso deben ser enteros")
+			return nil
+		}
+
+		indexes = append(indexes, val.Value().(int))
+	}
+
+	if structType == value.IVOR_VECTOR {
+
+		switch vectorValue := variable.Value.(type) {
+
+		case *VectorValue:
+			indexValue := index.(*value.IntValue).InternalValue
+
+			if !vectorValue.ValidIndex(indexValue) {
+				v.ErrorTable.NewSemanticError(ctx.GetStart(), "El indice "+strconv.Itoa(indexValue)+" esta fuera de rango")
+				return nil
+			}
+
+			return &VectorItemReference{
+				Vector: vectorValue,
+				Index:  indexValue,
+				Value:  vectorValue.Get(indexValue),
+			}
+		default:
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La variable "+varName+" no es un vector")
+			return nil
+		}
+
+	} else {
+		log.Fatal("Invalid struct type")
+	}
+	return nil
+}
+
 // Falta el visit repeating
 // Falta todo de Vectores
 

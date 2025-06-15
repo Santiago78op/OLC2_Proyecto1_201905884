@@ -41,7 +41,7 @@ vect_expr:
     ;
 
 vect_item:
-    id_pattern (LBRACE expression RBRACE)+   # VectorItem
+    id_pattern (LBRACK expression RBRACK)+   # VectorItem
     ;
 
 // llamada a un vector por medio de una propiedad
@@ -55,7 +55,7 @@ vect_func:
     ;
 
 repeating:
-    (var_type | matrix_type) LPAREN ID COLON expression COMMA ID COLON expression RPAREN  # RepeatingDecl
+    (vector_type | matrix_type) LPAREN ID COLON expression COMMA ID COLON expression RPAREN  # RepeatingDecl
     ;
 // Termina Declaracion Vectores
 
