@@ -40,6 +40,7 @@ vect_expr:
     LBRACE ( expression (COMMA expression)* )? RBRACE  # VectorItemLis
     ;
 
+// vector_1[0]
 vect_item:
     id_pattern (LBRACK expression RBRACK)+   # VectorItem
     ;
@@ -98,6 +99,8 @@ assign_stmt:
         | ASSIGN) expression	                  # VectorAssign
     ;
 
+// variable ASSIGN expression
+// num2 
 id_pattern // (a.a)
     : ID (DOT ID)*                                # IdPattern
     ;

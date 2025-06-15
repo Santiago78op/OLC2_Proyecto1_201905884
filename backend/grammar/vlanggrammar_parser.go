@@ -150,12 +150,12 @@ func vlanggrammarParserInit() {
 		0, 0, 0, 131, 134, 1, 0, 0, 0, 132, 130, 1, 0, 0, 0, 132, 133, 1, 0, 0,
 		0, 133, 136, 1, 0, 0, 0, 134, 132, 1, 0, 0, 0, 135, 127, 1, 0, 0, 0, 135,
 		136, 1, 0, 0, 0, 136, 137, 1, 0, 0, 0, 137, 138, 5, 38, 0, 0, 138, 7, 1,
-		0, 0, 0, 139, 144, 3, 28, 14, 0, 140, 141, 5, 37, 0, 0, 141, 142, 3, 34,
-		17, 0, 142, 143, 5, 38, 0, 0, 143, 145, 1, 0, 0, 0, 144, 140, 1, 0, 0,
+		0, 0, 0, 139, 144, 3, 28, 14, 0, 140, 141, 5, 39, 0, 0, 141, 142, 3, 34,
+		17, 0, 142, 143, 5, 40, 0, 0, 143, 145, 1, 0, 0, 0, 144, 140, 1, 0, 0,
 		0, 145, 146, 1, 0, 0, 0, 146, 144, 1, 0, 0, 0, 146, 147, 1, 0, 0, 0, 147,
 		9, 1, 0, 0, 0, 148, 149, 3, 8, 4, 0, 149, 150, 5, 43, 0, 0, 150, 151, 3,
 		28, 14, 0, 151, 11, 1, 0, 0, 0, 152, 153, 3, 8, 4, 0, 153, 154, 5, 43,
-		0, 0, 154, 155, 3, 56, 28, 0, 155, 13, 1, 0, 0, 0, 156, 159, 3, 16, 8,
+		0, 0, 154, 155, 3, 56, 28, 0, 155, 13, 1, 0, 0, 0, 156, 159, 3, 18, 9,
 		0, 157, 159, 3, 22, 11, 0, 158, 156, 1, 0, 0, 0, 158, 157, 1, 0, 0, 0,
 		159, 160, 1, 0, 0, 0, 160, 161, 5, 35, 0, 0, 161, 162, 5, 50, 0, 0, 162,
 		163, 5, 42, 0, 0, 163, 164, 3, 34, 17, 0, 164, 165, 5, 44, 0, 0, 165, 166,
@@ -1787,7 +1787,7 @@ func (p *VLangGrammar) Vect_expr() (localctx IVect_exprContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2217354176495618) != 0 {
+	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2217354176495616) != 0 {
 		{
 			p.SetState(127)
 			p.expression(0)
@@ -1932,12 +1932,12 @@ func (s *VectorItemContext) Id_pattern() IId_patternContext {
 	return t.(IId_patternContext)
 }
 
-func (s *VectorItemContext) AllLBRACE() []antlr.TerminalNode {
-	return s.GetTokens(VLangGrammarLBRACE)
+func (s *VectorItemContext) AllLBRACK() []antlr.TerminalNode {
+	return s.GetTokens(VLangGrammarLBRACK)
 }
 
-func (s *VectorItemContext) LBRACE(i int) antlr.TerminalNode {
-	return s.GetToken(VLangGrammarLBRACE, i)
+func (s *VectorItemContext) LBRACK(i int) antlr.TerminalNode {
+	return s.GetToken(VLangGrammarLBRACK, i)
 }
 
 func (s *VectorItemContext) AllExpression() []IExpressionContext {
@@ -1981,12 +1981,12 @@ func (s *VectorItemContext) Expression(i int) IExpressionContext {
 	return t.(IExpressionContext)
 }
 
-func (s *VectorItemContext) AllRBRACE() []antlr.TerminalNode {
-	return s.GetTokens(VLangGrammarRBRACE)
+func (s *VectorItemContext) AllRBRACK() []antlr.TerminalNode {
+	return s.GetTokens(VLangGrammarRBRACK)
 }
 
-func (s *VectorItemContext) RBRACE(i int) antlr.TerminalNode {
-	return s.GetToken(VLangGrammarRBRACE, i)
+func (s *VectorItemContext) RBRACK(i int) antlr.TerminalNode {
+	return s.GetToken(VLangGrammarRBRACK, i)
 }
 
 func (s *VectorItemContext) EnterRule(listener antlr.ParseTreeListener) {
@@ -2033,7 +2033,7 @@ func (p *VLangGrammar) Vect_item() (localctx IVect_itemContext) {
 		case 1:
 			{
 				p.SetState(140)
-				p.Match(VLangGrammarLBRACE)
+				p.Match(VLangGrammarLBRACK)
 				if p.HasError() {
 					// Recognition error - abort rule
 					goto errorExit
@@ -2045,7 +2045,7 @@ func (p *VLangGrammar) Vect_item() (localctx IVect_itemContext) {
 			}
 			{
 				p.SetState(142)
-				p.Match(VLangGrammarRBRACE)
+				p.Match(VLangGrammarRBRACK)
 				if p.HasError() {
 					// Recognition error - abort rule
 					goto errorExit
@@ -2549,10 +2549,10 @@ func (s *RepeatingDeclContext) RPAREN() antlr.TerminalNode {
 	return s.GetToken(VLangGrammarRPAREN, 0)
 }
 
-func (s *RepeatingDeclContext) Var_type() IVar_typeContext {
+func (s *RepeatingDeclContext) Vector_type() IVector_typeContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IVar_typeContext); ok {
+		if _, ok := ctx.(IVector_typeContext); ok {
 			t = ctx.(antlr.RuleContext)
 			break
 		}
@@ -2562,7 +2562,7 @@ func (s *RepeatingDeclContext) Var_type() IVar_typeContext {
 		return nil
 	}
 
-	return t.(IVar_typeContext)
+	return t.(IVector_typeContext)
 }
 
 func (s *RepeatingDeclContext) Matrix_type() IMatrix_typeContext {
@@ -2614,21 +2614,20 @@ func (p *VLangGrammar) Repeating() (localctx IRepeatingContext) {
 		goto errorExit
 	}
 
-	switch p.GetTokenStream().LA(1) {
-	case VLangGrammarMUT:
+	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 7, p.GetParserRuleContext()) {
+	case 1:
 		{
 			p.SetState(156)
-			p.Var_type()
+			p.Vector_type()
 		}
 
-	case VLangGrammarLBRACK:
+	case 2:
 		{
 			p.SetState(157)
 			p.Matrix_type()
 		}
 
-	default:
-		p.SetError(antlr.NewNoViableAltException(p, nil, nil, nil, nil, nil))
+	case antlr.ATNInvalidAltNumber:
 		goto errorExit
 	}
 	{
@@ -8841,7 +8840,7 @@ func (p *VLangGrammar) Func_call() (localctx IFunc_callContext) {
 	}
 	_la = p.GetTokenStream().LA(1)
 
-	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2217354176495618) != 0 {
+	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&2217354176495616) != 0 {
 		{
 			p.SetState(405)
 			p.Arg_list()

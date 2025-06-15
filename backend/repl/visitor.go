@@ -218,6 +218,49 @@ func (v *ReplVisitor) VisitVarVectDecl(ctx *compiler.VarVectDeclContext) interfa
 	return nil
 }
 
+// Contexto decl_stmt
+// visitor MutSliceDecl // mut slice []int
+// Ejemplo: mut slice []int
+func (v *ReplVisitor) VisitMutSliceDecl(ctx *compiler.MutSliceDeclContext) interface{} {
+	fmt.Printf("🔹 Visitando MutSliceDecl: %s\n", ctx.GetText())
+
+	// Obtener información de la declaración
+	isConst := false // mut indica mutable, no constante
+	varName := ctx.ID().GetText()
+	vectorType := v.Visit(ctx.Vector_type()).(string)
+
+	// Extraer el tipo del elemento del vector
+	// vectorType será algo como "[]int", necesitamos extraer "int"
+	if !IsVectorType(vectorType) {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Tipo de vector inválido: "+vectorType)
+		return nil
+	}
+
+	// Remover los corchetes para obtener el tipo del elemento
+	itemType := RemoveBrackets(vectorType)
+
+	// Validar que el tipo del elemento sea válido
+	if !v.ValidType(itemType) {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Tipo de elemento inválido para vector: "+itemType)
+		return nil
+	}
+
+	// Crear un vector vacío del tipo especificado
+	emptyVector := NewVectorValue([]value.IVOR{}, vectorType, itemType)
+
+	// Agregar la variable al scope
+	variable, msg := v.ScopeTrace.AddVariable(varName, vectorType, emptyVector, isConst, false, ctx.GetStart())
+
+	// Verificar si hubo error al agregar la variable
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		return nil
+	}
+
+	fmt.Printf("✅ Vector mutable '%s' de tipo '%s' declarado exitosamente\n", varName, vectorType)
+	return nil
+}
+
 // Contextos VectorItemLis
 // Ejemplo: {1, 2, 3}
 func (v *ReplVisitor) VisitVectorItemLis(ctx *compiler.VectorItemLisContext) interface{} {
@@ -447,10 +490,81 @@ func (v *ReplVisitor) VisitArgAddAssigDecl(ctx *compiler.ArgAddAssigDeclContext)
 }
 
 // Falta  VisitVectorAssign
+func (v *ReplVisitor) VisitVectorAssign(ctx *compiler.VectorAssignContext) interface{} {
+
+	rightValue := v.Visit(ctx.Expression()).(value.IVOR)
+
+	switch itemRef := v.Visit(ctx.Vect_item()).(type) {
+	case *VectorItemReference:
+
+		leftValue := itemRef.Value
+
+		// check type, todo: improve cast -> ¿? idk what i was thinking
+		if rightValue.Type() != itemRef.Vector.ItemType {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede asignar un valor de tipo "+rightValue.Type()+" a un vector de tipo "+itemRef.Vector.ItemType)
+			return nil
+		}
+		op := string(ctx.GetOp().GetText()[0])
+
+		if op == "=" {
+			itemRef.Vector.InternalValue[itemRef.Index] = rightValue
+			return nil
+		}
+
+		strat, ok := BinaryStrats[op]
+
+		if !ok {
+			log.Fatal("Binary operator not found")
+		}
+
+		ok, msg, varValue := strat.Validate(leftValue, rightValue)
+
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+			return nil
+		}
+
+		itemRef.Vector.InternalValue[itemRef.Index] = varValue
+
+		return nil
+	case *MatrixItemReference:
+		leftValue := itemRef.Value
+
+		// check type, todo: improve cast -> ¿? idk what i was thinking
+		if rightValue.Type() != RemoveBrackets(itemRef.Matrix.Type()) {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede asignar un valor de tipo "+rightValue.Type()+" a una matriz de tipo "+RemoveBrackets(itemRef.Matrix.Type()))
+			return nil
+		}
+
+		op := string(ctx.GetOp().GetText()[0])
+
+		if op == "=" {
+			itemRef.Matrix.Set(itemRef.Index, rightValue)
+			return nil
+		}
+
+		strat, ok := BinaryStrats[op]
+
+		if !ok {
+			log.Fatal("Binary operator not found")
+		}
+
+		ok, msg, varValue := strat.Validate(leftValue, rightValue)
+
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+			return nil
+		}
+
+		itemRef.Matrix.Set(itemRef.Index, varValue)
+		return nil
+	}
+
+	return nil
+}
 
 // Id parents
 func (v *ReplVisitor) VisitIdPattern(ctx *compiler.IdPatternContext) interface{} {
-	fmt.Print("El valor de IdPattern es: " + ctx.GetText() + "\n")
 	return ctx.GetText()
 }
 
@@ -658,6 +772,17 @@ func (v *ReplVisitor) VisitIdPatternExpr(ctx *compiler.IdPatternExprContext) int
 func (v *ReplVisitor) VisitParensExpr(ctx *compiler.ParensExprContext) interface{} {
 	fmt.Print("El valor de ParenExp es: " + ctx.GetText() + "\n")
 	return v.Visit(ctx.Expression())
+}
+
+// Expresiones con vectores
+func (v *ReplVisitor) VisitVectorItemExpr(ctx *compiler.VectorItemExprContext) interface{} {
+
+	switch itemRef := v.Visit(ctx.Vect_item()).(type) {
+	case *VectorItemReference:
+		return itemRef.Value
+		// falta el caso de matriz
+	}
+	return value.DefaultNilValue
 }
 
 // Expresiones con vectores
