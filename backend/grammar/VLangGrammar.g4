@@ -27,11 +27,11 @@ stmt:
 // Ejemplo: Mut variable_1 int = 10
 // Ejemplo: Mut variable_2 int 
 decl_stmt: 
-    var_type ID type ASSIGN expression  # MutVarDecl
-    | var_type ID ASSIGN expression     # ValueDecl 
-    | ID type ASSIGN expression         # VarAssDecl  
-    | ID ASSIGN type expression         # VarVectDecl  // vector []int = {1,2,3,4}
-    | var_type ID vector_type           # MutSliceDecl // mut slice []int
+    var_type ID type ASSIGN expression  # MutVarDecl  // mut num2 int = 5
+    | var_type ID ASSIGN expression     # ValueDecl   // mut num2 = 5
+    | var_type ID type                  # ValDeclVec  // mut vector []int
+    | ID type ASSIGN expression         # VarAssDecl  // num2 int = 5                                          
+    | ID ASSIGN type expression         # VarVectDecl // numbers = []int {1, 2, 3, 4, 5};
     ;
 
 // Inicia Declaracion de Vector

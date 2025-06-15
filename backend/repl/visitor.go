@@ -221,43 +221,9 @@ func (v *ReplVisitor) VisitVarVectDecl(ctx *compiler.VarVectDeclContext) interfa
 // Contexto decl_stmt
 // visitor MutSliceDecl // mut slice []int
 // Ejemplo: mut slice []int
-func (v *ReplVisitor) VisitMutSliceDecl(ctx *compiler.MutSliceDeclContext) interface{} {
+func (v *ReplVisitor) VisitValDeclVec(ctx *compiler.ValDeclVecContext) interface{} {
 	fmt.Printf("🔹 Visitando MutSliceDecl: %s\n", ctx.GetText())
-
-	// Obtener información de la declaración
-	isConst := false // mut indica mutable, no constante
-	varName := ctx.ID().GetText()
-	vectorType := v.Visit(ctx.Vector_type()).(string)
-
-	// Extraer el tipo del elemento del vector
-	// vectorType será algo como "[]int", necesitamos extraer "int"
-	if !IsVectorType(vectorType) {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Tipo de vector inválido: "+vectorType)
-		return nil
-	}
-
-	// Remover los corchetes para obtener el tipo del elemento
-	itemType := RemoveBrackets(vectorType)
-
-	// Validar que el tipo del elemento sea válido
-	if !v.ValidType(itemType) {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Tipo de elemento inválido para vector: "+itemType)
-		return nil
-	}
-
-	// Crear un vector vacío del tipo especificado
-	emptyVector := NewVectorValue([]value.IVOR{}, vectorType, itemType)
-
-	// Agregar la variable al scope
-	variable, msg := v.ScopeTrace.AddVariable(varName, vectorType, emptyVector, isConst, false, ctx.GetStart())
-
-	// Verificar si hubo error al agregar la variable
-	if variable == nil {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
-		return nil
-	}
-
-	fmt.Printf("✅ Vector mutable '%s' de tipo '%s' declarado exitosamente\n", varName, vectorType)
+	fmt.Printf("🔹Holaaaaaaa")
 	return nil
 }
 
@@ -780,7 +746,8 @@ func (v *ReplVisitor) VisitVectorItemExpr(ctx *compiler.VectorItemExprContext) i
 	switch itemRef := v.Visit(ctx.Vect_item()).(type) {
 	case *VectorItemReference:
 		return itemRef.Value
-		// falta el caso de matriz
+	case *MatrixItemReference:
+		return itemRef.Value
 	}
 	return value.DefaultNilValue
 }

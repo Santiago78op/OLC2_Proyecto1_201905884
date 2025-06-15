@@ -19,14 +19,14 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#ValueDecl.
 	VisitValueDecl(ctx *ValueDeclContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#ValDeclVec.
+	VisitValDeclVec(ctx *ValDeclVecContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#VarAssDecl.
 	VisitVarAssDecl(ctx *VarAssDeclContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#VarVectDecl.
 	VisitVarVectDecl(ctx *VarVectDeclContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#MutSliceDecl.
-	VisitMutSliceDecl(ctx *MutSliceDeclContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#VectorItemLis.
 	VisitVectorItemLis(ctx *VectorItemLisContext) interface{}

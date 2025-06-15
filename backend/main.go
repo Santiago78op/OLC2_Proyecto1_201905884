@@ -114,6 +114,12 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("🔹 Tree es nil: %v\n", tree == nil)
 	fmt.Printf("🔹 Tree text: %s\n", tree.GetText())
 	fmt.Printf("🔹 Errores en ErrorTable: %d\n", len(syntaxErrorListener.ErrorTable.Errors))
+	if len(syntaxErrorListener.ErrorTable.Errors) > 0 {
+		fmt.Println("❌ Errores de sintaxis encontrados:")
+		for _, err := range syntaxErrorListener.ErrorTable.Errors {
+			fmt.Printf("  - %s\n", err)
+		}
+	}
 
 	// Esquema de funciones y estructuras declaradas en el codigo
 	dclVisitor := repl.NewDclVisitor(syntaxErrorListener.ErrorTable)

@@ -44,6 +44,12 @@ func (s *BaseVLangGrammarListener) EnterValueDecl(ctx *ValueDeclContext) {}
 // ExitValueDecl is called when production ValueDecl is exited.
 func (s *BaseVLangGrammarListener) ExitValueDecl(ctx *ValueDeclContext) {}
 
+// EnterValDeclVec is called when production ValDeclVec is entered.
+func (s *BaseVLangGrammarListener) EnterValDeclVec(ctx *ValDeclVecContext) {}
+
+// ExitValDeclVec is called when production ValDeclVec is exited.
+func (s *BaseVLangGrammarListener) ExitValDeclVec(ctx *ValDeclVecContext) {}
+
 // EnterVarAssDecl is called when production VarAssDecl is entered.
 func (s *BaseVLangGrammarListener) EnterVarAssDecl(ctx *VarAssDeclContext) {}
 
@@ -55,12 +61,6 @@ func (s *BaseVLangGrammarListener) EnterVarVectDecl(ctx *VarVectDeclContext) {}
 
 // ExitVarVectDecl is called when production VarVectDecl is exited.
 func (s *BaseVLangGrammarListener) ExitVarVectDecl(ctx *VarVectDeclContext) {}
-
-// EnterMutSliceDecl is called when production MutSliceDecl is entered.
-func (s *BaseVLangGrammarListener) EnterMutSliceDecl(ctx *MutSliceDeclContext) {}
-
-// ExitMutSliceDecl is called when production MutSliceDecl is exited.
-func (s *BaseVLangGrammarListener) ExitMutSliceDecl(ctx *MutSliceDeclContext) {}
 
 // EnterVectorItemLis is called when production VectorItemLis is entered.
 func (s *BaseVLangGrammarListener) EnterVectorItemLis(ctx *VectorItemLisContext) {}

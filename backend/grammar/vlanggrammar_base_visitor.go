@@ -23,15 +23,15 @@ func (v *BaseVLangGrammarVisitor) VisitValueDecl(ctx *ValueDeclContext) interfac
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitValDeclVec(ctx *ValDeclVecContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitVarAssDecl(ctx *VarAssDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseVLangGrammarVisitor) VisitVarVectDecl(ctx *VarVectDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitMutSliceDecl(ctx *MutSliceDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

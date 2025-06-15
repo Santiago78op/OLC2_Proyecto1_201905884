@@ -8,7 +8,6 @@ FUNC  : 'fn';
 
 // Estructuras
 STR         : 'struct';
-SLICE_TYPE  : 'slice';
 
 // Control de flujo - wk => keyWord
 IF_KW       : 'if';

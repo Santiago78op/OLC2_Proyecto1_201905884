@@ -19,14 +19,14 @@ type VLangGrammarListener interface {
 	// EnterValueDecl is called when entering the ValueDecl production.
 	EnterValueDecl(c *ValueDeclContext)
 
+	// EnterValDeclVec is called when entering the ValDeclVec production.
+	EnterValDeclVec(c *ValDeclVecContext)
+
 	// EnterVarAssDecl is called when entering the VarAssDecl production.
 	EnterVarAssDecl(c *VarAssDeclContext)
 
 	// EnterVarVectDecl is called when entering the VarVectDecl production.
 	EnterVarVectDecl(c *VarVectDeclContext)
-
-	// EnterMutSliceDecl is called when entering the MutSliceDecl production.
-	EnterMutSliceDecl(c *MutSliceDeclContext)
 
 	// EnterVectorItemLis is called when entering the VectorItemLis production.
 	EnterVectorItemLis(c *VectorItemLisContext)
@@ -211,14 +211,14 @@ type VLangGrammarListener interface {
 	// ExitValueDecl is called when exiting the ValueDecl production.
 	ExitValueDecl(c *ValueDeclContext)
 
+	// ExitValDeclVec is called when exiting the ValDeclVec production.
+	ExitValDeclVec(c *ValDeclVecContext)
+
 	// ExitVarAssDecl is called when exiting the VarAssDecl production.
 	ExitVarAssDecl(c *VarAssDeclContext)
 
 	// ExitVarVectDecl is called when exiting the VarVectDecl production.
 	ExitVarVectDecl(c *VarVectDeclContext)
-
-	// ExitMutSliceDecl is called when exiting the MutSliceDecl production.
-	ExitMutSliceDecl(c *MutSliceDeclContext)
 
 	// ExitVectorItemLis is called when exiting the VectorItemLis production.
 	ExitVectorItemLis(c *VectorItemLisContext)
