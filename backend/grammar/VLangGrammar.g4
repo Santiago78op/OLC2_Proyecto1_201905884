@@ -27,20 +27,26 @@ stmt:
 // Ejemplo: Mut variable_1 int = 10
 // Ejemplo: Mut variable_2 int 
 decl_stmt: 
-    var_type ID type ASSIGN expression  # MutVarDecl
-    | var_type ID ASSIGN expression     # ValueDecl 
-    | ID type ASSIGN expression         # VarAssDecl
+    var_type ID type ASSIGN expression  # MutVarDecl  // mut num2 int = 5
+    | var_type ID ASSIGN expression     # ValueDecl   // mut num2 = 5
+    | var_type ID type                  # ValDeclVec  // mut vector []int
+    | ID type ASSIGN expression         # VarAssDecl  // num2 int = 5                                          
+    | ID ASSIGN vector_type vect_expr   # VarVectDecl // numbers = []int {1, 2, 3, 4, 5};
     ;
 
 // Inicia Declaracion de Vector
+// {1,2,3,4}
 vect_expr:
-    LBRACK ( expression (COMMA expression)* )? RBRACK  # VectorItemLis
+    LBRACE ( expression (COMMA expression)* )? RBRACE  # VectorItemLis
     ;
 
+// vector_1[0]
 vect_item:
-    id_pattern (LBRACE expression RBRACE)+   # VectorItem
+    id_pattern (LBRACK expression RBRACK)+   # VectorItem
     ;
 
+// llamada a un vector por medio de una propiedad
+// ejemplo: vector_1.id
 vect_prop:
     vect_item DOT id_pattern   # VectorProperty
     ;
@@ -50,7 +56,7 @@ vect_func:
     ;
 
 repeating:
-    (var_type | matrix_type) LPAREN ID COLON expression COMMA ID COLON expression RPAREN  # RepeatingDecl
+    (vector_type | matrix_type) LPAREN ID COLON expression COMMA ID COLON expression RPAREN  # RepeatingDecl
     ;
 // Termina Declaracion Vectores
 
@@ -59,13 +65,15 @@ var_type
     : MUT
     ;
 
+// Inicia Declaracion de Vectores
+// [] int, [] float, [] String, [] bool
+vector_type: LBRACK RBRACK ID
+    ;
+
 type: 
     ID 
     | vector_type 
     | matrix_type
-    ;
-
-vector_type: LBRACE ID RBRACK
     ;
 
 matrix_type: 
@@ -75,6 +83,7 @@ matrix_type:
 
 aux_matrix_type: LBRACK matrix_type RBRACK
     ;
+
 
 // Termina Declaracion de Variables
 
