@@ -290,6 +290,8 @@ func (v *ReplVisitor) VisitValDeclVec(ctx *compiler.ValDeclVecContext) interface
 	return nil
 }
 
+// Contextos matrices
+
 // Contextos VectorItemLis
 // Ejemplo: {1, 2, 3}
 func (v *ReplVisitor) VisitVectorItemLis(ctx *compiler.VectorItemLisContext) interface{} {

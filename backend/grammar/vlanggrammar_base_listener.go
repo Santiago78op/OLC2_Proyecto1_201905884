@@ -62,6 +62,12 @@ func (s *BaseVLangGrammarListener) EnterVarVectDecl(ctx *VarVectDeclContext) {}
 // ExitVarVectDecl is called when production VarVectDecl is exited.
 func (s *BaseVLangGrammarListener) ExitVarVectDecl(ctx *VarVectDeclContext) {}
 
+// EnterVarMatrixDecl is called when production VarMatrixDecl is entered.
+func (s *BaseVLangGrammarListener) EnterVarMatrixDecl(ctx *VarMatrixDeclContext) {}
+
+// ExitVarMatrixDecl is called when production VarMatrixDecl is exited.
+func (s *BaseVLangGrammarListener) ExitVarMatrixDecl(ctx *VarMatrixDeclContext) {}
+
 // EnterVectorItemLis is called when production VectorItemLis is entered.
 func (s *BaseVLangGrammarListener) EnterVectorItemLis(ctx *VectorItemLisContext) {}
 
@@ -104,12 +110,6 @@ func (s *BaseVLangGrammarListener) EnterVector_type(ctx *Vector_typeContext) {}
 // ExitVector_type is called when production vector_type is exited.
 func (s *BaseVLangGrammarListener) ExitVector_type(ctx *Vector_typeContext) {}
 
-// EnterType is called when production type is entered.
-func (s *BaseVLangGrammarListener) EnterType(ctx *TypeContext) {}
-
-// ExitType is called when production type is exited.
-func (s *BaseVLangGrammarListener) ExitType(ctx *TypeContext) {}
-
 // EnterMatrix_type is called when production matrix_type is entered.
 func (s *BaseVLangGrammarListener) EnterMatrix_type(ctx *Matrix_typeContext) {}
 
@@ -121,6 +121,12 @@ func (s *BaseVLangGrammarListener) EnterAux_matrix_type(ctx *Aux_matrix_typeCont
 
 // ExitAux_matrix_type is called when production aux_matrix_type is exited.
 func (s *BaseVLangGrammarListener) ExitAux_matrix_type(ctx *Aux_matrix_typeContext) {}
+
+// EnterType is called when production type is entered.
+func (s *BaseVLangGrammarListener) EnterType(ctx *TypeContext) {}
+
+// ExitType is called when production type is exited.
+func (s *BaseVLangGrammarListener) ExitType(ctx *TypeContext) {}
 
 // EnterAssignmentDecl is called when production AssignmentDecl is entered.
 func (s *BaseVLangGrammarListener) EnterAssignmentDecl(ctx *AssignmentDeclContext) {}

@@ -35,6 +35,10 @@ func (v *BaseVLangGrammarVisitor) VisitVarVectDecl(ctx *VarVectDeclContext) inte
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitVarMatrixDecl(ctx *VarMatrixDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitVectorItemLis(ctx *VectorItemLisContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -63,15 +67,15 @@ func (v *BaseVLangGrammarVisitor) VisitVector_type(ctx *Vector_typeContext) inte
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseVLangGrammarVisitor) VisitType(ctx *TypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseVLangGrammarVisitor) VisitMatrix_type(ctx *Matrix_typeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseVLangGrammarVisitor) VisitAux_matrix_type(ctx *Aux_matrix_typeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitType(ctx *TypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
