@@ -44,11 +44,29 @@ func (s *BaseVLangGrammarListener) EnterValueDecl(ctx *ValueDeclContext) {}
 // ExitValueDecl is called when production ValueDecl is exited.
 func (s *BaseVLangGrammarListener) ExitValueDecl(ctx *ValueDeclContext) {}
 
+// EnterValDeclVec is called when production ValDeclVec is entered.
+func (s *BaseVLangGrammarListener) EnterValDeclVec(ctx *ValDeclVecContext) {}
+
+// ExitValDeclVec is called when production ValDeclVec is exited.
+func (s *BaseVLangGrammarListener) ExitValDeclVec(ctx *ValDeclVecContext) {}
+
 // EnterVarAssDecl is called when production VarAssDecl is entered.
 func (s *BaseVLangGrammarListener) EnterVarAssDecl(ctx *VarAssDeclContext) {}
 
 // ExitVarAssDecl is called when production VarAssDecl is exited.
 func (s *BaseVLangGrammarListener) ExitVarAssDecl(ctx *VarAssDeclContext) {}
+
+// EnterVarVectDecl is called when production VarVectDecl is entered.
+func (s *BaseVLangGrammarListener) EnterVarVectDecl(ctx *VarVectDeclContext) {}
+
+// ExitVarVectDecl is called when production VarVectDecl is exited.
+func (s *BaseVLangGrammarListener) ExitVarVectDecl(ctx *VarVectDeclContext) {}
+
+// EnterVarMatrixDecl is called when production VarMatrixDecl is entered.
+func (s *BaseVLangGrammarListener) EnterVarMatrixDecl(ctx *VarMatrixDeclContext) {}
+
+// ExitVarMatrixDecl is called when production VarMatrixDecl is exited.
+func (s *BaseVLangGrammarListener) ExitVarMatrixDecl(ctx *VarMatrixDeclContext) {}
 
 // EnterVectorItemLis is called when production VectorItemLis is entered.
 func (s *BaseVLangGrammarListener) EnterVectorItemLis(ctx *VectorItemLisContext) {}
@@ -86,12 +104,6 @@ func (s *BaseVLangGrammarListener) EnterVar_type(ctx *Var_typeContext) {}
 // ExitVar_type is called when production var_type is exited.
 func (s *BaseVLangGrammarListener) ExitVar_type(ctx *Var_typeContext) {}
 
-// EnterType is called when production type is entered.
-func (s *BaseVLangGrammarListener) EnterType(ctx *TypeContext) {}
-
-// ExitType is called when production type is exited.
-func (s *BaseVLangGrammarListener) ExitType(ctx *TypeContext) {}
-
 // EnterVector_type is called when production vector_type is entered.
 func (s *BaseVLangGrammarListener) EnterVector_type(ctx *Vector_typeContext) {}
 
@@ -110,6 +122,12 @@ func (s *BaseVLangGrammarListener) EnterAux_matrix_type(ctx *Aux_matrix_typeCont
 // ExitAux_matrix_type is called when production aux_matrix_type is exited.
 func (s *BaseVLangGrammarListener) ExitAux_matrix_type(ctx *Aux_matrix_typeContext) {}
 
+// EnterType is called when production type is entered.
+func (s *BaseVLangGrammarListener) EnterType(ctx *TypeContext) {}
+
+// ExitType is called when production type is exited.
+func (s *BaseVLangGrammarListener) ExitType(ctx *TypeContext) {}
+
 // EnterAssignmentDecl is called when production AssignmentDecl is entered.
 func (s *BaseVLangGrammarListener) EnterAssignmentDecl(ctx *AssignmentDeclContext) {}
 
@@ -127,12 +145,6 @@ func (s *BaseVLangGrammarListener) EnterVectorAssign(ctx *VectorAssignContext) {
 
 // ExitVectorAssign is called when production VectorAssign is exited.
 func (s *BaseVLangGrammarListener) ExitVectorAssign(ctx *VectorAssignContext) {}
-
-// EnterIncDecAssign is called when production IncDecAssign is entered.
-func (s *BaseVLangGrammarListener) EnterIncDecAssign(ctx *IncDecAssignContext) {}
-
-// ExitIncDecAssign is called when production IncDecAssign is exited.
-func (s *BaseVLangGrammarListener) ExitIncDecAssign(ctx *IncDecAssignContext) {}
 
 // EnterIdPattern is called when production IdPattern is entered.
 func (s *BaseVLangGrammarListener) EnterIdPattern(ctx *IdPatternContext) {}
@@ -170,6 +182,18 @@ func (s *BaseVLangGrammarListener) EnterNilLiteral(ctx *NilLiteralContext) {}
 // ExitNilLiteral is called when production NilLiteral is exited.
 func (s *BaseVLangGrammarListener) ExitNilLiteral(ctx *NilLiteralContext) {}
 
+// EnterIncremento is called when production incremento is entered.
+func (s *BaseVLangGrammarListener) EnterIncremento(ctx *IncrementoContext) {}
+
+// ExitIncremento is called when production incremento is exited.
+func (s *BaseVLangGrammarListener) ExitIncremento(ctx *IncrementoContext) {}
+
+// EnterDecremento is called when production decremento is entered.
+func (s *BaseVLangGrammarListener) EnterDecremento(ctx *DecrementoContext) {}
+
+// ExitDecremento is called when production decremento is exited.
+func (s *BaseVLangGrammarListener) ExitDecremento(ctx *DecrementoContext) {}
+
 // EnterRepeatingExpr is called when production RepeatingExpr is entered.
 func (s *BaseVLangGrammarListener) EnterRepeatingExpr(ctx *RepeatingExprContext) {}
 
@@ -181,6 +205,12 @@ func (s *BaseVLangGrammarListener) EnterVectorPropertyExpr(ctx *VectorPropertyEx
 
 // ExitVectorPropertyExpr is called when production VectorPropertyExpr is exited.
 func (s *BaseVLangGrammarListener) ExitVectorPropertyExpr(ctx *VectorPropertyExprContext) {}
+
+// EnterIncredecr is called when production incredecr is entered.
+func (s *BaseVLangGrammarListener) EnterIncredecr(ctx *IncredecrContext) {}
+
+// ExitIncredecr is called when production incredecr is exited.
+func (s *BaseVLangGrammarListener) ExitIncredecr(ctx *IncredecrContext) {}
 
 // EnterVectorItemExpr is called when production VectorItemExpr is entered.
 func (s *BaseVLangGrammarListener) EnterVectorItemExpr(ctx *VectorItemExprContext) {}

@@ -19,8 +19,17 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#ValueDecl.
 	VisitValueDecl(ctx *ValueDeclContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#ValDeclVec.
+	VisitValDeclVec(ctx *ValDeclVecContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#VarAssDecl.
 	VisitVarAssDecl(ctx *VarAssDeclContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#VarVectDecl.
+	VisitVarVectDecl(ctx *VarVectDeclContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#VarMatrixDecl.
+	VisitVarMatrixDecl(ctx *VarMatrixDeclContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#VectorItemLis.
 	VisitVectorItemLis(ctx *VectorItemLisContext) interface{}
@@ -40,9 +49,6 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#var_type.
 	VisitVar_type(ctx *Var_typeContext) interface{}
 
-	// Visit a parse tree produced by VLangGrammar#type.
-	VisitType(ctx *TypeContext) interface{}
-
 	// Visit a parse tree produced by VLangGrammar#vector_type.
 	VisitVector_type(ctx *Vector_typeContext) interface{}
 
@@ -52,6 +58,9 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#aux_matrix_type.
 	VisitAux_matrix_type(ctx *Aux_matrix_typeContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#type.
+	VisitType(ctx *TypeContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#AssignmentDecl.
 	VisitAssignmentDecl(ctx *AssignmentDeclContext) interface{}
 
@@ -60,9 +69,6 @@ type VLangGrammarVisitor interface {
 
 	// Visit a parse tree produced by VLangGrammar#VectorAssign.
 	VisitVectorAssign(ctx *VectorAssignContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#IncDecAssign.
-	VisitIncDecAssign(ctx *IncDecAssignContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#IdPattern.
 	VisitIdPattern(ctx *IdPatternContext) interface{}
@@ -82,11 +88,20 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#NilLiteral.
 	VisitNilLiteral(ctx *NilLiteralContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#incremento.
+	VisitIncremento(ctx *IncrementoContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#decremento.
+	VisitDecremento(ctx *DecrementoContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#RepeatingExpr.
 	VisitRepeatingExpr(ctx *RepeatingExprContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#VectorPropertyExpr.
 	VisitVectorPropertyExpr(ctx *VectorPropertyExprContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#incredecr.
+	VisitIncredecr(ctx *IncredecrContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#VectorItemExpr.
 	VisitVectorItemExpr(ctx *VectorItemExprContext) interface{}

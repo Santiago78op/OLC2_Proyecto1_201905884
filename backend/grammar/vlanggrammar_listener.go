@@ -19,8 +19,17 @@ type VLangGrammarListener interface {
 	// EnterValueDecl is called when entering the ValueDecl production.
 	EnterValueDecl(c *ValueDeclContext)
 
+	// EnterValDeclVec is called when entering the ValDeclVec production.
+	EnterValDeclVec(c *ValDeclVecContext)
+
 	// EnterVarAssDecl is called when entering the VarAssDecl production.
 	EnterVarAssDecl(c *VarAssDeclContext)
+
+	// EnterVarVectDecl is called when entering the VarVectDecl production.
+	EnterVarVectDecl(c *VarVectDeclContext)
+
+	// EnterVarMatrixDecl is called when entering the VarMatrixDecl production.
+	EnterVarMatrixDecl(c *VarMatrixDeclContext)
 
 	// EnterVectorItemLis is called when entering the VectorItemLis production.
 	EnterVectorItemLis(c *VectorItemLisContext)
@@ -40,9 +49,6 @@ type VLangGrammarListener interface {
 	// EnterVar_type is called when entering the var_type production.
 	EnterVar_type(c *Var_typeContext)
 
-	// EnterType is called when entering the type production.
-	EnterType(c *TypeContext)
-
 	// EnterVector_type is called when entering the vector_type production.
 	EnterVector_type(c *Vector_typeContext)
 
@@ -52,6 +58,9 @@ type VLangGrammarListener interface {
 	// EnterAux_matrix_type is called when entering the aux_matrix_type production.
 	EnterAux_matrix_type(c *Aux_matrix_typeContext)
 
+	// EnterType is called when entering the type production.
+	EnterType(c *TypeContext)
+
 	// EnterAssignmentDecl is called when entering the AssignmentDecl production.
 	EnterAssignmentDecl(c *AssignmentDeclContext)
 
@@ -60,9 +69,6 @@ type VLangGrammarListener interface {
 
 	// EnterVectorAssign is called when entering the VectorAssign production.
 	EnterVectorAssign(c *VectorAssignContext)
-
-	// EnterIncDecAssign is called when entering the IncDecAssign production.
-	EnterIncDecAssign(c *IncDecAssignContext)
 
 	// EnterIdPattern is called when entering the IdPattern production.
 	EnterIdPattern(c *IdPatternContext)
@@ -82,11 +88,20 @@ type VLangGrammarListener interface {
 	// EnterNilLiteral is called when entering the NilLiteral production.
 	EnterNilLiteral(c *NilLiteralContext)
 
+	// EnterIncremento is called when entering the incremento production.
+	EnterIncremento(c *IncrementoContext)
+
+	// EnterDecremento is called when entering the decremento production.
+	EnterDecremento(c *DecrementoContext)
+
 	// EnterRepeatingExpr is called when entering the RepeatingExpr production.
 	EnterRepeatingExpr(c *RepeatingExprContext)
 
 	// EnterVectorPropertyExpr is called when entering the VectorPropertyExpr production.
 	EnterVectorPropertyExpr(c *VectorPropertyExprContext)
+
+	// EnterIncredecr is called when entering the incredecr production.
+	EnterIncredecr(c *IncredecrContext)
 
 	// EnterVectorItemExpr is called when entering the VectorItemExpr production.
 	EnterVectorItemExpr(c *VectorItemExprContext)
@@ -199,8 +214,17 @@ type VLangGrammarListener interface {
 	// ExitValueDecl is called when exiting the ValueDecl production.
 	ExitValueDecl(c *ValueDeclContext)
 
+	// ExitValDeclVec is called when exiting the ValDeclVec production.
+	ExitValDeclVec(c *ValDeclVecContext)
+
 	// ExitVarAssDecl is called when exiting the VarAssDecl production.
 	ExitVarAssDecl(c *VarAssDeclContext)
+
+	// ExitVarVectDecl is called when exiting the VarVectDecl production.
+	ExitVarVectDecl(c *VarVectDeclContext)
+
+	// ExitVarMatrixDecl is called when exiting the VarMatrixDecl production.
+	ExitVarMatrixDecl(c *VarMatrixDeclContext)
 
 	// ExitVectorItemLis is called when exiting the VectorItemLis production.
 	ExitVectorItemLis(c *VectorItemLisContext)
@@ -220,9 +244,6 @@ type VLangGrammarListener interface {
 	// ExitVar_type is called when exiting the var_type production.
 	ExitVar_type(c *Var_typeContext)
 
-	// ExitType is called when exiting the type production.
-	ExitType(c *TypeContext)
-
 	// ExitVector_type is called when exiting the vector_type production.
 	ExitVector_type(c *Vector_typeContext)
 
@@ -232,6 +253,9 @@ type VLangGrammarListener interface {
 	// ExitAux_matrix_type is called when exiting the aux_matrix_type production.
 	ExitAux_matrix_type(c *Aux_matrix_typeContext)
 
+	// ExitType is called when exiting the type production.
+	ExitType(c *TypeContext)
+
 	// ExitAssignmentDecl is called when exiting the AssignmentDecl production.
 	ExitAssignmentDecl(c *AssignmentDeclContext)
 
@@ -240,9 +264,6 @@ type VLangGrammarListener interface {
 
 	// ExitVectorAssign is called when exiting the VectorAssign production.
 	ExitVectorAssign(c *VectorAssignContext)
-
-	// ExitIncDecAssign is called when exiting the IncDecAssign production.
-	ExitIncDecAssign(c *IncDecAssignContext)
 
 	// ExitIdPattern is called when exiting the IdPattern production.
 	ExitIdPattern(c *IdPatternContext)
@@ -262,11 +283,20 @@ type VLangGrammarListener interface {
 	// ExitNilLiteral is called when exiting the NilLiteral production.
 	ExitNilLiteral(c *NilLiteralContext)
 
+	// ExitIncremento is called when exiting the incremento production.
+	ExitIncremento(c *IncrementoContext)
+
+	// ExitDecremento is called when exiting the decremento production.
+	ExitDecremento(c *DecrementoContext)
+
 	// ExitRepeatingExpr is called when exiting the RepeatingExpr production.
 	ExitRepeatingExpr(c *RepeatingExprContext)
 
 	// ExitVectorPropertyExpr is called when exiting the VectorPropertyExpr production.
 	ExitVectorPropertyExpr(c *VectorPropertyExprContext)
+
+	// ExitIncredecr is called when exiting the incredecr production.
+	ExitIncredecr(c *IncredecrContext)
 
 	// ExitVectorItemExpr is called when exiting the VectorItemExpr production.
 	ExitVectorItemExpr(c *VectorItemExprContext)

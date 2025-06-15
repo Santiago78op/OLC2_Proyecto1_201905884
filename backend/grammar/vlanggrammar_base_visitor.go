@@ -23,7 +23,19 @@ func (v *BaseVLangGrammarVisitor) VisitValueDecl(ctx *ValueDeclContext) interfac
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitValDeclVec(ctx *ValDeclVecContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitVarAssDecl(ctx *VarAssDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitVarVectDecl(ctx *VarVectDeclContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitVarMatrixDecl(ctx *VarMatrixDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -51,10 +63,6 @@ func (v *BaseVLangGrammarVisitor) VisitVar_type(ctx *Var_typeContext) interface{
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseVLangGrammarVisitor) VisitType(ctx *TypeContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseVLangGrammarVisitor) VisitVector_type(ctx *Vector_typeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -67,6 +75,10 @@ func (v *BaseVLangGrammarVisitor) VisitAux_matrix_type(ctx *Aux_matrix_typeConte
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitType(ctx *TypeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitAssignmentDecl(ctx *AssignmentDeclContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -76,10 +88,6 @@ func (v *BaseVLangGrammarVisitor) VisitArgAddAssigDecl(ctx *ArgAddAssigDeclConte
 }
 
 func (v *BaseVLangGrammarVisitor) VisitVectorAssign(ctx *VectorAssignContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitIncDecAssign(ctx *IncDecAssignContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -107,11 +115,23 @@ func (v *BaseVLangGrammarVisitor) VisitNilLiteral(ctx *NilLiteralContext) interf
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitIncremento(ctx *IncrementoContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitDecremento(ctx *DecrementoContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitRepeatingExpr(ctx *RepeatingExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseVLangGrammarVisitor) VisitVectorPropertyExpr(ctx *VectorPropertyExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitIncredecr(ctx *IncredecrContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
