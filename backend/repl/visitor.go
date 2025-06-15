@@ -132,25 +132,30 @@ func (v *ReplVisitor) VisitValueDecl(ctx *compiler.ValueDeclContext) interface{}
 
 	isConst := false
 	varName := ctx.ID().GetText()
+	fmt.Printf("[DEBUG] Iniciando ValueDecl para variable '%s'\n", varName)
+
 	varValue := v.Visit(ctx.Expression()).(value.IVOR)
+
 	varType := varValue.Type()
+	fmt.Printf("[DEBUG] Tipo inferido para '%s': %s\n", varName, varType)
 
 	if varType == "[]" {
 		v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede inferir el tipo de un vector vacio '"+varName+"'")
 		return nil
 	}
 
-	// copy object
 	if obj, ok := varValue.(*ObjectValue); ok {
 		varValue = obj.Copy()
 	}
 
 	variable, msg := v.ScopeTrace.AddVariable(varName, varType, varValue, isConst, false, ctx.GetStart())
 
-	// Variable already exists
 	if variable == nil {
 		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+	} else {
+		fmt.Printf("[DEBUG] Variable '%s' registrada correctamente en el scope.\n", varName)
 	}
+
 	return nil
 }
 
@@ -457,6 +462,7 @@ func (v *ReplVisitor) VisitParensExpr(ctx *compiler.ParensExprContext) interface
 
 // Funciones con expresiones
 func (v *ReplVisitor) VisitFuncCallExp(ctx *compiler.FuncCallExprContext) interface{} {
+	fmt.Print("El valor de FuncCallExp es: " + ctx.GetText() + "\n")
 	return v.Visit(ctx.Func_call())
 }
 
@@ -636,6 +642,7 @@ func (v *ReplVisitor) VisitForStmtCond(ctx *compiler.ForStmtCondContext) interfa
 	v.CallStack.Clean(forItem)
 	return nil
 }
+
 func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface{} {
 
 	initAssign := ctx.Assign_stmt(0)
@@ -704,7 +711,7 @@ func (v *ReplVisitor) VisitFuncCall(ctx *compiler.FuncCallContext) interface{} {
 
 	if funcObj == nil && structObj == nil {
 		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg1+msg2)
-		return value.DefaultNilValues
+		return value.DefaultNilValue
 	}
 
 	args := make([]*Argument, 0)

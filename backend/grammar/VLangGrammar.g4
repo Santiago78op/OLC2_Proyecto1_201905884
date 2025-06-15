@@ -106,7 +106,7 @@ literal
 // Inicio Expresiones
 expression
     : LPAREN expression RPAREN                       # ParensExpr 
-    | func_call                                      # FuncCallExpr 
+    | func_call                                      
     | id_pattern                                     # IdPatternExpr
     | vect_item                                      # VectorItemExpr
     | vect_prop                                      # VectorPropertyExpr

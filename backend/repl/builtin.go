@@ -27,6 +27,55 @@ func (b BuiltInFunction) Copy() value.IVOR {
 
 // * Print Function
 func Print(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
+	return PrintCore(context, args, false)
+}
+
+func PrintLn(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
+	return PrintCore(context, args, true)
+}
+
+func PrintCore(context *ReplContext, args []*Argument, newLine bool) (value.IVOR, bool, string) {
+
+	var output string
+
+	for i, arg := range args {
+
+		if !value.IsPrimitiveType(arg.Value.Type()) {
+			return value.DefaultNilValue, false, "La función print solo acepta tipos primitivos"
+		}
+
+		switch arg.Value.Type() {
+
+		case value.IVOR_BOOL:
+			output += strconv.FormatBool(arg.Value.Value().(bool))
+		case value.IVOR_INT:
+			output += strconv.Itoa(arg.Value.Value().(int))
+		case value.IVOR_FLOAT:
+			output += strconv.FormatFloat(arg.Value.Value().(float64), 'f', 4, 64)
+		case value.IVOR_STRING:
+			output += arg.Value.Value().(string)
+		case value.IVOR_CHARACTER:
+			output += arg.Value.Value().(string)
+		case value.IVOR_NIL:
+			output += "nil"
+		}
+
+		if i < len(args)-1 {
+			output += " "
+		}
+	}
+
+	if newLine {
+		context.Console.Print(output + "\n") // println agrega doble salto si así lo deseas
+	} else {
+		context.Console.Print(output)
+	}
+
+	return value.DefaultNilValue, true, ""
+}
+
+/*
+func Print(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 
 	var output string
 
@@ -63,9 +112,11 @@ func Print(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 	return value.DefaultNilValue, true, ""
 }
 
+*/
+
 // * Int Function
 
-func Int(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
+func Atoi(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 
 	if len(args) != 1 {
 		return value.DefaultNilValue, false, "La función int solo acepta un argumento"
@@ -104,7 +155,7 @@ func Int(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 
 // * Float Function
 
-func Float(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
+func ParseFloat(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 
 	if len(args) != 1 {
 		return value.DefaultNilValue, false, "La función float solo acepta un argumento"
@@ -168,21 +219,48 @@ func String(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 	return value.DefaultNilValue, false, "No se pudo convertir el valor a string"
 }
 
+func TypeOf(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
+
+	if len(args) != 1 {
+		return value.DefaultNilValue, false, "La función typeOf solo acepta un argumento"
+	}
+
+	argValue := args[0].Value
+
+	// Obtenemos el tipo directamente (ya es el nombre del tipo)
+	typeName := argValue.Type()
+
+	// Debug: imprimir el tipo en la consola interna del intérprete
+	context.Console.Print("[DEBUG] TypeOf: " + typeName)
+
+	return &value.StringValue{
+		InternalValue: typeName,
+	}, true, ""
+}
+
 var DefaultBuiltInFunctions = map[string]*BuiltInFunction{
 	"print": {
 		Name: "print",
 		Exec: Print,
 	},
-	"Int": {
-		Name: "Int",
-		Exec: Int,
-	},
-	"Float": {
-		Name: "Float",
-		Exec: Float,
+	"println": {
+		Name: "println",
+		Exec: PrintLn,
 	},
 	"String": {
 		Name: "String",
 		Exec: String,
+	},
+	"Atoi": {
+		Name: "Atoi",
+		Exec: Atoi,
+	},
+	"parseFloat": {
+		Name: "parseFloat",
+		Exec: ParseFloat,
+	},
+	"typeOf": {
+		Name: "typeOf",
+		Exec: TypeOf,
 	},
 }
