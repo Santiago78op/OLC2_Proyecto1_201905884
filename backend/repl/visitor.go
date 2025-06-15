@@ -190,31 +190,59 @@ func (v *ReplVisitor) VisitVarDecl(ctx *compiler.VarAssDeclContext) interface{} 
 // Ejemplo: vector_1 []int = [1, 2, 3]
 // cibtexto VarVectDecl
 func (v *ReplVisitor) VisitVarVectDecl(ctx *compiler.VarVectDeclContext) interface{} {
-	// Si hubiera constantes se validan aquí
-	// isConst := isDeclConst(ctx.Var_type().GetText())
-	isConst := false // No se manejan constantes en vectores
+	fmt.Printf("🔹 Visitando VarVectDecl: %s\n", ctx.GetText())
 
-	// Obtenemos el context de la declaración VarVectDecl
+	// No hay constantes en este contexto
+	isConst := false
+
+	// Obtener información del contexto
 	varName := ctx.ID().GetText()
 	varType := v.Visit(ctx.Type_()).(string)
 	varValue := v.Visit(ctx.Expression()).(value.IVOR)
 
-	// Validar tipo de variable
+	// Validar que el tipo declarado sea un vector
+	if !IsVectorType(varType) {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El tipo '"+varType+"' no es un tipo de vector válido")
+		return nil
+	}
+
+	// Validar que el valor asignado sea compatible con vectores
+	if varValue.Type() != varType && varValue.Type() != "[]" {
+		// Verificar si es un vector compatible
+		if !IsVectorType(varValue.Type()) {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede asignar un valor de tipo '"+varValue.Type()+"' a una variable de tipo '"+varType+"'")
+			return nil
+		}
+
+		// Verificar compatibilidad de tipos de elementos
+		declaredItemType := RemoveBrackets(varType)
+		valueItemType := RemoveBrackets(varValue.Type())
+
+		if declaredItemType != valueItemType {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede asignar un vector de tipo '"+varValue.Type()+"' a una variable de tipo '"+varType+"'")
+			return nil
+		}
+	}
+
+	// Manejar copia de objetos
 	if obj, ok := varValue.(*ObjectValue); ok {
 		varValue = obj.Copy()
 	}
 
+	// Manejar copia de vectores
 	if IsVectorType(varValue.Type()) {
 		varValue = varValue.Copy()
 	}
 
+	// Agregar variable al scope
 	variable, msg := v.ScopeTrace.AddVariable(varName, varType, varValue, isConst, false, ctx.GetStart())
 
-	// Variable already exists
 	if variable == nil {
 		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		return nil
 	}
 
+	fmt.Printf("✅ Variable vector '%s' declarada con tipo '%s'\n", varName, varType)
 	return nil
 }
 
@@ -222,8 +250,45 @@ func (v *ReplVisitor) VisitVarVectDecl(ctx *compiler.VarVectDeclContext) interfa
 // visitor MutSliceDecl // mut slice []int
 // Ejemplo: mut slice []int
 func (v *ReplVisitor) VisitValDeclVec(ctx *compiler.ValDeclVecContext) interface{} {
-	fmt.Printf("🔹 Visitando MutSliceDecl: %s\n", ctx.GetText())
-	fmt.Printf("🔹Holaaaaaaa")
+	fmt.Printf("🔹 Visitando ValDeclVec: %s\n", ctx.GetText())
+
+	// En este contexto no hay constantes, solo variables mut
+	isConst := false
+
+	// Obtener el nombre de la variable
+	varName := ctx.ID().GetText()
+
+	// Obtener el tipo del vector (ej: "[]int")
+	varType := v.Visit(ctx.Type_()).(string)
+
+	// Validar que sea un tipo de vector válido
+	if !IsVectorType(varType) {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El tipo '"+varType+"' no es un tipo de vector válido")
+		return nil
+	}
+
+	// Extraer el tipo de los elementos del vector (ej: "int" de "[]int")
+	itemType := RemoveBrackets(varType)
+
+	// Validar que el tipo del elemento sea válido
+	if !v.ValidType(itemType) {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El tipo de elemento '"+itemType+"' no es válido para un vector")
+		return nil
+	}
+
+	// Crear un vector vacío del tipo especificado
+	emptyVector := NewVectorValue([]value.IVOR{}, varType, itemType)
+
+	// Agregar la variable al scope actual
+	variable, msg := v.ScopeTrace.AddVariable(varName, varType, emptyVector, isConst, false, ctx.GetStart())
+
+	// Si la variable ya existe o hay otro error, reportarlo
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		return nil
+	}
+
+	fmt.Printf("✅ Vector '%s' de tipo '%s' declarado exitosamente\n", varName, varType)
 	return nil
 }
 
@@ -384,30 +449,59 @@ func (v *ReplVisitor) VisitAssignmentDecl(ctx *compiler.AssignmentDeclContext) i
 	varName := v.Visit(ctx.Id_pattern()).(string)
 	varValue := v.Visit(ctx.Expression()).(value.IVOR)
 
+	// Buscar la variable en el scope
 	variable := v.ScopeTrace.GetVariable(varName)
 
 	if variable == nil {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+varName+" no encontrada")
-	} else {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable '"+varName+"' no encontrada")
+		return nil
+	}
 
-		// copy object
-		if obj, ok := varValue.(*ObjectValue); ok {
-			varValue = obj.Copy()
+	// Validaciones específicas para vectores
+	if IsVectorType(variable.Type) {
+		// Si la variable es un vector, validar compatibilidad
+		if !IsVectorType(varValue.Type()) && varValue.Type() != "[]" {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede asignar un valor de tipo '"+varValue.Type()+"' a una variable vector de tipo '"+variable.Type+"'")
+			return nil
 		}
 
-		canMutate := true
+		// Validar compatibilidad de tipos de elementos
+		if IsVectorType(varValue.Type()) {
+			varItemType := RemoveBrackets(variable.Type)
+			valueItemType := RemoveBrackets(varValue.Type())
 
-		if v.ScopeTrace.CurrentScope.isStruct {
-			canMutate = v.ScopeTrace.IsMutatingEnvironment()
-		}
-
-		ok, msg := variable.AssignValue(varValue, canMutate)
-
-		if !ok {
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+			if varItemType != valueItemType {
+				v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede asignar un vector de tipo '"+varValue.Type()+"' a una variable de tipo '"+variable.Type+"'")
+				return nil
+			}
 		}
 	}
 
+	// Manejar copia de objetos
+	if obj, ok := varValue.(*ObjectValue); ok {
+		varValue = obj.Copy()
+	}
+
+	// Manejar copia de vectores para evitar referencias compartidas
+	if IsVectorType(varValue.Type()) {
+		varValue = varValue.Copy()
+	}
+
+	// Verificar contexto de mutación (para propiedades de struct)
+	canMutate := true
+	if v.ScopeTrace.CurrentScope.isStruct {
+		canMutate = v.ScopeTrace.IsMutatingEnvironment()
+	}
+
+	// Realizar la asignación
+	ok, msg := variable.AssignValue(varValue, canMutate)
+
+	if !ok {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		return nil
+	}
+
+	fmt.Printf("✅ Asignación completada: '%s' = valor de tipo '%s'\n", varName, varValue.Type())
 	return nil
 
 }
