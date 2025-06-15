@@ -31,7 +31,7 @@ decl_stmt:
     | var_type ID ASSIGN expression     # ValueDecl   // mut num2 = 5
     | var_type ID type                  # ValDeclVec  // mut vector []int
     | ID type ASSIGN expression         # VarAssDecl  // num2 int = 5                                          
-    | ID ASSIGN type expression         # VarVectDecl // numbers = []int {1, 2, 3, 4, 5};
+    | ID ASSIGN vector_type vect_expr   # VarVectDecl // numbers = []int {1, 2, 3, 4, 5};
     ;
 
 // Inicia Declaracion de Vector
