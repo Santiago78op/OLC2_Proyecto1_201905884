@@ -31,7 +31,8 @@ decl_stmt:
     | var_type ID ASSIGN expression     # ValueDecl   // mut num2 = 5
     | var_type ID type                  # ValDeclVec  // mut vector []int
     | ID type ASSIGN expression         # VarAssDecl  // num2 int = 5                                          
-    | ID ASSIGN vector_type vect_expr   # VarVectDecl // numbers = []int {1, 2, 3, 4, 5};
+    | ID ASSIGN vector_type vect_expr   # VarVectDecl // numbers = []int {1, 2, 3, 4, 5}
+    | ID ASSIGN matrix_type vect_expr   # VarMatrixDecl // matrix = [][]int { {1, 2}, {3, 4} }
     ;
 
 // Inicia Declaracion de Vector
@@ -70,32 +71,37 @@ var_type
 vector_type: LBRACK RBRACK ID
     ;
 
+matrix_type:
+    aux_matrix_type
+    | LBRACK RBRACK LBRACK RBRACK ID
+    ;
+
+aux_matrix_type: LBRACK RBRACK
+    ;
+
 type: 
     ID 
     | vector_type 
     | matrix_type
     ;
 
-matrix_type: 
-    aux_matrix_type 
-    | LBRACK LBRACK ID RBRACK RBRACK
-    ;
-
-aux_matrix_type: LBRACK matrix_type RBRACK
-    ;
-
-
 // Termina Declaracion de Variables
 
 // Inicia Asignacion de Variables
 // varSring = "Hola"
 assign_stmt:
-    id_pattern ASSIGN expression                                            # AssignmentDecl
-    | id_pattern op = ( PLUS_ASSIGN | MINUS_ASSIGN) expression              # ArgAddAssigDecl
-    | vect_item op = ( PLUS_ASSIGN | MINUS_ASSIGN  | ASSIGN) expression	    # VectorAssign
-    | id_pattern op = (INCREMENT | DECREMENT)                               # IncDecAssign
+    id_pattern ASSIGN expression                  # AssignmentDecl
+    | id_pattern op = (
+        PLUS_ASSIGN | MINUS_ASSIGN
+    ) expression                                  # ArgAddAssigDecl
+    | vect_item op = ( 
+        PLUS_ASSIGN 
+        | MINUS_ASSIGN 
+        | ASSIGN) expression	                  # VectorAssign
     ;
 
+// variable ASSIGN expression
+// num2 
 id_pattern // (a.a)
     : ID (DOT ID)*                                # IdPattern
     ;
@@ -112,17 +118,24 @@ literal
     | NIL_LITERAL                                 # NilLiteral
     ;
 
+// Incremento y decremento
+incredecre
+    : ID INC    #incremento
+    | ID DEC    #decremento
+    ;
+
 // Inicio Expresiones
 expression
     : LPAREN expression RPAREN                       # ParensExpr 
-    | func_call_expre                                # FuncCallExpr 
+    | func_call                                      # FuncCallExpr 
     | id_pattern                                     # IdPatternExpr
     | vect_item                                      # VectorItemExpr
     | vect_prop                                      # VectorPropertyExpr
     | vect_func                                      # VectorFuncCallExpr
     | literal                                        # LiteralExpr
-    | vect_expr                                      # VectorExpr
+    | vect_expr                                      # VectorExpr 
     | repeating                                      # RepeatingExpr
+    | incredecre                                     # incredecr
     | op = ( NOT | MINUS) expression                 # UnaryExpr
     | left = expression op = (
         MULT | DIV | MOD
@@ -165,9 +178,9 @@ while_stmt: WHILE_KW expression LBRACE stmt* RBRACE # WhileStmt;
 // Inicia Sentencias de Iteracion For
 for_stmt:
     FOR_KW expression LBRACE stmt* RBRACE                                        # ForStmtCond
-    | FOR_KW assign_stmt SEMI expression SEMI assign_stmt LBRACE stmt* RBRACE    # ForAssCond
-	| FOR_KW ID COMMA expression IN_KW (expression | range) LBRACE stmt* RBRACE  # ForStmt ;
+    | FOR_KW assign_stmt SEMI expression SEMI expression LBRACE stmt* RBRACE     # ForAssCond
 
+	| FOR_KW ID COMMA expression IN_KW (expression | range) LBRACE stmt* RBRACE  # ForStmt ;
 
 range: expression DOT DOT DOT expression # NumericRange;
 // Termina Sentencias de Iteracion For

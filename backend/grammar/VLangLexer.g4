@@ -22,9 +22,10 @@ BREAK_KW    : 'break';
 CONTINUE_KW : 'continue';
 RETURN_KW   : 'return';
 
-// Operadores de incremento/decremento
-INCREMENT: '++';
-DECREMENT: '--';
+
+// Incremento y Decremento
+DEC     : '--';
+INC     : '++' ;
 
 // Operadores Aritmeticos
 PLUS     : '+';
@@ -34,7 +35,6 @@ DIV      : '/';
 MOD      : '%';
 
 // Operadores de Asignacion
-DEFINE      : ':=';
 ASSIGN      : '=';
 PLUS_ASSIGN : '+=';
 MINUS_ASSIGN: '-=';
