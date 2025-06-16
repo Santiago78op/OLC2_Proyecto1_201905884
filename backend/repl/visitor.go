@@ -1504,60 +1504,58 @@ func (v *ReplVisitor) VisitBlockInd(ctx *compiler.BlockIndContext) interface{} {
 	return nil
 }
 
-/*
 func (v *ReplVisitor) VisitForStmt(ctx *compiler.ForStmtContext) interface{} {
 
-    indexName := ctx.ID(0).GetText()
-    valueName := ctx.ID(1).GetText()
+	indexName := ctx.ID(0).GetText()
+	valueName := ctx.ID(1).GetText()
 
-    iterableValue := v.Visit(ctx.Expr()).(value.IVOR)
+	iterableValue := v.Visit(ctx.Expression()).(value.IVOR)
 
-    var iterableItem *VectorValue
+	var iterableItem *VectorValue
 
-    if IsVectorType(iterableValue.Type()) {
-        iterableItem = iterableValue.(*VectorValue)
-    } else if iterableValue.Type() == value.IVOR_STRING {
-        iterableItem = StringToVector(iterableValue.(*value.StringValue))
-    } else {
-        v.ErrorTable.NewSemanticError(ctx.GetStart(), "El valor del for debe ser un vector o una cadena")
-        return nil
-    }
+	if IsVectorType(iterableValue.Type()) {
+		iterableItem = iterableValue.(*VectorValue)
+	} else if iterableValue.Type() == value.IVOR_STRING {
+		iterableItem = StringToVector(iterableValue.(*value.StringValue))
+	} else {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El valor del for debe ser un vector o una cadena")
+		return nil
+	}
 
-    if iterableItem.Size() == 0 {
-        return nil
-    }
+	if iterableItem.Size() == 0 {
+		return nil
+	}
 
-    outerForScope := v.ScopeTrace.PushScope("outer_for")
+	outerForScope := v.ScopeTrace.PushScope("outer_for")
 
-    // Declarar índice y valor
-    indexVar, msg1 := outerForScope.AddVariable(indexName, value.IVOR_INT, &value.IntValue{InternalValue: 0}, true, false, ctx.ID(0).GetSymbol())
-    valueVar, msg2 := outerForScope.AddVariable(valueName, iterableItem.ItemType, iterableItem.Current(), true, false, ctx.ID(1).GetSymbol())
+	// Declarar índice y valor
+	indexVar, msg1 := outerForScope.AddVariable(indexName, value.IVOR_INT, &value.IntValue{InternalValue: 0}, true, false, ctx.ID(0).GetSymbol())
+	valueVar, msg2 := outerForScope.AddVariable(valueName, iterableItem.ItemType, iterableItem.Current(), true, false, ctx.ID(1).GetSymbol())
 
-    if indexVar == nil || valueVar == nil {
-        v.ErrorTable.NewSemanticError(ctx.GetStart(), msg1 + " " + msg2)
-        log.Fatal("Error declarando variables del for")
-        return nil
-    }
+	if indexVar == nil || valueVar == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg1+" "+msg2)
+		log.Fatal("Error declarando variables del for")
+		return nil
+	}
 
-    forItem := &CallStackItem{
-        ReturnValue: value.DefaultNilValue,
-        Type:        []string{BreakItem, ContinueItem},
-    }
+	forItem := &CallStackItem{
+		ReturnValue: value.DefaultNilValue,
+		Type:        []string{BreakItem, ContinueItem},
+	}
 
-    v.CallStack.Push(forItem)
-    innerForScope := v.ScopeTrace.PushScope("inner_for")
+	v.CallStack.Push(forItem)
+	innerForScope := v.ScopeTrace.PushScope("inner_for")
 
-    v.VisitInnerForWithIndex(ctx, outerForScope, innerForScope, forItem, iterableItem, indexVar, valueVar)
+	v.VisitInnerForWithIndex(ctx, outerForScope, innerForScope, forItem, iterableItem, indexVar, valueVar)
 
-    iterableItem.Reset()
-    v.ScopeTrace.PopScope()
-    v.ScopeTrace.PopScope()
-    v.CallStack.Clean(forItem)
-    return nil
+	iterableItem.Reset()
+	v.ScopeTrace.PopScope()
+	v.ScopeTrace.PopScope()
+	v.CallStack.Clean(forItem)
+	return nil
 }
 
-
-func (v *ReplVisitor) VisitInnerForWithIndex(ctx *compiler.ForStmtContext, outerForScope *BaseScope, innerForScope *BaseScope, forItem *CallStackItem, iterableItem *VectorValue, indexVar *Variable, valueVar *Variable) {
+func (v *ReplVisitor) VisitInnerForWithIndex(ctx *compiler.ForStmtContext, outerForScope *BaseScopeTrace, innerForScope *BaseScopeTrace, forItem *CallStackItem, iterableItem *VectorValue, indexVar *Variable, valueVar *Variable) {
 
 	defer func() {
 		innerForScope.Reset()
@@ -1577,7 +1575,7 @@ func (v *ReplVisitor) VisitInnerForWithIndex(ctx *compiler.ForStmtContext, outer
 	}()
 
 	for iterableItem.CurrentIndex < iterableItem.Size() {
-		indexVar.Value = &value.IntValue{InternalValue: int64(iterableItem.CurrentIndex)}
+		indexVar.Value = &value.IntValue{InternalValue: iterableItem.CurrentIndex}
 		valueVar.Value = iterableItem.Current()
 
 		for _, stmt := range ctx.AllStmt() {
@@ -1588,5 +1586,3 @@ func (v *ReplVisitor) VisitInnerForWithIndex(ctx *compiler.ForStmtContext, outer
 		innerForScope.Reset()
 	}
 }
-
-*/
