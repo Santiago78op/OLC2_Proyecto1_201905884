@@ -27,8 +27,15 @@ func (b BuiltInFunction) Copy() value.IVOR {
 }
 
 // * Print Function
-// * Print Function
 func Print(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
+	return PrintCore(context, args, false)
+}
+
+func PrintLn(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
+	return PrintCore(context, args, true)
+}
+
+func PrintCore(context *ReplContext, args []*Argument, newLine bool) (value.IVOR, bool, string) {
 
 	var output string
 
@@ -69,7 +76,11 @@ func Print(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 		}
 	}
 
-	context.Console.Print(output + "\n")
+	if newLine {
+		context.Console.Print(output + "\n") // println agrega doble salto si así lo deseas
+	} else {
+		context.Console.Print(output)
+	}
 
 	return value.DefaultNilValue, true, ""
 }
@@ -116,9 +127,9 @@ func formatVector(vector *VectorValue) string {
 	return result.String()
 }
 
-// * Int Function
+// * Atoi Function
 
-func Int(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
+func Atoi(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 
 	if len(args) != 1 {
 		return value.DefaultNilValue, false, "La función int solo acepta un argumento"
@@ -157,7 +168,7 @@ func Int(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 
 // * Float Function
 
-func Float(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
+func ParseFloat(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 
 	if len(args) != 1 {
 		return value.DefaultNilValue, false, "La función float solo acepta un argumento"
@@ -180,45 +191,21 @@ func Float(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 	}, true, ""
 }
 
-// * String Function
-
-func String(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
+// * TypeOf Function
+func TypeOf(context *ReplContext, args []*Argument) (value.IVOR, bool, string) {
 
 	if len(args) != 1 {
-		return value.DefaultNilValue, false, "La función string solo acepta un argumento"
+		return value.DefaultNilValue, false, "La función typeOf solo acepta un argumento"
 	}
 
 	argValue := args[0].Value
 
-	if !(argValue.Type() == value.IVOR_INT || argValue.Type() == value.IVOR_FLOAT || argValue.Type() == value.IVOR_BOOL) {
-		return value.DefaultNilValue, false, "La función string solo acepta un argumento de tipo int, float o bool"
-	}
+	// Obtenemos el tipo directamente (ya es el nombre del tipo)
+	typeName := argValue.Type()
 
-	if argValue.Type() == value.IVOR_INT {
-		stringValue := strconv.Itoa(argValue.Value().(int))
-
-		return &value.StringValue{
-			InternalValue: stringValue,
-		}, true, ""
-	}
-
-	if argValue.Type() == value.IVOR_FLOAT {
-		stringValue := strconv.FormatFloat(argValue.Value().(float64), 'f', 4, 64)
-
-		return &value.StringValue{
-			InternalValue: stringValue,
-		}, true, ""
-	}
-
-	if argValue.Type() == value.IVOR_BOOL {
-		stringValue := strconv.FormatBool(argValue.Value().(bool))
-
-		return &value.StringValue{
-			InternalValue: stringValue,
-		}, true, ""
-	}
-
-	return value.DefaultNilValue, false, "No se pudo convertir el valor a string"
+	return &value.StringValue{
+		InternalValue: typeName,
+	}, true, ""
 }
 
 var DefaultBuiltInFunctions = map[string]*BuiltInFunction{
@@ -226,16 +213,20 @@ var DefaultBuiltInFunctions = map[string]*BuiltInFunction{
 		Name: "print",
 		Exec: Print,
 	},
-	"int": {
-		Name: "int",
-		Exec: Int,
+	"println": {
+		Name: "println",
+		Exec: PrintLn,
 	},
-	"float": {
-		Name: "float",
-		Exec: Float,
+	"Atoi": {
+		Name: "Atoi",
+		Exec: Atoi,
 	},
-	"string": {
-		Name: "string",
-		Exec: String,
+	"parseFloat": {
+		Name: "parseFloat",
+		Exec: ParseFloat,
+	},
+	"typeOf": {
+		Name: "typeOf",
+		Exec: TypeOf,
 	},
 }

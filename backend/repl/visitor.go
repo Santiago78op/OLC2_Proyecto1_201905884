@@ -55,6 +55,8 @@ func (v *ReplVisitor) Visit(tree antlr.ParseTree) interface{} {
 		fmt.Printf("❌ ERROR NODE en ReplVisitor: %s\n", val.GetText())
 		log.Fatal(val.GetText())
 		return nil
+	case *compiler.FuncCallExprContext:
+		return v.VisitFuncCall(val.Func_call().(*compiler.FuncCallContext))
 	default:
 		fmt.Printf("🔹 ReplVisitor aceptando tree\n")
 		return tree.Accept(v)
