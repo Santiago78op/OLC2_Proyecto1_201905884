@@ -265,7 +265,7 @@ func (v *ReplVisitor) VisitAssignmentDecl(ctx *compiler.AssignmentDeclContext) i
 
 }
 
-func (v *ReplVisitor) VisitIncDecAssign(ctx *compiler.IncDecAssignContext) interface{} {
+func (v *ReplVisitor) VisitIncDecAssign(ctx *compiler.) interface{} {
 
 	// Obtenemos el nombre de la variable
 	varName := v.Visit(ctx.Id_pattern()).(string)
