@@ -125,25 +125,33 @@ incredecre
 
 // Inicio Expresiones
 expression
-    : left = expression op = OR right = expression    # BinaryExpr       // Menor precedencia
-    | left = expression op = AND right = expression   # BinaryExpr
-    | left = expression op = (EQ | NE) right = expression # BinaryExpr
-    | left = expression op = (LE | LT | GE | GT) right = expression # BinaryExpr
-    | left = expression op = (PLUS | MINUS) right = expression # BinaryExpr
-    | left = expression op = (MULT | DIV | MOD) right = expression # BinaryExpr  // Mayor precedencia de binarios
-    | op = (NOT | MINUS) expression                   # UnaryExpr        // Operadores unarios
-    | LPAREN expression RPAREN                        # ParensExpr       // Máxima precedencia
-    | func_call                                       # FuncCallExpr 
-    | id_pattern                                      # IdPatternExpr
-    | vect_item                                       # VectorItemExpr
-    | vect_prop                                       # VectorPropertyExpr
-    | vect_func                                       # VectorFuncCallExpr
-    | literal                                         # LiteralExpr
-    | vect_expr                                       # VectorExpr 
-    | repeating                                       # RepeatingExpr
-    | incredecre                                      # incredecr
-    | ID LBRACE struct_param_list? RBRACE             # StructInstantiationExpr
-    | expression '.' ID                               # StructAccessExpr
+    : LPAREN expression RPAREN                       # ParensExpr 
+    | func_call                                      # FuncCallExpr 
+    | id_pattern                                     # IdPatternExpr
+    | vect_item                                      # VectorItemExpr
+    | vect_prop                                      # VectorPropertyExpr
+    | vect_func                                      # VectorFuncCallExpr
+    | literal                                        # LiteralExpr
+    | vect_expr                                      # VectorExpr 
+    | repeating                                      # RepeatingExpr
+    | incredecre                                     # incredecr
+    | op = ( NOT | MINUS) expression                 # UnaryExpr
+    | left = expression op = (
+        MULT | DIV | MOD
+    ) right = expression                             # BinaryExpr
+    | left = expression op = (
+        PLUS | MINUS
+    ) right = expression                             # BinaryExpr
+    | left = expression op = (
+        LE | LT | GE | GT 
+    ) right = expression                             # BinaryExpr
+    | left = expression op = (
+        EQ | NE
+    ) right = expression                             # BinaryExpr
+    | left = expression op = AND right = expression  # BinaryExpr
+    | left = expression op = OR right = expression   # BinaryExpr
+    | ID LBRACE struct_param_list? RBRACE            # StructInstantiationExpr
+    | expression '.' ID                              # StructAccessExpr
     ;
 // Terminan Expresiones
 
