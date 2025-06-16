@@ -58,6 +58,9 @@ type VLangGrammarListener interface {
 	// EnterMatrixItemList is called when entering the MatrixItemList production.
 	EnterMatrixItemList(c *MatrixItemListContext)
 
+	// EnterMatrixItem is called when entering the MatrixItem production.
+	EnterMatrixItem(c *MatrixItemContext)
+
 	// EnterType is called when entering the type production.
 	EnterType(c *TypeContext)
 
@@ -96,6 +99,9 @@ type VLangGrammarListener interface {
 
 	// EnterRepeatingExpr is called when entering the RepeatingExpr production.
 	EnterRepeatingExpr(c *RepeatingExprContext)
+
+	// EnterMatrixItemExpr is called when entering the MatrixItemExpr production.
+	EnterMatrixItemExpr(c *MatrixItemExprContext)
 
 	// EnterIncredecr is called when entering the incredecr production.
 	EnterIncredecr(c *IncredecrContext)
@@ -262,6 +268,9 @@ type VLangGrammarListener interface {
 	// ExitMatrixItemList is called when exiting the MatrixItemList production.
 	ExitMatrixItemList(c *MatrixItemListContext)
 
+	// ExitMatrixItem is called when exiting the MatrixItem production.
+	ExitMatrixItem(c *MatrixItemContext)
+
 	// ExitType is called when exiting the type production.
 	ExitType(c *TypeContext)
 
@@ -300,6 +309,9 @@ type VLangGrammarListener interface {
 
 	// ExitRepeatingExpr is called when exiting the RepeatingExpr production.
 	ExitRepeatingExpr(c *RepeatingExprContext)
+
+	// ExitMatrixItemExpr is called when exiting the MatrixItemExpr production.
+	ExitMatrixItemExpr(c *MatrixItemExprContext)
 
 	// ExitIncredecr is called when exiting the incredecr production.
 	ExitIncredecr(c *IncredecrContext)

@@ -75,6 +75,10 @@ func (v *BaseVLangGrammarVisitor) VisitMatrixItemList(ctx *MatrixItemListContext
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitMatrixItem(ctx *MatrixItemContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitType(ctx *TypeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -124,6 +128,10 @@ func (v *BaseVLangGrammarVisitor) VisitDecremento(ctx *DecrementoContext) interf
 }
 
 func (v *BaseVLangGrammarVisitor) VisitRepeatingExpr(ctx *RepeatingExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitMatrixItemExpr(ctx *MatrixItemExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

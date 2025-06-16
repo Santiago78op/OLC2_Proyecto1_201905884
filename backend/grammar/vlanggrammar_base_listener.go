@@ -122,6 +122,12 @@ func (s *BaseVLangGrammarListener) EnterMatrixItemList(ctx *MatrixItemListContex
 // ExitMatrixItemList is called when production MatrixItemList is exited.
 func (s *BaseVLangGrammarListener) ExitMatrixItemList(ctx *MatrixItemListContext) {}
 
+// EnterMatrixItem is called when production MatrixItem is entered.
+func (s *BaseVLangGrammarListener) EnterMatrixItem(ctx *MatrixItemContext) {}
+
+// ExitMatrixItem is called when production MatrixItem is exited.
+func (s *BaseVLangGrammarListener) ExitMatrixItem(ctx *MatrixItemContext) {}
+
 // EnterType is called when production type is entered.
 func (s *BaseVLangGrammarListener) EnterType(ctx *TypeContext) {}
 
@@ -199,6 +205,12 @@ func (s *BaseVLangGrammarListener) EnterRepeatingExpr(ctx *RepeatingExprContext)
 
 // ExitRepeatingExpr is called when production RepeatingExpr is exited.
 func (s *BaseVLangGrammarListener) ExitRepeatingExpr(ctx *RepeatingExprContext) {}
+
+// EnterMatrixItemExpr is called when production MatrixItemExpr is entered.
+func (s *BaseVLangGrammarListener) EnterMatrixItemExpr(ctx *MatrixItemExprContext) {}
+
+// ExitMatrixItemExpr is called when production MatrixItemExpr is exited.
+func (s *BaseVLangGrammarListener) ExitMatrixItemExpr(ctx *MatrixItemExprContext) {}
 
 // EnterIncredecr is called when production incredecr is entered.
 func (s *BaseVLangGrammarListener) EnterIncredecr(ctx *IncredecrContext) {}

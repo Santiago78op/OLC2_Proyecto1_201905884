@@ -58,6 +58,9 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#MatrixItemList.
 	VisitMatrixItemList(ctx *MatrixItemListContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#MatrixItem.
+	VisitMatrixItem(ctx *MatrixItemContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#type.
 	VisitType(ctx *TypeContext) interface{}
 
@@ -96,6 +99,9 @@ type VLangGrammarVisitor interface {
 
 	// Visit a parse tree produced by VLangGrammar#RepeatingExpr.
 	VisitRepeatingExpr(ctx *RepeatingExprContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#MatrixItemExpr.
+	VisitMatrixItemExpr(ctx *MatrixItemExprContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#incredecr.
 	VisitIncredecr(ctx *IncredecrContext) interface{}
