@@ -94,6 +94,8 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 		v.Visit(ctx.Switch_stmt())
 	} else if ctx.For_stmt() != nil {
 		v.Visit(ctx.For_stmt())
+	} else if ctx.Strct_dcl() != nil {
+		v.Visit(ctx.Strct_dcl())
 	} else {
 		log.Fatal("Statement not recognized: ", ctx.GetText())
 	}
@@ -1619,4 +1621,129 @@ func (v *ReplVisitor) VisitInnerForWithIndex(ctx *compiler.ForStmtContext, outer
 		iterableItem.Next()
 		innerForScope.Reset()
 	}
+}
+
+// Structs
+func (v *ReplVisitor) VisitStructDecl(ctx *compiler.StructDeclContext) interface{} {
+	if v.ScopeTrace.CurrentScope != v.ScopeTrace.GlobalScope {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Los structs solo pueden ser declaradas en el scope global")
+		return nil
+	}
+
+	structAdded, msg := v.ScopeTrace.GlobalScope.AddStruct(ctx.ID().GetText(), &Struct{
+		Name:   ctx.ID().GetText(),
+		Fields: ctx.AllStruct_prop(),
+		Token:  ctx.GetStart(),
+	})
+
+	if !structAdded {
+		v.ErrorTable.NewSemanticError(ctx.ID().GetSymbol(), msg)
+	}
+
+	return nil
+}
+
+func (v *ReplVisitor) VisitStructAttr(ctx *compiler.StructAttrContext) interface{} {
+	varName := ctx.ID().GetText()
+	explicitType := ""
+	finalType := ""
+	var varValue value.IVOR = value.DefaultUnInitializedValue
+
+	if ctx.Type_() != nil {
+		explicitType = v.Visit(ctx.Type_()).(string)
+		finalType = explicitType
+	} else {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Los atributos de un struct deben tener tipo explícito")
+		return nil
+	}
+
+	variable, msg := v.ScopeTrace.AddVariable(varName, finalType, varValue, true, true, ctx.ID().GetSymbol())
+
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+	}
+
+	return nil
+}
+
+type StructInstance struct {
+	StructName string
+	Fields     map[string]value.IVOR
+}
+
+func (v *ReplVisitor) VisitStructInstantiationExpr(ctx *compiler.StructInstantiationExprContext) interface{} {
+	idToken := ctx.ID()
+	if idToken == nil {
+		log.Println("Error: no se pudo obtener el ID del struct")
+		return nil
+	}
+	structName := idToken.GetText()
+	log.Printf("Nombre del struct a instanciar: %s\n", structName)
+
+	params := ctx.Struct_param_list()
+	fieldsMap := make(map[string]value.IVOR)
+
+	if params != nil {
+		i := 0
+		for {
+			paramCtx := params.Struct_param(i)
+			if paramCtx == nil {
+				break
+			}
+			paramName := paramCtx.ID().GetText()
+			exprValue := v.Visit(paramCtx.Expression()).(value.IVOR)
+			log.Printf("Param: %s = %v\n", paramName, exprValue)
+			fieldsMap[paramName] = exprValue
+			i++
+		}
+	}
+
+	structValue := &value.StructValue{
+		Instance: &value.StructInstance{
+			StructName: structName,
+			Fields:     fieldsMap,
+		},
+	}
+
+	log.Println("Instancia creada correctamente:", structValue.ToString())
+	return structValue
+}
+
+func (v *ReplVisitor) VisitStruct_param(ctx *compiler.Struct_paramContext) interface{} {
+	fieldName := ctx.ID().GetText()
+	val := v.Visit(ctx.Expression()).(value.IVOR)
+
+	return &StructFieldValue{
+		Name:  fieldName,
+		Value: val,
+	}
+}
+
+type StructFieldValue struct {
+	Name  string
+	Value value.IVOR
+}
+
+func (v *ReplVisitor) VisitStructAccessExpr(ctx *compiler.StructAccessExprContext) interface{} {
+	// Evaluar la expresión a la izquierda del punto (debería ser una variable o un acceso anidado)
+	left := v.Visit(ctx.Expression())
+
+	// Obtener el nombre del atributo accedido
+	attrName := ctx.ID().GetText()
+
+	// Validar que la expresión de la izquierda sea una instancia de struct
+	structVal, ok := left.(*value.StructValue)
+	if !ok {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La expresión no es una instancia de struct")
+		return nil
+	}
+
+	// Buscar el atributo en los campos del struct
+	attrVal, exists := structVal.Instance.Fields[attrName]
+	if !exists {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El atributo '"+attrName+"' no existe en el struct '"+structVal.Instance.StructName+"'")
+		return nil
+	}
+
+	return attrVal
 }

@@ -75,7 +75,7 @@ matrix_type:
     | LBRACK RBRACK LBRACK RBRACK ID
     ;
 
-aux_matrix_type: LBRACK RBRACK
+aux_matrix_type: LBRACK RBRACK matrix_type
     ;
 
 type: 
@@ -150,6 +150,8 @@ expression
     ) right = expression                             # BinaryExpr
     | left = expression op = AND right = expression  # BinaryExpr
     | left = expression op = OR right = expression   # BinaryExpr
+    | ID LBRACE struct_param_list? RBRACE            # StructInstantiationExpr
+    | expression '.' ID                              # StructAccessExpr
     ;
 // Terminan Expresiones
 
@@ -213,12 +215,19 @@ param_list: func_param (COMMA func_param)* # ParamList;
 func_param: ID type                        # FuncParam;
 
 // Inicia Estructuras de control
-strct_dcl: STR ID LBRACE struct_prop* RBRACE # StructDecl;
+strct_dcl: STR ID LBRACE struct_prop+ RBRACE # StructDecl;
 
 struct_prop:
-	var_type ID (COLON type)? (ASSIGN expression)?	# StructAttr
+    type ID SEMI # StructAttr
+;
+
+//struct_instantiation: ID LBRACE struct_param_list? RBRACE;
+
+struct_param_list
+    : struct_param (',' struct_param)* ','?
     ;
 
-struct_vector: LBRACK ID RBRACK LPAREN RPAREN       # StructVector
+struct_param
+    : ID ':' expression
     ;
 // Termina Estructuras de control

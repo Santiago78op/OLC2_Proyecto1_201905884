@@ -200,29 +200,54 @@ func (s *BaseVLangGrammarListener) EnterRepeatingExpr(ctx *RepeatingExprContext)
 // ExitRepeatingExpr is called when production RepeatingExpr is exited.
 func (s *BaseVLangGrammarListener) ExitRepeatingExpr(ctx *RepeatingExprContext) {}
 
-// EnterVectorPropertyExpr is called when production VectorPropertyExpr is entered.
-func (s *BaseVLangGrammarListener) EnterVectorPropertyExpr(ctx *VectorPropertyExprContext) {}
-
-// ExitVectorPropertyExpr is called when production VectorPropertyExpr is exited.
-func (s *BaseVLangGrammarListener) ExitVectorPropertyExpr(ctx *VectorPropertyExprContext) {}
-
 // EnterIncredecr is called when production incredecr is entered.
 func (s *BaseVLangGrammarListener) EnterIncredecr(ctx *IncredecrContext) {}
 
 // ExitIncredecr is called when production incredecr is exited.
 func (s *BaseVLangGrammarListener) ExitIncredecr(ctx *IncredecrContext) {}
 
-// EnterVectorItemExpr is called when production VectorItemExpr is entered.
-func (s *BaseVLangGrammarListener) EnterVectorItemExpr(ctx *VectorItemExprContext) {}
+// EnterStructAccessExpr is called when production StructAccessExpr is entered.
+func (s *BaseVLangGrammarListener) EnterStructAccessExpr(ctx *StructAccessExprContext) {}
 
-// ExitVectorItemExpr is called when production VectorItemExpr is exited.
-func (s *BaseVLangGrammarListener) ExitVectorItemExpr(ctx *VectorItemExprContext) {}
+// ExitStructAccessExpr is called when production StructAccessExpr is exited.
+func (s *BaseVLangGrammarListener) ExitStructAccessExpr(ctx *StructAccessExprContext) {}
 
 // EnterBinaryExpr is called when production BinaryExpr is entered.
 func (s *BaseVLangGrammarListener) EnterBinaryExpr(ctx *BinaryExprContext) {}
 
 // ExitBinaryExpr is called when production BinaryExpr is exited.
 func (s *BaseVLangGrammarListener) ExitBinaryExpr(ctx *BinaryExprContext) {}
+
+// EnterStructInstantiationExpr is called when production StructInstantiationExpr is entered.
+func (s *BaseVLangGrammarListener) EnterStructInstantiationExpr(ctx *StructInstantiationExprContext) {
+}
+
+// ExitStructInstantiationExpr is called when production StructInstantiationExpr is exited.
+func (s *BaseVLangGrammarListener) ExitStructInstantiationExpr(ctx *StructInstantiationExprContext) {}
+
+// EnterUnaryExpr is called when production UnaryExpr is entered.
+func (s *BaseVLangGrammarListener) EnterUnaryExpr(ctx *UnaryExprContext) {}
+
+// ExitUnaryExpr is called when production UnaryExpr is exited.
+func (s *BaseVLangGrammarListener) ExitUnaryExpr(ctx *UnaryExprContext) {}
+
+// EnterIdPatternExpr is called when production IdPatternExpr is entered.
+func (s *BaseVLangGrammarListener) EnterIdPatternExpr(ctx *IdPatternExprContext) {}
+
+// ExitIdPatternExpr is called when production IdPatternExpr is exited.
+func (s *BaseVLangGrammarListener) ExitIdPatternExpr(ctx *IdPatternExprContext) {}
+
+// EnterVectorPropertyExpr is called when production VectorPropertyExpr is entered.
+func (s *BaseVLangGrammarListener) EnterVectorPropertyExpr(ctx *VectorPropertyExprContext) {}
+
+// ExitVectorPropertyExpr is called when production VectorPropertyExpr is exited.
+func (s *BaseVLangGrammarListener) ExitVectorPropertyExpr(ctx *VectorPropertyExprContext) {}
+
+// EnterVectorItemExpr is called when production VectorItemExpr is entered.
+func (s *BaseVLangGrammarListener) EnterVectorItemExpr(ctx *VectorItemExprContext) {}
+
+// ExitVectorItemExpr is called when production VectorItemExpr is exited.
+func (s *BaseVLangGrammarListener) ExitVectorItemExpr(ctx *VectorItemExprContext) {}
 
 // EnterParensExpr is called when production ParensExpr is entered.
 func (s *BaseVLangGrammarListener) EnterParensExpr(ctx *ParensExprContext) {}
@@ -247,18 +272,6 @@ func (s *BaseVLangGrammarListener) EnterVectorExpr(ctx *VectorExprContext) {}
 
 // ExitVectorExpr is called when production VectorExpr is exited.
 func (s *BaseVLangGrammarListener) ExitVectorExpr(ctx *VectorExprContext) {}
-
-// EnterUnaryExpr is called when production UnaryExpr is entered.
-func (s *BaseVLangGrammarListener) EnterUnaryExpr(ctx *UnaryExprContext) {}
-
-// ExitUnaryExpr is called when production UnaryExpr is exited.
-func (s *BaseVLangGrammarListener) ExitUnaryExpr(ctx *UnaryExprContext) {}
-
-// EnterIdPatternExpr is called when production IdPatternExpr is entered.
-func (s *BaseVLangGrammarListener) EnterIdPatternExpr(ctx *IdPatternExprContext) {}
-
-// ExitIdPatternExpr is called when production IdPatternExpr is exited.
-func (s *BaseVLangGrammarListener) ExitIdPatternExpr(ctx *IdPatternExprContext) {}
 
 // EnterFuncCallExpr is called when production FuncCallExpr is entered.
 func (s *BaseVLangGrammarListener) EnterFuncCallExpr(ctx *FuncCallExprContext) {}
@@ -404,8 +417,14 @@ func (s *BaseVLangGrammarListener) EnterStructAttr(ctx *StructAttrContext) {}
 // ExitStructAttr is called when production StructAttr is exited.
 func (s *BaseVLangGrammarListener) ExitStructAttr(ctx *StructAttrContext) {}
 
-// EnterStructVector is called when production StructVector is entered.
-func (s *BaseVLangGrammarListener) EnterStructVector(ctx *StructVectorContext) {}
+// EnterStruct_param_list is called when production struct_param_list is entered.
+func (s *BaseVLangGrammarListener) EnterStruct_param_list(ctx *Struct_param_listContext) {}
 
-// ExitStructVector is called when production StructVector is exited.
-func (s *BaseVLangGrammarListener) ExitStructVector(ctx *StructVectorContext) {}
+// ExitStruct_param_list is called when production struct_param_list is exited.
+func (s *BaseVLangGrammarListener) ExitStruct_param_list(ctx *Struct_param_listContext) {}
+
+// EnterStruct_param is called when production struct_param is entered.
+func (s *BaseVLangGrammarListener) EnterStruct_param(ctx *Struct_paramContext) {}
+
+// ExitStruct_param is called when production struct_param is exited.
+func (s *BaseVLangGrammarListener) ExitStruct_param(ctx *Struct_paramContext) {}

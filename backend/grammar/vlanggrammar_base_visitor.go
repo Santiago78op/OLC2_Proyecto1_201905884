@@ -127,19 +127,35 @@ func (v *BaseVLangGrammarVisitor) VisitRepeatingExpr(ctx *RepeatingExprContext) 
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseVLangGrammarVisitor) VisitVectorPropertyExpr(ctx *VectorPropertyExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
 func (v *BaseVLangGrammarVisitor) VisitIncredecr(ctx *IncredecrContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseVLangGrammarVisitor) VisitVectorItemExpr(ctx *VectorItemExprContext) interface{} {
+func (v *BaseVLangGrammarVisitor) VisitStructAccessExpr(ctx *StructAccessExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
 func (v *BaseVLangGrammarVisitor) VisitBinaryExpr(ctx *BinaryExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitStructInstantiationExpr(ctx *StructInstantiationExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitUnaryExpr(ctx *UnaryExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitIdPatternExpr(ctx *IdPatternExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitVectorPropertyExpr(ctx *VectorPropertyExprContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitVectorItemExpr(ctx *VectorItemExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -156,14 +172,6 @@ func (v *BaseVLangGrammarVisitor) VisitVectorFuncCallExpr(ctx *VectorFuncCallExp
 }
 
 func (v *BaseVLangGrammarVisitor) VisitVectorExpr(ctx *VectorExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitUnaryExpr(ctx *UnaryExprContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitIdPatternExpr(ctx *IdPatternExprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 
@@ -263,6 +271,10 @@ func (v *BaseVLangGrammarVisitor) VisitStructAttr(ctx *StructAttrContext) interf
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseVLangGrammarVisitor) VisitStructVector(ctx *StructVectorContext) interface{} {
+func (v *BaseVLangGrammarVisitor) VisitStruct_param_list(ctx *Struct_param_listContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
+func (v *BaseVLangGrammarVisitor) VisitStruct_param(ctx *Struct_paramContext) interface{} {
 	return v.VisitChildren(ctx)
 }
