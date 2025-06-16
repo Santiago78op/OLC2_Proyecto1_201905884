@@ -524,3 +524,107 @@ func NewStructScope() *BaseScopeTrace {
 		isStruct:  true,
 	}
 }
+
+// Reporteria
+
+type ReportTable struct {
+	GlobalScope ReportScope
+}
+
+type ReportScope struct {
+	Name        string
+	Vars        []ReportSymbol
+	Funcs       []ReportSymbol
+	Structs     []ReportSymbol
+	ChildScopes []ReportScope
+}
+
+type ReportSymbol struct {
+	Name   string
+	Type   string
+	Line   int
+	Column int
+}
+
+func (s *ScopeTrace) Report() ReportTable {
+	return ReportTable{
+		GlobalScope: s.CurrentScope.Report(),
+	}
+}
+
+func (s *BaseScopeTrace) Report() ReportScope {
+
+	reportScope := ReportScope{
+		Name:        s.name,
+		Vars:        make([]ReportSymbol, 0),
+		Funcs:       make([]ReportSymbol, 0),
+		Structs:     make([]ReportSymbol, 0),
+		ChildScopes: make([]ReportScope, 0),
+	}
+
+	for _, v := range s.variables {
+
+		token := v.Token
+		line := 0
+		column := 0
+
+		if token != nil {
+			line = token.GetLine()
+			column = token.GetColumn()
+		}
+
+		reportScope.Vars = append(reportScope.Vars, ReportSymbol{
+			Name:   v.Name,
+			Type:   v.Type,
+			Line:   line,
+			Column: column,
+		})
+	}
+
+	for _, f := range s.functions {
+		switch function := f.(type) {
+		case *BuiltInFunction:
+			reportScope.Funcs = append(reportScope.Funcs, ReportSymbol{
+				Name:   function.Name,
+				Type:   "Embebida: " + function.Name,
+				Line:   0,
+				Column: 0,
+			})
+		case *Function:
+
+			line := 0
+			column := 0
+
+			if function.Token != nil {
+				line = function.Token.GetLine()
+				column = function.Token.GetColumn()
+			}
+
+			reportScope.Funcs = append(reportScope.Funcs, ReportSymbol{
+				Name:   function.Name,
+				Type:   function.ReturnType,
+				Line:   line,
+				Column: column,
+			})
+		case *ObjectBuiltInFunction:
+			break
+		default:
+			log.Fatal("Function type not found")
+		}
+	}
+
+	for _, v := range s.structs {
+		reportScope.Structs = append(reportScope.Structs, ReportSymbol{
+			Name:   v.Name,
+			Type:   v.Name,
+			Line:   v.Token.GetLine(),
+			Column: v.Token.GetColumn(),
+		})
+	}
+
+	for _, v := range s.children {
+		reportScope.ChildScopes = append(reportScope.ChildScopes, v.Report())
+	}
+
+	return reportScope
+}
