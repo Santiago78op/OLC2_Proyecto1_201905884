@@ -41,10 +41,10 @@ func (s *BaseScopeTrace) Children() []*BaseScopeTrace {
 
 // Valida si el tipo de dato es válido para el ámbito actual.
 func (s *BaseScopeTrace) ValidType(_type string) bool {
-	// Falta hacer la validación de Structs
 
-	// Verifica si el tipo es válido, aca estan inmersos los vectores
-	return value.IsPrimitiveType(_type)
+	_, isStructType := s.structs[_type]
+
+	return value.IsPrimitiveType(_type) || isStructType
 }
 
 func (s *BaseScopeTrace) AddChild(child *BaseScopeTrace) {
@@ -101,33 +101,31 @@ func (s *BaseScopeTrace) AddVariable(name string, varType string, value value.IV
 func (s *BaseScopeTrace) GetVariable(name string) *Variable {
 
 	// Si el nombre contiene un punto, se asume que es una variable de objeto
-
 	if strings.Contains(name, ".") {
 		return s.searchObjectVariable(name, nil)
 	}
 
 	// Busca la variable en el ámbito actual
-	initScope := s
+	initialScope := s
 
 	for {
-		if variable, exists := initScope.variables[name]; exists {
+		if variable, ok := initialScope.variables[name]; ok {
 
-			/*
-				if variable.Type == value.IVOR_POINTER {
-					// Si la variable es un puntero, retorna el valor apuntado
-					return variable.Value.(*PointerValue).AssocVariable // Retorna el valor apuntado por el puntero
-				}
-			*/
+			if variable.Type == value.IVOR_POINTER {
+				// Si la variable es un puntero, retorna el valor apuntado
+				return variable.Value.(*PointerValue).AssocVariable // Retorna el valor apuntado por el puntero
+			}
+
 			// Si la variable existe, retorna un puntero a la variable
 			return variable
 		}
 
-		if initScope.parent == nil {
+		if initialScope.parent == nil {
 			break // Si no hay un ámbito padre, termina la búsqueda
 		}
 
 		// Si no se encuentra la variable, sube al ámbito padre
-		initScope = initScope.parent
+		initialScope = initialScope.parent
 	}
 
 	// Si no se encuentra la variable, retorna nil
@@ -375,9 +373,9 @@ func (s *BaseScopeTrace) GetStruct(name string) (*Struct, string) {
 
 // Reset reinicializa el ámbito actual, eliminando todas las variables y funciones definidas en él.
 func (s *BaseScopeTrace) Reset() {
-	s.variables = make(map[string]*Variable)  // Reinicializa el mapa de variables
-	s.functions = make(map[string]value.IVOR) // Reinicializa el mapa de funciones
-	s.children = make([]*BaseScopeTrace, 0)   // Reinicializa los hijos del ámbito
+	s.variables = make(map[string]*Variable)
+	s.children = make([]*BaseScopeTrace, 0)
+	s.functions = make(map[string]value.IVOR)
 }
 
 // IsMutatingScope verifica si el ámbito actual o alguno de sus padres está en modo de mutación.
@@ -427,7 +425,7 @@ func NewGlobalScope() *BaseScopeTrace {
 // Este ámbito local es utilizado para almacenar variables y funciones que son
 // específicas de una ejecución o contexto particular dentro del REPL.
 // Se inicializa con un nombre específico y un mapa vacío de variables y funciones.
-func NewCurrentScope(name string) *BaseScopeTrace {
+func NewLocalScope(name string) *BaseScopeTrace {
 	return &BaseScopeTrace{
 		name:      name,
 		variables: make(map[string]*Variable),
@@ -446,7 +444,7 @@ type ScopeTrace struct {
 // PushScope crea un nuevo ámbito local dentro de la traza de ejecución del REPL.
 func (s *ScopeTrace) PushScope(name string) *BaseScopeTrace {
 
-	newScope := NewCurrentScope(name)
+	newScope := NewLocalScope(name)
 	s.CurrentScope.AddChild(newScope)
 	s.CurrentScope = newScope
 

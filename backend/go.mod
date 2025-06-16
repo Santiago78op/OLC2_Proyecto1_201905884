@@ -9,6 +9,5 @@ require (
 )
 
 require (
-	github.com/antlr4-go/antlr v0.0.0-20230518091524-98b52378c522 // indirect
 	golang.org/x/exp v0.0.0-20250606033433-dcc06ee1d476 // indirect
 )

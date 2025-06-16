@@ -104,9 +104,11 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 }
 
 // En el enunciado no hay constantes, solo variables mut
+/*
 func isDeclConst(lexval string) bool {
 	return lexval == "let"
 }
+*/
 
 // Ejemplo: Mut variable_1 int = 10
 // Ejemplo: Mut variable_2 int
