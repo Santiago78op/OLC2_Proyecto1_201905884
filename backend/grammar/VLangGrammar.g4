@@ -70,13 +70,16 @@ repeating:
 vector_type: LBRACK RBRACK ID
     ;
 
-matrix_type:
-    aux_matrix_type
-    | LBRACK RBRACK LBRACK RBRACK ID
+// Inicia Declaracion de Matriz
+// [][] int, [][] float, [][] String, [][] bool
+matrix_type: LBRACK RBRACK LBRACK RBRACK ID
     ;
 
-aux_matrix_type: LBRACK RBRACK matrix_type
+matrix_expr
+    : LBRACE vect_expr (COMMA vect_expr)* RBRACE
     ;
+
+// Finaliza Declaracion de Matriz
 
 type: 
     ID 
