@@ -146,7 +146,7 @@ func vlanggrammarParserInit() {
 		0, 0, 119, 120, 3, 34, 17, 0, 120, 132, 1, 0, 0, 0, 121, 122, 5, 49, 0,
 		0, 122, 123, 5, 22, 0, 0, 123, 124, 3, 18, 9, 0, 124, 125, 3, 8, 4, 0,
 		125, 132, 1, 0, 0, 0, 126, 127, 5, 49, 0, 0, 127, 128, 5, 22, 0, 0, 128,
-		129, 3, 20, 10, 0, 129, 130, 3, 8, 4, 0, 130, 132, 1, 0, 0, 0, 131, 101,
+		129, 3, 20, 10, 0, 129, 130, 3, 22, 11, 0, 130, 132, 1, 0, 0, 0, 131, 101,
 		1, 0, 0, 0, 131, 107, 1, 0, 0, 0, 131, 112, 1, 0, 0, 0, 131, 116, 1, 0,
 		0, 0, 131, 121, 1, 0, 0, 0, 131, 126, 1, 0, 0, 0, 132, 5, 1, 0, 0, 0, 133,
 		134, 5, 1, 0, 0, 134, 7, 1, 0, 0, 0, 135, 144, 5, 36, 0, 0, 136, 141, 3,
@@ -1169,10 +1169,10 @@ func (s *VarMatrixDeclContext) Matrix_type() IMatrix_typeContext {
 	return t.(IMatrix_typeContext)
 }
 
-func (s *VarMatrixDeclContext) Vect_expr() IVect_exprContext {
+func (s *VarMatrixDeclContext) Matrix_expr() IMatrix_exprContext {
 	var t antlr.RuleContext
 	for _, ctx := range s.GetChildren() {
-		if _, ok := ctx.(IVect_exprContext); ok {
+		if _, ok := ctx.(IMatrix_exprContext); ok {
 			t = ctx.(antlr.RuleContext)
 			break
 		}
@@ -1182,7 +1182,7 @@ func (s *VarMatrixDeclContext) Vect_expr() IVect_exprContext {
 		return nil
 	}
 
-	return t.(IVect_exprContext)
+	return t.(IMatrix_exprContext)
 }
 
 func (s *VarMatrixDeclContext) EnterRule(listener antlr.ParseTreeListener) {
@@ -1710,7 +1710,7 @@ func (p *VLangGrammar) Decl_stmt() (localctx IDecl_stmtContext) {
 		}
 		{
 			p.SetState(129)
-			p.Vect_expr()
+			p.Matrix_expr()
 		}
 
 	case antlr.ATNInvalidAltNumber:
