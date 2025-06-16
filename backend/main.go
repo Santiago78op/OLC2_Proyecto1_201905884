@@ -14,6 +14,7 @@ import (
 
 	// Importa el paquete de pruebas que contiene la lógica de ejecución
 
+	"main.go/ast"
 	"main.go/cst"
 	"main.go/errors"
 	compiler "main.go/grammar"
@@ -166,13 +167,28 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("🔹 Tiempo total: %v\n", reportEndTime.Sub(startTime))
 	fmt.Printf("🔹 Salida: %s\n", output)
 
+	// Generar AST nativo
+	var finalAST string
+	if tree != nil {
+		fmt.Println("🌳 Generando AST nativo...")
+		astNode := ast.GenerateNativeAST(tree)
+		finalAST = ast.GenerateASTSVG(astNode)
+		fmt.Println("✅ AST nativo generado exitosamente")
+	} else {
+		fmt.Println("❌ No se pudo generar el árbol de análisis")
+		finalAST = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200">
+			<rect width="400" height="200" fill="#1e1e1e"/>
+			<text x="200" y="100" text-anchor="middle" fill="#ffffff">Error en análisis sintáctico</text>
+		</svg>`
+	}
+
 	// Crear resultado con información detallada
 	result := executionResult{
 		Success:       success,
 		Errors:        syntaxErrorListener.ErrorTable.Errors,
 		Output:        output,
-		CSTSvg:        cstReport,
-		AST:           cstReport,
+		CSTSvg:        finalAST,
+		AST:           finalAST,
 		Symbols:       symbols,
 		ScopeTrace:    scopeReport,
 		ErrorSummary:  errorSummary,                                        // Agregar resumen de errores
