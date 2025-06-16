@@ -4,23 +4,22 @@ parser grammar VLangGrammar;
 options { tokenVocab = VLangLexer; }
 
 // Program entry point
-prog: (stmt)* EOF?;
-
-// Demilitador del lenguaje -> indica el final de una sentencia
-delim: NEWLINE?;
+program: (stmt)* EOF?
+    ;
 
 // Sentencias
 stmt: 
-    decl_stmt delim
-    | assign_stmt delim
-    | transfer_stmt delim 
+    decl_stmt 
+    | assign_stmt 
+    | block_ind 
+    | transfer_stmt  
     | if_stmt
 	| switch_stmt
+    | while_stmt
 	| for_stmt
-    | func_call delim
-    | vect_func delim
+    | func_call 
+    | vect_func 
     | func_dcl
-    | block_ind delim
     | strct_dcl
     ;
 
@@ -28,19 +27,63 @@ stmt:
 // Ejemplo: Mut variable_1 int = 10
 // Ejemplo: Mut variable_2 int 
 decl_stmt: 
-    var_type ID type_annotation (ASSIGN expression)?   # MutVarDecl
-    | ID type_annotation ASSIGN expression             # VarAssDecl
+    var_type ID type ASSIGN expression  # MutVarDecl    // mut num2 int = 5
+    | var_type ID ASSIGN expression     # ValueDecl     // mut num2 = 5 
+    | var_type ID type                  # ValDeclVec    // mut vector []int
+    | ID type ASSIGN expression         # VarAssDecl    // num2 int = 5                                          
+    | ID ASSIGN vector_type vect_expr   # VarVectDecl   // numbers = []int {1, 2, 3, 4, 5}
+    | ID ASSIGN matrix_type vect_expr   # VarMatrixDecl // matrix = [][]int { {1, 2}, {3, 4} }
     ;
 
-// Tipos de datos
-type_annotation
-    : (INT_TYPE | FLOAT_TYPE | STRING_TYPE | BOOL_TYPE | SLICE_TYPE | ID)
+var_type:
+    MUT
     ;
 
-// tipo de variable
-var_type
-    : MUT
+// Inicia Declaracion de Vector
+// {1,2,3,4}
+vect_expr:
+    LBRACE ( expression (COMMA expression)* )? RBRACE  # VectorItemLis
     ;
+
+// vector_1[0]
+vect_item:
+    id_pattern (LBRACK expression RBRACK)+   # VectorItem
+    ;
+
+// llamada a un vector por medio de una propiedad
+// ejemplo: vector_1.id
+vect_prop:
+    vect_item DOT id_pattern   # VectorProperty
+    ;
+
+vect_func:
+    vect_item DOT func_call   # VectorFuncCall 
+    ;
+
+repeating:
+    (vector_type | matrix_type) LPAREN ID COLON expression COMMA ID COLON expression RPAREN  # RepeatingDecl
+    ;
+// Termina Declaracion Vectores
+
+// Inicia Declaracion de Vectores
+// [] int, [] float, [] String, [] bool
+vector_type: LBRACK RBRACK ID
+    ;
+
+matrix_type:
+    aux_matrix_type
+    | LBRACK RBRACK LBRACK RBRACK ID
+    ;
+
+aux_matrix_type: LBRACK RBRACK
+    ;
+
+type: 
+    ID 
+    | vector_type 
+    | matrix_type
+    ;
+
 // Termina Declaracion de Variables
 
 // Inicia Asignacion de Variables
@@ -49,9 +92,15 @@ assign_stmt:
     id_pattern ASSIGN expression                  # AssignmentDecl
     | id_pattern op = (
         PLUS_ASSIGN | MINUS_ASSIGN
-    ) expression                                  # AugmentedAssignmentDecl
+    ) expression                                  # ArgAddAssigDecl
+    | vect_item op = ( 
+        PLUS_ASSIGN 
+        | MINUS_ASSIGN 
+        | ASSIGN) expression	                  # VectorAssign
     ;
 
+// variable ASSIGN expression
+// num2 
 id_pattern // (a.a)
     : ID (DOT ID)*                                # IdPattern
     ;
@@ -68,6 +117,12 @@ literal
     | NIL_LITERAL                                 # NilLiteral
     ;
 
+// Incremento y decremento
+incredecre
+    : ID INC    #incremento
+    | ID DEC    #decremento
+    ;
+
 // Inicio Expresiones
 expression
     : LPAREN expression RPAREN                       # ParensExpr 
@@ -77,8 +132,9 @@ expression
     | vect_prop                                      # VectorPropertyExpr
     | vect_func                                      # VectorFuncCallExpr
     | literal                                        # LiteralExpr
-    | vect_expr                                      # VectorExpr
+    | vect_expr                                      # VectorExpr 
     | repeating                                      # RepeatingExpr
+    | incredecre                                     # incredecr
     | op = ( NOT | MINUS) expression                 # UnaryExpr
     | left = expression op = (
         MULT | DIV | MOD
@@ -96,37 +152,6 @@ expression
     | left = expression op = OR right = expression   # BinaryExpr
     ;
 // Terminan Expresiones
-
-// Inicia Declaracion de Vector
-vect_expr:
-    LBRACK ( expression (COMMA expression)* )? RBRACK  # VectorItemLis
-    ;
-
-vect_item:
-    id_pattern (LBRACE expression RBRACE)+   # VectorItem
-    ;
-
-vect_prop:
-    vect_item DOT id_pattern   # VectorProperty
-    ;
-
-vect_func:
-    vect_item DOT func_call   # VectorFuncCall 
-    ;
-
-repeating:
-    (var_type | matrix_type) LPAREN ID COLON expression COMMA ID COLON expression RPAREN  # RepeatingDecl
-    ;
-
-
-type: vector_type | matrix_type;
-
-vector_type: LBRACE ID RBRACK;
-
-matrix_type: aux_matrix_type | LBRACK LBRACK ID RBRACK RBRACK;
-
-aux_matrix_type: LBRACK matrix_type RBRACK;
-// Termina Declaracion Vectores
 
 // Inicia Sentencias de Control If
 if_stmt: if_chain (ELSE_KW if_chain)* else_stmt? # IfStmt;
@@ -151,9 +176,10 @@ while_stmt: WHILE_KW expression LBRACE stmt* RBRACE # WhileStmt;
 
 // Inicia Sentencias de Iteracion For
 for_stmt:
-    FOR_KW expression LBRACE stmt* RBRACE                                     # ForStmtCond
-    | FOR_KW assign_stmt SEMI expression SEMI assign_stmt LBRACE stmt* RBRACE # ForAssCond
-	| FOR_KW ID COMMA expression IN_KW (expression | range) LBRACE stmt* RBRACE                # ForStmt;
+    FOR_KW expression LBRACE stmt* RBRACE                                        # ForStmtCond
+    | FOR_KW assign_stmt SEMI expression SEMI expression LBRACE stmt* RBRACE     # ForAssCond
+	| FOR_KW ID COMMA ID IN_KW expression LBRACE stmt* RBRACE                    # ForStmt
+    ;
 
 range: expression DOT DOT DOT expression # NumericRange;
 // Termina Sentencias de Iteracion For

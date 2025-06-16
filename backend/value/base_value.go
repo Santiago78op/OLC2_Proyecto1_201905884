@@ -4,12 +4,12 @@ package value
 // Representa los tipos de datos que pueden ser utilizados en el lenguaje
 const (
 	IVOR_INT              = "int"
-	IVOR_FLOAT            = "float64"
+	IVOR_FLOAT            = "float"
 	IVOR_STRING           = "string"
 	IVOR_BOOL             = "bool"
 	IVOR_CHARACTER        = "rune"
 	IVOR_NIL              = "nil"
-	IVOR_BUILTIN_FUNCTION = "builtin_function"
+	IVOR_BUILTIN_FUNCTION = "builtinFunction"
 	IVOR_FUNCTION         = "function"
 	IVOR_VECTOR           = "vector"
 	IVOR_OBJECT           = "object"

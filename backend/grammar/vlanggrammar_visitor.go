@@ -7,11 +7,8 @@ import "github.com/antlr4-go/antlr/v4"
 type VLangGrammarVisitor interface {
 	antlr.ParseTreeVisitor
 
-	// Visit a parse tree produced by VLangGrammar#prog.
-	VisitProg(ctx *ProgContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#delim.
-	VisitDelim(ctx *DelimContext) interface{}
+	// Visit a parse tree produced by VLangGrammar#program.
+	VisitProgram(ctx *ProgramContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#stmt.
 	VisitStmt(ctx *StmtContext) interface{}
@@ -19,20 +16,59 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#MutVarDecl.
 	VisitMutVarDecl(ctx *MutVarDeclContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#ValueDecl.
+	VisitValueDecl(ctx *ValueDeclContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#ValDeclVec.
+	VisitValDeclVec(ctx *ValDeclVecContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#VarAssDecl.
 	VisitVarAssDecl(ctx *VarAssDeclContext) interface{}
 
-	// Visit a parse tree produced by VLangGrammar#type_annotation.
-	VisitType_annotation(ctx *Type_annotationContext) interface{}
+	// Visit a parse tree produced by VLangGrammar#VarVectDecl.
+	VisitVarVectDecl(ctx *VarVectDeclContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#VarMatrixDecl.
+	VisitVarMatrixDecl(ctx *VarMatrixDeclContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#var_type.
 	VisitVar_type(ctx *Var_typeContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#VectorItemLis.
+	VisitVectorItemLis(ctx *VectorItemLisContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#VectorItem.
+	VisitVectorItem(ctx *VectorItemContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#VectorProperty.
+	VisitVectorProperty(ctx *VectorPropertyContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#VectorFuncCall.
+	VisitVectorFuncCall(ctx *VectorFuncCallContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#RepeatingDecl.
+	VisitRepeatingDecl(ctx *RepeatingDeclContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#vector_type.
+	VisitVector_type(ctx *Vector_typeContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#matrix_type.
+	VisitMatrix_type(ctx *Matrix_typeContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#aux_matrix_type.
+	VisitAux_matrix_type(ctx *Aux_matrix_typeContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#type.
+	VisitType(ctx *TypeContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#AssignmentDecl.
 	VisitAssignmentDecl(ctx *AssignmentDeclContext) interface{}
 
-	// Visit a parse tree produced by VLangGrammar#AugmentedAssignmentDecl.
-	VisitAugmentedAssignmentDecl(ctx *AugmentedAssignmentDeclContext) interface{}
+	// Visit a parse tree produced by VLangGrammar#ArgAddAssigDecl.
+	VisitArgAddAssigDecl(ctx *ArgAddAssigDeclContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#VectorAssign.
+	VisitVectorAssign(ctx *VectorAssignContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#IdPattern.
 	VisitIdPattern(ctx *IdPatternContext) interface{}
@@ -52,11 +88,20 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#NilLiteral.
 	VisitNilLiteral(ctx *NilLiteralContext) interface{}
 
+	// Visit a parse tree produced by VLangGrammar#incremento.
+	VisitIncremento(ctx *IncrementoContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#decremento.
+	VisitDecremento(ctx *DecrementoContext) interface{}
+
 	// Visit a parse tree produced by VLangGrammar#RepeatingExpr.
 	VisitRepeatingExpr(ctx *RepeatingExprContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#VectorPropertyExpr.
 	VisitVectorPropertyExpr(ctx *VectorPropertyExprContext) interface{}
+
+	// Visit a parse tree produced by VLangGrammar#incredecr.
+	VisitIncredecr(ctx *IncredecrContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#VectorItemExpr.
 	VisitVectorItemExpr(ctx *VectorItemExprContext) interface{}
@@ -84,33 +129,6 @@ type VLangGrammarVisitor interface {
 
 	// Visit a parse tree produced by VLangGrammar#FuncCallExpr.
 	VisitFuncCallExpr(ctx *FuncCallExprContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#VectorItemLis.
-	VisitVectorItemLis(ctx *VectorItemLisContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#VectorItem.
-	VisitVectorItem(ctx *VectorItemContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#VectorProperty.
-	VisitVectorProperty(ctx *VectorPropertyContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#VectorFuncCall.
-	VisitVectorFuncCall(ctx *VectorFuncCallContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#RepeatingDecl.
-	VisitRepeatingDecl(ctx *RepeatingDeclContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#type.
-	VisitType(ctx *TypeContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#vector_type.
-	VisitVector_type(ctx *Vector_typeContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#matrix_type.
-	VisitMatrix_type(ctx *Matrix_typeContext) interface{}
-
-	// Visit a parse tree produced by VLangGrammar#aux_matrix_type.
-	VisitAux_matrix_type(ctx *Aux_matrix_typeContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#IfStmt.
 	VisitIfStmt(ctx *IfStmtContext) interface{}

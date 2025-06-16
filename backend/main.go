@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -28,29 +29,75 @@ type executionResult struct {
 func executeCode(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	// Receive code from the request body
+	// 🔍 DEBUG: Verificar Content-Type
+	contentType := r.Header.Get("Content-Type")
+	fmt.Printf("🔹 Content-Type recibido: %s\n", contentType)
+
+	// 🔍 DEBUG: Leer el body completo para debugging
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		fmt.Printf("❌ Error leyendo body: %v\n", err)
+		http.Error(w, "Error reading request body", http.StatusBadRequest)
+		return
+	}
+
+	fmt.Printf("🔹 Body raw recibido: %s\n", string(bodyBytes))
+	fmt.Printf("🔹 Longitud del body: %d bytes\n", len(bodyBytes))
+
+	// Recrear el reader para el JSON decoder
+	// (necesario porque ya leímos el body)
+	if len(bodyBytes) == 0 {
+		fmt.Println("❌ Body está vacío")
+		http.Error(w, "Request body is empty", http.StatusBadRequest)
+		return
+	}
+
+	// Cambiar la estructura para usar string en lugar de *string
 	var requestData struct {
 		Code string `json:"code"`
 	}
 
-	if err := json.NewDecoder(r.Body).Decode(&requestData); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	// Decodificar desde los bytes leídos
+	if err := json.Unmarshal(bodyBytes, &requestData); err != nil {
+		fmt.Printf("❌ Error decodificando JSON: %v\n", err)
+		http.Error(w, fmt.Sprintf("Invalid JSON: %v", err), http.StatusBadRequest)
 		return
 	}
 
-	fmt.Println("Received code for execution:")
-	fmt.Println(requestData.Code)
+	// Verificar si el código está presente
+	if requestData.Code == "" {
+		fmt.Println("❌ Campo 'code' está vacío")
+		http.Error(w, "Code field i		git pull --no-rebases required and cannot be empty", http.StatusBadRequest)
+		return
+	}
 
-	// 1. Analisis Lexico
+	// Si en el requestData.Code viene \n al inicio, lo eliminamos hasta el primer carácter
+	codeString := requestData.Code
+	for len(codeString) > 0 && (codeString[0] == '\n' || codeString[0] == '\r') {
+		codeString = codeString[1:]
+	}
+
+	// ¡NO necesitas desescapar nada aquí!
+
+	fmt.Printf("✅ Código recibido exitosamente:\n%s\n", codeString)
+	fmt.Printf("🔹 Longitud del código: %d caracteres\n", len(codeString))
+
+	// ...existing code...
+
+	fmt.Printf("✅ Código recibido exitosamente:\n%s\n", codeString)
+	fmt.Printf("🔹 Longitud del código: %d caracteres\n", len(codeString))
+
+	// 1. Análisis Léxico
 	lexicalErrorListener := errors.NewLexicalErrorListener()
-	lexer := compiler.NewVLangLexer(antlr.NewInputStream(requestData.Code))
+	lexer := compiler.NewVLangLexer(antlr.NewInputStream(codeString))
 
 	lexer.RemoveErrorListeners()
 	lexer.AddErrorListener(lexicalErrorListener)
+
 	// 2. Tokens
-	// New<Nombre de mi gramatica>(Stream) < id, valor>  token
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
-	// 3. Analisis Sintactico Parser + errores sintácticos
+
+	// 3. Análisis Sintáctico Parser + errores sintácticos
 	parser := compiler.NewVLangGrammar(stream)
 	parser.BuildParseTrees = true
 
@@ -60,32 +107,42 @@ func executeCode(w http.ResponseWriter, r *http.Request) {
 	parser.AddErrorListener(syntaxErrorListener)
 
 	// 4. Árbol sintáctico
-	// En tu gramatica tienes el axioma, o simbolo inicial
-	// Este es el que deberas agregar como parte del parser.
-	tree := parser.Prog() // Aquí se debe llamar al método adecuado según tu gramática
+	tree := parser.Program()
 
+	// ✅ VERIFICACIONES CRÍTICAS
+	fmt.Printf("🔹 Tree creado: %T\n", tree)
+	fmt.Printf("🔹 Tree es nil: %v\n", tree == nil)
+	fmt.Printf("🔹 Tree text: %s\n", tree.GetText())
+	fmt.Printf("🔹 Errores en ErrorTable: %d\n", len(syntaxErrorListener.ErrorTable.Errors))
+	if len(syntaxErrorListener.ErrorTable.Errors) > 0 {
+		fmt.Println("❌ Errores de sintaxis encontrados:")
+		for _, err := range syntaxErrorListener.ErrorTable.Errors {
+			fmt.Printf("  - %s\n", err)
+		}
+	}
+
+	// Esquema de funciones y estructuras declaradas en el codigo
 	dclVisitor := repl.NewDclVisitor(syntaxErrorListener.ErrorTable)
 	dclVisitor.Visit(tree)
 
+	// Procesa el contendifo de funciones y estructuras, procesar
+	// cualquiera codigo que nosea función o estructura
 	replVisitor := repl.NewVisitor(dclVisitor)
 	replVisitor.Visit(tree)
 
 	cstReport := ""
 
-	intepretationEndTime := time.Now()
-
+	interpretationEndTime := time.Now()
 	startTime := time.Now()
-
 	reportEndTime := time.Now()
 
 	fmt.Println("Interpretation finished")
-
-	fmt.Println("Interpretation time:", intepretationEndTime.Sub(startTime))
-	fmt.Println("Total (with report) time:", reportEndTime.Sub(intepretationEndTime))
+	fmt.Println("Interpretation time:", interpretationEndTime.Sub(startTime))
+	fmt.Println("Total (with report) time:", reportEndTime.Sub(interpretationEndTime))
 	fmt.Println("")
 
 	// Imprimir Output
-	fmt.Println("Output:", replVisitor.Console.GetOutput())
+	fmt.Println("Output: \n", replVisitor.Console.GetOutput())
 
 	executionResult := executionResult{
 		Success: true,

@@ -4,11 +4,10 @@ lexer grammar VLangLexer;
 
 // Palabras clave
 MUT   : 'mut';
-FUNC  : 'func';
+FUNC  : 'fn';
 
 // Estructuras
 STR         : 'struct';
-SLICE_TYPE  : 'slice';
 
 // Control de flujo - wk => keyWord
 IF_KW       : 'if';
@@ -24,12 +23,9 @@ CONTINUE_KW : 'continue';
 RETURN_KW   : 'return';
 
 
-INT_TYPE    : 'int';
-FLOAT_TYPE  : 'float64';
-STRING_TYPE : 'string';
-BOOL_TYPE   : 'bool';
-RUNE_TYPE   : 'rune';
-
+// Incremento y Decremento
+DEC     : '--';
+INC     : '++' ;
 
 // Operadores Aritmeticos
 PLUS     : '+';
@@ -68,19 +64,15 @@ COLON    : ':';
 DOT      : '.';
 COMMA    : ',';
 
-NEWLINE : '\n';
-
 
 // Literales
 fragment DIGIT : [0-9];
 fragment LETTER : [a-zA-Z];
 fragment UNDERSCORE : '_';
-fragment CHAR : [!-~];
 
 INT_LITERAL    : DIGIT+;
 FLOAT_LITERAL  : DIGIT+ '.' DIGIT+;
-CHAR_LITERAL   : CHAR; 
-STRING_LITERAL : '"' (~["\\\r\n] | EscapeSequence)* '"';
+STRING_LITERAL: '"' (~["\r\n\\] | ESC_SEQ)* '"';
 BOOL_LITERAL   : 'true' | 'false';
 NIL_LITERAL    : 'nil';
 
@@ -88,16 +80,10 @@ NIL_LITERAL    : 'nil';
 ID : (LETTER | UNDERSCORE) (LETTER | DIGIT | UNDERSCORE)*;
 
 // Secuencia de escape
-fragment EscapeSequence
-    : '\\' [btnfr"'\\]
-    | '\\' 'n'
-    | '\\' 'r'
-    | '\\' 't'
+fragment ESC_SEQ: '\\' [btnfr"'\\]
     ;
 
 // Commentarios
-LINE_COMMENT  : '//' ~[\r\n]* -> skip;
-BLOCK_COMMENT : '/*' .*? '*/' -> skip;
-
-// Espacios en blanco
-WS : [ \t\r\n]+ -> skip;
+WS : [ \t\r\n]+ -> skip ;
+LINE_COMMENT  : '//' ~[\r\n]* -> skip ;
+BLOCK_COMMENT : '/*' .*? '*/' -> skip ;

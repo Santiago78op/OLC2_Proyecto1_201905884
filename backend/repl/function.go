@@ -102,6 +102,13 @@ func (f *Function) Exec(visitor *ReplVisitor, args []*Argument, token antlr.Toke
 				return
 			}
 
+			// create the pointer
+			pointer := &PointerValue{
+				AssocVariable: arg.VariableRef,
+			}
+
+			// add pointer to scope
+			context.ScopeTrace.CurrentScope.AddVariable(varName, value.IVOR_POINTER, pointer, false, false, arg.Token)
 			continue
 		}
 

@@ -19,42 +19,53 @@ type Variable struct {
 func (v *Variable) TypeValidation() (bool, string) {
 
 	// Verifica sel valor sea igual a default uninitialized value
-	// y si es asi, retorna true y un mensaje indicando que la variable no ha sido inicializada
-	// Ejemplo: mut x int;
 	if v.Value == value.DefaultUnInitializedValue {
 		v.Value = value.DefaultValue(v.Type, v.Value)
 		return true, ""
 	}
 
 	// Verifica si el valor de la variable es nulo
-	// y si es asi, retorna true y un mensaje indicando que la variable es nula
-	// Ejemplo: mut x = nil;
 	if v.Value == value.DefaultNilValue {
 		if v.AllowNil {
 			return true, ""
 		}
 	}
 
+	// *** VALIDACIÓN ESPECÍFICA PARA VECTORES ***
+	if IsVectorType(v.Type) && IsVectorType(v.Value.Type()) {
+		// Extraer tipos de elementos para comparar
+		varItemType := RemoveBrackets(v.Type)           // ej: "int" de "[]int"
+		valueItemType := RemoveBrackets(v.Value.Type()) // ej: "int" de "[]int"
+
+		// Si los tipos de elementos coinciden, la asignación es válida
+		if varItemType == valueItemType {
+			return true, ""
+		} else {
+			msg := "Type mismatch: No se puede asignar un vector de tipo " + v.Value.Type() + " a una variable de tipo " + v.Type
+			v.Value = value.DefaultNilValue
+			return false, msg
+		}
+	}
+
+	// *** VALIDACIÓN PARA VECTORES VACÍOS ***
+	if IsVectorType(v.Type) && v.Value.Type() == "[]" {
+		return true, ""
+	}
+
+	// Comparación de tipos exactos para otros casos
 	if v.Type != v.Value.Type() {
-
-		// Falta validar Vectores
-
-		// Trata de hacer una conversión implícita del valor al tipo de la variable
+		// Trata de hacer una conversión implícita
 		convertedValue, ok := value.ImplicitCast(v.Type, v.Value)
 
 		if !ok {
-			// Si la conversión falla, retorna false y un mensaje de error
-			// La variable obtine el valor de nil a no saber que tipo convertir
-			msg := "Type mismatch: No se puede asignar un valor al tipo: " + v.Value.Type() + " a una variable de tipo: " + v.Type
+			msg := "Type mismatch: No se puede asignar un valor de tipo " + v.Value.Type() + " a una variable de tipo " + v.Type
 			v.Value = value.DefaultNilValue
 			return false, msg
 		}
 
-		// Si la conversión es exitosa, actualiza el valor de la variable
 		v.Value = convertedValue
 	}
 
-	// Si todo está bien, retorna True y un mensaje de éxito
 	return true, ""
 }
 
@@ -73,12 +84,6 @@ func (v *Variable) AssignValue(val value.IVOR, isMutatingContext bool) (bool, st
 
 	// Asigna el valor a la variable
 	v.Value = val
-
-	// Realiza la validación de tipo
-	valid, msg := v.TypeValidation()
-	if !valid {
-		return false, msg
-	}
 
 	// Si la validación de tipo es exitosa, retorna v.Value.Type() == v.Type, "Variable assigned successfully"
 	return v.TypeValidation()

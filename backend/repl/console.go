@@ -16,7 +16,7 @@ Print es un método de la estructura Console que agrega un mensaje a la salida.
 Este método simula el comportamiento de imprimir en una consola.
 */
 func (c *Console) Print(s string) {
-	c.output += s + "\n"
+	c.output += s
 }
 
 /*
