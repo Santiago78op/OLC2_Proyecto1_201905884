@@ -1749,3 +1749,104 @@ func (v *ReplVisitor) VisitStructAccessExpr(ctx *compiler.StructAccessExprContex
 
 	return attrVal
 }
+
+// Declaracion de matrices
+// Ejemplo: matrix [][]int = { {1,2,3}, {4,5,6}, {7,8,9} }
+func (v *ReplVisitor) VisitVarMatrixDecl(ctx *compiler.VarMatrixDeclContext) interface{} {
+	fmt.Printf("🔹 Visitando VarMatrixDecl: %s\n", ctx.GetText())
+
+	isConst := false
+
+	// Obtener información
+	varName := ctx.ID().GetText()
+	matrixType := v.Visit(ctx.Matrix_type()).(string)
+	matrixValue := v.Visit(ctx.Matrix_expr()).(value.IVOR)
+
+	fmt.Printf("   Variable: '%s'\n", varName)
+	fmt.Printf("   Tipo Matrix: '%s'\n", matrixType)
+	fmt.Printf("   Valor Matrix: %v (tipo: %s)\n", matrixValue, matrixValue.Type())
+
+	// Validar tipo
+	if !IsMatrixType(matrixType) {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El tipo '"+matrixType+"' no es un tipo de matriz válido")
+		return nil
+	}
+
+	// Validar tipo de datos dentro de la matriz
+	if matrixValue.Type() != matrixType && matrixValue.Type() != "[][]" {
+		if IsMatrixType(matrixValue.Type()) {
+			declaredItemType := RemoveMatrixBrackets(matrixType)
+			valueItemType := RemoveMatrixBrackets(matrixValue.Type())
+
+			if declaredItemType != valueItemType {
+				v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede asignar una matriz de tipo '"+matrixValue.Type()+"' a '"+matrixType+"'")
+				return nil
+			}
+		} else {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "No se puede asignar un valor de tipo '"+matrixValue.Type()+"' a '"+matrixType+"'")
+			return nil
+		}
+	}
+
+	// Copia de matrices (muy recomendable para evitar referencias compartidas)
+	if IsMatrixType(matrixValue.Type()) {
+		matrixValue = matrixValue.Copy()
+	}
+
+	// Agregar al scope
+	variable, msg := v.ScopeTrace.AddVariable(varName, matrixType, matrixValue, isConst, false, ctx.GetStart())
+
+	if variable == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
+		return nil
+	}
+
+	fmt.Printf("✅ Variable matriz '%s' declarada exitosamente con tipo '%s'\n", varName, matrixType)
+	return nil
+}
+
+// Procesamiento de la expresion literal de la matriz
+// Ejemplo: { {1,2,3}, {4,5,6}, {7,8,9} }
+func (v *ReplVisitor) VisitMatrixItemList(ctx *compiler.MatrixItemListContext) interface{} {
+	fmt.Printf("🔹 Visitando MatrixItemList: %s\n", ctx.GetText())
+
+	var matrixItems [][]value.IVOR
+	var rowLength int = -1
+	var innerType string = value.IVOR_NIL
+
+	for i, row := range ctx.AllVect_expr() {
+		rowValue := v.Visit(row).(*value.VectorValue)
+		matrixItems = append(matrixItems, rowValue.Items)
+
+		if i == 0 {
+			rowLength = len(rowValue.Items)
+			innerType = rowValue.ItemType
+		} else {
+			if len(rowValue.Items) != rowLength {
+				v.ErrorTable.NewSemanticError(ctx.GetStart(), "Todas las filas de la matriz deben tener el mismo tamaño")
+				return value.DefaultNilValue
+			}
+			if rowValue.ItemType != innerType {
+				v.ErrorTable.NewSemanticError(ctx.GetStart(), "Todos los elementos de la matriz deben ser del mismo tipo")
+				return value.DefaultNilValue
+			}
+		}
+	}
+
+	_type := "[[]]" + innerType
+
+	if IsMatrixType(_type) {
+		return NewMatrixValue(matrixItems, _type, innerType)
+	}
+
+	v.ErrorTable.NewSemanticError(ctx.GetStart(), "Tipo "+_type+" no encontrado")
+	return value.DefaultNilValue
+}
+
+func IsMatrixType(typ string) bool {
+	return strings.HasPrefix(typ, "[[]]")
+}
+
+func RemoveMatrixBrackets(typ string) string {
+	return strings.Replace(typ, "[[]]", "", 1)
+}
