@@ -3226,15 +3226,6 @@ type IMatrix_exprContext interface {
 
 	// GetParser returns the parser.
 	GetParser() antlr.Parser
-
-	// Getter signatures
-	LBRACE() antlr.TerminalNode
-	AllVect_expr() []IVect_exprContext
-	Vect_expr(i int) IVect_exprContext
-	RBRACE() antlr.TerminalNode
-	AllCOMMA() []antlr.TerminalNode
-	COMMA(i int) antlr.TerminalNode
-
 	// IsMatrix_exprContext differentiates from other interfaces.
 	IsMatrix_exprContext()
 }
@@ -3271,11 +3262,41 @@ func NewMatrix_exprContext(parser antlr.Parser, parent antlr.ParserRuleContext, 
 
 func (s *Matrix_exprContext) GetParser() antlr.Parser { return s.parser }
 
-func (s *Matrix_exprContext) LBRACE() antlr.TerminalNode {
+func (s *Matrix_exprContext) CopyAll(ctx *Matrix_exprContext) {
+	s.CopyFrom(&ctx.BaseParserRuleContext)
+}
+
+func (s *Matrix_exprContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *Matrix_exprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+type MatrixItemListContext struct {
+	Matrix_exprContext
+}
+
+func NewMatrixItemListContext(parser antlr.Parser, ctx antlr.ParserRuleContext) *MatrixItemListContext {
+	var p = new(MatrixItemListContext)
+
+	InitEmptyMatrix_exprContext(&p.Matrix_exprContext)
+	p.parser = parser
+	p.CopyAll(ctx.(*Matrix_exprContext))
+
+	return p
+}
+
+func (s *MatrixItemListContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *MatrixItemListContext) LBRACE() antlr.TerminalNode {
 	return s.GetToken(VLangGrammarLBRACE, 0)
 }
 
-func (s *Matrix_exprContext) AllVect_expr() []IVect_exprContext {
+func (s *MatrixItemListContext) AllVect_expr() []IVect_exprContext {
 	children := s.GetChildren()
 	len := 0
 	for _, ctx := range children {
@@ -3296,7 +3317,7 @@ func (s *Matrix_exprContext) AllVect_expr() []IVect_exprContext {
 	return tst
 }
 
-func (s *Matrix_exprContext) Vect_expr(i int) IVect_exprContext {
+func (s *MatrixItemListContext) Vect_expr(i int) IVect_exprContext {
 	var t antlr.RuleContext
 	j := 0
 	for _, ctx := range s.GetChildren() {
@@ -3316,42 +3337,34 @@ func (s *Matrix_exprContext) Vect_expr(i int) IVect_exprContext {
 	return t.(IVect_exprContext)
 }
 
-func (s *Matrix_exprContext) RBRACE() antlr.TerminalNode {
+func (s *MatrixItemListContext) RBRACE() antlr.TerminalNode {
 	return s.GetToken(VLangGrammarRBRACE, 0)
 }
 
-func (s *Matrix_exprContext) AllCOMMA() []antlr.TerminalNode {
+func (s *MatrixItemListContext) AllCOMMA() []antlr.TerminalNode {
 	return s.GetTokens(VLangGrammarCOMMA)
 }
 
-func (s *Matrix_exprContext) COMMA(i int) antlr.TerminalNode {
+func (s *MatrixItemListContext) COMMA(i int) antlr.TerminalNode {
 	return s.GetToken(VLangGrammarCOMMA, i)
 }
 
-func (s *Matrix_exprContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *Matrix_exprContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *Matrix_exprContext) EnterRule(listener antlr.ParseTreeListener) {
+func (s *MatrixItemListContext) EnterRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(VLangGrammarListener); ok {
-		listenerT.EnterMatrix_expr(s)
+		listenerT.EnterMatrixItemList(s)
 	}
 }
 
-func (s *Matrix_exprContext) ExitRule(listener antlr.ParseTreeListener) {
+func (s *MatrixItemListContext) ExitRule(listener antlr.ParseTreeListener) {
 	if listenerT, ok := listener.(VLangGrammarListener); ok {
-		listenerT.ExitMatrix_expr(s)
+		listenerT.ExitMatrixItemList(s)
 	}
 }
 
-func (s *Matrix_exprContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+func (s *MatrixItemListContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 	switch t := visitor.(type) {
 	case VLangGrammarVisitor:
-		return t.VisitMatrix_expr(s)
+		return t.VisitMatrixItemList(s)
 
 	default:
 		return t.VisitChildren(s)
@@ -3363,6 +3376,7 @@ func (p *VLangGrammar) Matrix_expr() (localctx IMatrix_exprContext) {
 	p.EnterRule(localctx, 22, VLangGrammarRULE_matrix_expr)
 	var _la int
 
+	localctx = NewMatrixItemListContext(p, localctx)
 	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(189)

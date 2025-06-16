@@ -76,7 +76,7 @@ matrix_type: LBRACK RBRACK LBRACK RBRACK ID
     ;
 
 matrix_expr
-    : LBRACE vect_expr (COMMA vect_expr)* RBRACE
+    : LBRACE vect_expr (COMMA vect_expr)* RBRACE  #MatrixItemList
     ;
 
 // Finaliza Declaracion de Matriz

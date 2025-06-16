@@ -55,8 +55,8 @@ type VLangGrammarVisitor interface {
 	// Visit a parse tree produced by VLangGrammar#matrix_type.
 	VisitMatrix_type(ctx *Matrix_typeContext) interface{}
 
-	// Visit a parse tree produced by VLangGrammar#matrix_expr.
-	VisitMatrix_expr(ctx *Matrix_exprContext) interface{}
+	// Visit a parse tree produced by VLangGrammar#MatrixItemList.
+	VisitMatrixItemList(ctx *MatrixItemListContext) interface{}
 
 	// Visit a parse tree produced by VLangGrammar#type.
 	VisitType(ctx *TypeContext) interface{}
