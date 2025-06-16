@@ -27,7 +27,7 @@ func ImplicitCast(targetType string, value IVOR) (IVOR, bool) {
 	// 2. Los caracteres pueden convertirse a cadenas
 	if targetType == IVOR_STRING && value.Type() == IVOR_CHARACTER {
 		return &StringValue{
-			InternalValue: string(value.(*CharacterValue).InternalValue),
+			InternalValue: value.(*CharacterValue).InternalValue,
 		}, true
 	}
 

@@ -67,27 +67,28 @@ func (f *Function) Exec(visitor *ReplVisitor, args []*Argument, token antlr.Toke
 	}
 	context.CallStack.Push(funcItem)
 
-	// handle return from callstack
-
+	// ✅ CORRECCIÓN: handle return from callstack - PRIMERO recover, DESPUÉS cleanup
 	defer func() {
-
-		context.CallStack.Clean(funcItem)                        // clean callstack
-		context.ScopeTrace.PopScope()                            // pop function scope
-		context.ScopeTrace.CurrentScope.IsMutating = wasMutating // restore mutating flag
-		context.ScopeTrace.CurrentScope = initialScope           // restore the call time scope
-
+		// 1. PRIMERO: Manejar panic/return
 		if item, ok := recover().(*CallStackItem); item != nil && ok {
 
 			if item != funcItem {
 				context.ErrorTable.NewSemanticError(token, "Return invalido")
+				f.ReturnValue = value.DefaultNilValue
+			} else {
+				// validate return type
+				f.ValidateReturn(context, item.ReturnValue, token) // return value from return statement
 			}
-
-			// validate return type
-			f.ValidateReturn(context, item.ReturnValue, token) // return value from return statement
-			return
+		} else {
+			// No hay return explícito, usar valor por defecto
+			f.ValidateReturn(context, value.DefaultNilValue, token)
 		}
 
-		f.ValidateReturn(context, value.DefaultNilValue, token)
+		// 2. DESPUÉS: Limpiar call stack y restaurar scope
+		context.CallStack.Clean(funcItem)                        // clean callstack
+		context.ScopeTrace.PopScope()                            // pop function scope
+		context.ScopeTrace.CurrentScope.IsMutating = wasMutating // restore mutating flag
+		context.ScopeTrace.CurrentScope = initialScope           // restore the call time scope
 	}()
 
 	// push args to scope
@@ -119,9 +120,6 @@ func (f *Function) Exec(visitor *ReplVisitor, args []*Argument, token antlr.Toke
 	for _, stmt := range f.Body {
 		visitor.Visit(stmt)
 	}
-
-	// f.ValidateReturn(context, value.DefaultNilValue, token)
-	// return
 }
 
 func (f *Function) ValidateArgs(context *ReplContext, args []*Argument, token antlr.Token) (bool, map[string]*Argument) {
@@ -165,11 +163,21 @@ func (f *Function) ValidateArgs(context *ReplContext, args []*Argument, token an
 			continue
 		}
 
-		// validate type
+		// ✅ CORRECCIÓN: Usar conversión implícita en lugar de comparación directa
 		if argToValidate.Value.Type() != param.Type && param.Type != value.IVOR_ANY {
-			context.ErrorTable.NewSemanticError(token, fmt.Sprintf("Tipo de argumento %s invalido", param.InnerName))
-			errorFound = true
-			continue
+			// Intentar conversión implícita
+			convertedValue, canConvert := value.ImplicitCast(param.Type, argToValidate.Value)
+
+			if canConvert {
+				// Actualizar el argumento con el valor convertido
+				argToValidate.Value = convertedValue
+				fmt.Printf("🔄 DEBUG: Conversión implícita %s -> %s para parámetro %s\n",
+					argToValidate.Value.Type(), param.Type, param.InnerName)
+			} else {
+				context.ErrorTable.NewSemanticError(token, fmt.Sprintf("Tipo de argumento %s invalido, esperado %s, recibido %s", param.InnerName, param.Type, argToValidate.Value.Type()))
+				errorFound = true
+				continue
+			}
 		}
 
 		// validate pass by reference

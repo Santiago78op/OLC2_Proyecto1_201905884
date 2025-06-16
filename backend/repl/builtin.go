@@ -217,16 +217,16 @@ var DefaultBuiltInFunctions = map[string]*BuiltInFunction{
 		Name: "println",
 		Exec: PrintLn,
 	},
-	"Atoi": {
-		Name: "Atoi",
+	"atoi": {
+		Name: "atoi",
 		Exec: Atoi,
 	},
 	"parseFloat": {
 		Name: "parseFloat",
 		Exec: ParseFloat,
 	},
-	"typeOf": {
-		Name: "typeOf",
+	"TypeOf": {
+		Name: "TypeOf",
 		Exec: TypeOf,
 	},
 }
