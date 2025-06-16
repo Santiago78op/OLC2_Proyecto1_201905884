@@ -1811,21 +1811,15 @@ func (v *ReplVisitor) VisitMatrixItemList(ctx *compiler.MatrixItemListContext) i
 	fmt.Printf("🔹 Visitando MatrixItemList: %s\n", ctx.GetText())
 
 	var matrixItems [][]value.IVOR
-	var rowLength int = -1
 	var innerType string = value.IVOR_NIL
 
 	for i, row := range ctx.AllVect_expr() {
-		rowValue := v.Visit(row).(*value.VectorValue)
-		matrixItems = append(matrixItems, rowValue.Items)
+		rowValue := v.Visit(row).(*VectorValue)
+		matrixItems = append(matrixItems, rowValue.InternalValue)
 
 		if i == 0 {
-			rowLength = len(rowValue.Items)
 			innerType = rowValue.ItemType
 		} else {
-			if len(rowValue.Items) != rowLength {
-				v.ErrorTable.NewSemanticError(ctx.GetStart(), "Todas las filas de la matriz deben tener el mismo tamaño")
-				return value.DefaultNilValue
-			}
 			if rowValue.ItemType != innerType {
 				v.ErrorTable.NewSemanticError(ctx.GetStart(), "Todos los elementos de la matriz deben ser del mismo tipo")
 				return value.DefaultNilValue
@@ -1841,6 +1835,14 @@ func (v *ReplVisitor) VisitMatrixItemList(ctx *compiler.MatrixItemListContext) i
 
 	v.ErrorTable.NewSemanticError(ctx.GetStart(), "Tipo "+_type+" no encontrado")
 	return value.DefaultNilValue
+}
+
+func (v *ReplVisitor) VisitMatrix_type(ctx *compiler.Matrix_typeContext) interface{} {
+	// Extraemos el tipo base
+	baseType := ctx.ID().GetText()
+
+	// Formamos el tipo completo de matriz
+	return "[[]]" + baseType
 }
 
 func IsMatrixType(typ string) bool {
