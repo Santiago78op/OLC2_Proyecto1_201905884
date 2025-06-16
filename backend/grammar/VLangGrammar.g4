@@ -27,12 +27,16 @@ stmt:
 // Ejemplo: Mut variable_1 int = 10
 // Ejemplo: Mut variable_2 int 
 decl_stmt: 
-    var_type ID type ASSIGN expression  # MutVarDecl  // mut num2 int = 5
-    | var_type ID ASSIGN expression     # ValueDecl   // mut num2 = 5
-    | var_type ID type                  # ValDeclVec  // mut vector []int
-    | ID type ASSIGN expression         # VarAssDecl  // num2 int = 5                                          
-    | ID ASSIGN vector_type vect_expr   # VarVectDecl // numbers = []int {1, 2, 3, 4, 5}
+    var_type ID type ASSIGN expression  # MutVarDecl    // mut num2 int = 5
+    | var_type ID ASSIGN expression     # ValueDecl     // mut num2 = 5 
+    | var_type ID type                  # ValDeclVec    // mut vector []int
+    | ID type ASSIGN expression         # VarAssDecl    // num2 int = 5                                          
+    | ID ASSIGN vector_type vect_expr   # VarVectDecl   // numbers = []int {1, 2, 3, 4, 5}
     | ID ASSIGN matrix_type vect_expr   # VarMatrixDecl // matrix = [][]int { {1, 2}, {3, 4} }
+    ;
+
+var_type:
+    MUT
     ;
 
 // Inicia Declaracion de Vector
@@ -60,11 +64,6 @@ repeating:
     (vector_type | matrix_type) LPAREN ID COLON expression COMMA ID COLON expression RPAREN  # RepeatingDecl
     ;
 // Termina Declaracion Vectores
-
-// tipo de variable
-var_type
-    : MUT
-    ;
 
 // Inicia Declaracion de Vectores
 // [] int, [] float, [] String, [] bool

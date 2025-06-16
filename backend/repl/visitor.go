@@ -993,26 +993,9 @@ func (v *ReplVisitor) VisitForStmtCond(ctx *compiler.ForStmtCondContext) interfa
 	v.CallStack.Push(forItem)
 	v.ScopeTrace.PushScope("for_cond")
 
-	// Manejo de control de flujo con panic/recover
 	defer func() {
-		if item, ok := recover().(*CallStackItem); item != nil && ok {
-
-			// Si no es el for actual, propaga el panic hacia arriba
-			if item != forItem {
-				panic(item)
-			}
-
-			// Si es un continue, simplemente dejamos que siga el ciclo
-			if item.IsAction(ContinueItem) {
-				item.ResetAction()
-
-			}
-
-			// Si es un break, terminamos el for
-			if item.IsAction(BreakItem) {
-				// terminar el ciclo asd
-			}
-		}
+		v.ScopeTrace.PopScope()
+		v.CallStack.Clean(forItem)
 	}()
 
 	for {
@@ -1032,14 +1015,50 @@ func (v *ReplVisitor) VisitForStmtCond(ctx *compiler.ForStmtCondContext) interfa
 			break
 		}
 
-		for _, stmt := range ctx.AllStmt() {
-			v.Visit(stmt)
-			// no se necesita verificar break, continue ni return porque son manejados automáticamente por el panic/recover
+		// Variable para controlar el flujo
+		shouldBreak := false
+		shouldContinue := false
+
+		// Defer para capturar continue/break dentro del cuerpo del bucle
+		func() {
+			defer func() {
+				if item, ok := recover().(*CallStackItem); item != nil && ok {
+					// Si no es el for actual, propaga el panic hacia arriba
+					if item != forItem {
+						panic(item)
+					}
+
+					// Si es un continue, marcamos para continuar
+					if item.IsAction(ContinueItem) {
+						item.ResetAction()
+						shouldContinue = true
+						return
+					}
+
+					// Si es un break, marcamos para terminar
+					if item.IsAction(BreakItem) {
+						item.ResetAction()
+						shouldBreak = true
+						return
+					}
+				}
+			}()
+
+			// Ejecutar todas las statements del cuerpo del bucle
+			for _, stmt := range ctx.AllStmt() {
+				v.Visit(stmt)
+			}
+		}()
+
+		// Verificar las acciones después de ejecutar el cuerpo
+		if shouldBreak {
+			break
+		}
+		if shouldContinue {
+			continue // Saltar a la siguiente iteración
 		}
 	}
 
-	v.ScopeTrace.PopScope()
-	v.CallStack.Clean(forItem)
 	return nil
 }
 
@@ -1062,28 +1081,9 @@ func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface
 	}
 	v.CallStack.Push(forItem)
 
-	// Defer para cleanup y manejo de control de flujo
 	defer func() {
 		v.ScopeTrace.PopScope()    // Limpiar scope
 		v.CallStack.Clean(forItem) // Limpiar call stack
-
-		// Manejo de panic/recover para break/continue
-		if item, ok := recover().(*CallStackItem); item != nil && ok {
-			// Si no es nuestro forItem, propagar panic hacia arriba
-			if item != forItem {
-				panic(item)
-			}
-
-			// Si es continue, se resetea la acción y continúa
-			if item.IsAction(ContinueItem) {
-				item.ResetAction()
-			}
-
-			// Si es break, simplemente termina (no hace nada más)
-			if item.IsAction(BreakItem) {
-				// El bucle termina naturalmente
-			}
-		}
 	}()
 
 	// Bucle principal
@@ -1113,15 +1113,52 @@ func (v *ReplVisitor) VisitForAssCond(ctx *compiler.ForAssCondContext) interface
 			break // Condición falsa, salir del bucle
 		}
 
-		// Ejecutar cuerpo del bucle (println, suma = suma + i, etc.)
-		for _, stmt := range ctx.AllStmt() {
-			v.Visit(stmt)
+		// Variables para controlar el flujo
+		shouldBreak := false
+		shouldContinue := false
 
-			// Verificar si hubo break/continue durante la ejecución del cuerpo
-			// Esto se maneja automáticamente por el panic/recover
+		// Ejecutar cuerpo del bucle con manejo de continue/break
+		func() {
+			defer func() {
+				if item, ok := recover().(*CallStackItem); item != nil && ok {
+					// Si no es nuestro forItem, propagar panic hacia arriba
+					if item != forItem {
+						panic(item)
+					}
+
+					// Si es continue, marcamos para continuar
+					if item.IsAction(ContinueItem) {
+						item.ResetAction()
+						shouldContinue = true
+						return
+					}
+
+					// Si es break, marcamos para terminar
+					if item.IsAction(BreakItem) {
+						item.ResetAction()
+						shouldBreak = true
+						return
+					}
+				}
+			}()
+
+			// Ejecutar todas las statements del cuerpo del bucle
+			for _, stmt := range ctx.AllStmt() {
+				v.Visit(stmt)
+			}
+		}()
+
+		// Verificar las acciones después de ejecutar el cuerpo
+		if shouldBreak {
+			break
+		}
+		if shouldContinue {
+			// Ejecutar incremento antes de continuar a la siguiente iteración
+			v.Visit(incrementExpr)
+			continue
 		}
 
-		// Ejecutar incremento (i++)
+		// Ejecutar incremento (i++) para ejecución normal
 		v.Visit(incrementExpr)
 	}
 
@@ -1175,8 +1212,6 @@ func (v *ReplVisitor) VisitContinueStmt(ctx *compiler.ContinueStmtContext) inter
 
 func (v *ReplVisitor) VisitFuncCall(ctx *compiler.FuncCallContext) interface{} {
 
-	// find if its a func or constructor of a struct
-
 	canditateName := v.Visit(ctx.Id_pattern()).(string)
 	funcObj, msg1 := v.ScopeTrace.GetFunction(canditateName)
 	structObj, msg2 := v.ScopeTrace.GlobalScope.GetStruct(canditateName)
@@ -1188,22 +1223,19 @@ func (v *ReplVisitor) VisitFuncCall(ctx *compiler.FuncCallContext) interface{} {
 
 	args := make([]*Argument, 0)
 	if ctx.Arg_list() != nil {
-		// Visualizar lo que tiene Arg_list
 		fmt.Printf("🔹 Visitando Arg_list: %s\n", ctx.Arg_list().GetText())
-		// Como buscaria Arg_list en el visitor -> Ejemplo VisitArgList(ctx.Arg_list())
 		args = v.Visit(ctx.Arg_list()).([]*Argument)
 	}
 
-	/*
-		// struct has priority over func
-		if structObj != nil {
-			if IsArgValidForStruct(args) {
-				return NewObjectValue(v, canditateName, ctx.Id_pattern().GetStart(), args, false)
-			} else {
-				v.ErrorTable.NewSemanticError(ctx.GetStart(), "Si bien "+canditateName+" es un struct, no se puede llamar a su constructor con los argumentos especificados. Ni tampoco es una funcion.")
-				return value.DefaultNilValue
-			}
-		}*/
+	// Aca van estrcuturas
+	if structObj != nil {
+		if IsArgValidForStruct(args) {
+			return NewObjectValue(v, canditateName, ctx.Id_pattern().GetStart(), args, false)
+		} else {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Si bien "+canditateName+" es un struct, no se puede llamar a su constructor con los argumentos especificados. Ni tampoco es una funcion.")
+			return value.DefaultNilValue
+		}
+	}
 
 	switch funcObj := funcObj.(type) {
 	case *BuiltInFunction:

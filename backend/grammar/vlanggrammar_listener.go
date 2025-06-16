@@ -31,6 +31,9 @@ type VLangGrammarListener interface {
 	// EnterVarMatrixDecl is called when entering the VarMatrixDecl production.
 	EnterVarMatrixDecl(c *VarMatrixDeclContext)
 
+	// EnterVar_type is called when entering the var_type production.
+	EnterVar_type(c *Var_typeContext)
+
 	// EnterVectorItemLis is called when entering the VectorItemLis production.
 	EnterVectorItemLis(c *VectorItemLisContext)
 
@@ -45,9 +48,6 @@ type VLangGrammarListener interface {
 
 	// EnterRepeatingDecl is called when entering the RepeatingDecl production.
 	EnterRepeatingDecl(c *RepeatingDeclContext)
-
-	// EnterVar_type is called when entering the var_type production.
-	EnterVar_type(c *Var_typeContext)
 
 	// EnterVector_type is called when entering the vector_type production.
 	EnterVector_type(c *Vector_typeContext)
@@ -226,6 +226,9 @@ type VLangGrammarListener interface {
 	// ExitVarMatrixDecl is called when exiting the VarMatrixDecl production.
 	ExitVarMatrixDecl(c *VarMatrixDeclContext)
 
+	// ExitVar_type is called when exiting the var_type production.
+	ExitVar_type(c *Var_typeContext)
+
 	// ExitVectorItemLis is called when exiting the VectorItemLis production.
 	ExitVectorItemLis(c *VectorItemLisContext)
 
@@ -240,9 +243,6 @@ type VLangGrammarListener interface {
 
 	// ExitRepeatingDecl is called when exiting the RepeatingDecl production.
 	ExitRepeatingDecl(c *RepeatingDeclContext)
-
-	// ExitVar_type is called when exiting the var_type production.
-	ExitVar_type(c *Var_typeContext)
 
 	// ExitVector_type is called when exiting the vector_type production.
 	ExitVector_type(c *Vector_typeContext)

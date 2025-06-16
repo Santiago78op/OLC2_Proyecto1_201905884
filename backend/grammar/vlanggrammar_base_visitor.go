@@ -39,6 +39,10 @@ func (v *BaseVLangGrammarVisitor) VisitVarMatrixDecl(ctx *VarMatrixDeclContext) 
 	return v.VisitChildren(ctx)
 }
 
+func (v *BaseVLangGrammarVisitor) VisitVar_type(ctx *Var_typeContext) interface{} {
+	return v.VisitChildren(ctx)
+}
+
 func (v *BaseVLangGrammarVisitor) VisitVectorItemLis(ctx *VectorItemLisContext) interface{} {
 	return v.VisitChildren(ctx)
 }
@@ -56,10 +60,6 @@ func (v *BaseVLangGrammarVisitor) VisitVectorFuncCall(ctx *VectorFuncCallContext
 }
 
 func (v *BaseVLangGrammarVisitor) VisitRepeatingDecl(ctx *RepeatingDeclContext) interface{} {
-	return v.VisitChildren(ctx)
-}
-
-func (v *BaseVLangGrammarVisitor) VisitVar_type(ctx *Var_typeContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

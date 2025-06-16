@@ -49,8 +49,8 @@ func vlanggrammarParserInit() {
 		"BOOL_LITERAL", "NIL_LITERAL", "ID", "WS", "LINE_COMMENT", "BLOCK_COMMENT",
 	}
 	staticData.RuleNames = []string{
-		"program", "stmt", "decl_stmt", "vect_expr", "vect_item", "vect_prop",
-		"vect_func", "repeating", "var_type", "vector_type", "matrix_type",
+		"program", "stmt", "decl_stmt", "var_type", "vect_expr", "vect_item",
+		"vect_prop", "vect_func", "repeating", "vector_type", "matrix_type",
 		"aux_matrix_type", "type", "assign_stmt", "id_pattern", "literal", "incredecre",
 		"expression", "if_stmt", "if_chain", "else_stmt", "switch_stmt", "switch_case",
 		"default_case", "while_stmt", "for_stmt", "range", "transfer_stmt",
@@ -71,11 +71,11 @@ func vlanggrammarParserInit() {
 		1, 1, 1, 3, 1, 98, 8, 1, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
 		1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2,
 		1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2, 3, 2, 130,
-		8, 2, 1, 3, 1, 3, 1, 3, 1, 3, 5, 3, 136, 8, 3, 10, 3, 12, 3, 139, 9, 3,
-		3, 3, 141, 8, 3, 1, 3, 1, 3, 1, 4, 1, 4, 1, 4, 1, 4, 1, 4, 4, 4, 150, 8,
-		4, 11, 4, 12, 4, 151, 1, 5, 1, 5, 1, 5, 1, 5, 1, 6, 1, 6, 1, 6, 1, 6, 1,
-		7, 1, 7, 3, 7, 164, 8, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1, 7, 1,
-		7, 1, 7, 1, 7, 1, 8, 1, 8, 1, 9, 1, 9, 1, 9, 1, 9, 1, 10, 1, 10, 1, 10,
+		8, 2, 1, 3, 1, 3, 1, 4, 1, 4, 1, 4, 1, 4, 5, 4, 138, 8, 4, 10, 4, 12, 4,
+		141, 9, 4, 3, 4, 143, 8, 4, 1, 4, 1, 4, 1, 5, 1, 5, 1, 5, 1, 5, 1, 5, 4,
+		5, 152, 8, 5, 11, 5, 12, 5, 153, 1, 6, 1, 6, 1, 6, 1, 6, 1, 7, 1, 7, 1,
+		7, 1, 7, 1, 8, 1, 8, 3, 8, 166, 8, 8, 1, 8, 1, 8, 1, 8, 1, 8, 1, 8, 1,
+		8, 1, 8, 1, 8, 1, 8, 1, 8, 1, 9, 1, 9, 1, 9, 1, 9, 1, 10, 1, 10, 1, 10,
 		1, 10, 1, 10, 1, 10, 3, 10, 188, 8, 10, 1, 11, 1, 11, 1, 11, 1, 12, 1,
 		12, 1, 12, 3, 12, 196, 8, 12, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13,
 		1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 1, 13, 3, 13, 210, 8, 13, 1, 14, 1,
@@ -115,8 +115,8 @@ func vlanggrammarParserInit() {
 		54, 56, 58, 60, 62, 64, 66, 68, 70, 72, 74, 0, 7, 1, 0, 23, 24, 1, 0, 22,
 		24, 2, 0, 18, 18, 33, 33, 1, 0, 19, 21, 1, 0, 17, 18, 1, 0, 27, 30, 1,
 		0, 25, 26, 536, 0, 79, 1, 0, 0, 0, 2, 97, 1, 0, 0, 0, 4, 129, 1, 0, 0,
-		0, 6, 131, 1, 0, 0, 0, 8, 144, 1, 0, 0, 0, 10, 153, 1, 0, 0, 0, 12, 157,
-		1, 0, 0, 0, 14, 163, 1, 0, 0, 0, 16, 175, 1, 0, 0, 0, 18, 177, 1, 0, 0,
+		0, 6, 131, 1, 0, 0, 0, 8, 133, 1, 0, 0, 0, 10, 146, 1, 0, 0, 0, 12, 155,
+		1, 0, 0, 0, 14, 159, 1, 0, 0, 0, 16, 165, 1, 0, 0, 0, 18, 177, 1, 0, 0,
 		0, 20, 187, 1, 0, 0, 0, 22, 189, 1, 0, 0, 0, 24, 195, 1, 0, 0, 0, 26, 209,
 		1, 0, 0, 0, 28, 211, 1, 0, 0, 0, 30, 224, 1, 0, 0, 0, 32, 230, 1, 0, 0,
 		0, 34, 248, 1, 0, 0, 0, 36, 273, 1, 0, 0, 0, 38, 284, 1, 0, 0, 0, 40, 295,
@@ -130,38 +130,38 @@ func vlanggrammarParserInit() {
 		82, 84, 5, 0, 0, 1, 83, 82, 1, 0, 0, 0, 83, 84, 1, 0, 0, 0, 84, 1, 1, 0,
 		0, 0, 85, 98, 3, 4, 2, 0, 86, 98, 3, 26, 13, 0, 87, 98, 3, 58, 29, 0, 88,
 		98, 3, 54, 27, 0, 89, 98, 3, 36, 18, 0, 90, 98, 3, 42, 21, 0, 91, 98, 3,
-		48, 24, 0, 92, 98, 3, 50, 25, 0, 93, 98, 3, 56, 28, 0, 94, 98, 3, 12, 6,
+		48, 24, 0, 92, 98, 3, 50, 25, 0, 93, 98, 3, 56, 28, 0, 94, 98, 3, 14, 7,
 		0, 95, 98, 3, 64, 32, 0, 96, 98, 3, 70, 35, 0, 97, 85, 1, 0, 0, 0, 97,
 		86, 1, 0, 0, 0, 97, 87, 1, 0, 0, 0, 97, 88, 1, 0, 0, 0, 97, 89, 1, 0, 0,
 		0, 97, 90, 1, 0, 0, 0, 97, 91, 1, 0, 0, 0, 97, 92, 1, 0, 0, 0, 97, 93,
 		1, 0, 0, 0, 97, 94, 1, 0, 0, 0, 97, 95, 1, 0, 0, 0, 97, 96, 1, 0, 0, 0,
-		98, 3, 1, 0, 0, 0, 99, 100, 3, 16, 8, 0, 100, 101, 5, 49, 0, 0, 101, 102,
+		98, 3, 1, 0, 0, 0, 99, 100, 3, 6, 3, 0, 100, 101, 5, 49, 0, 0, 101, 102,
 		3, 24, 12, 0, 102, 103, 5, 22, 0, 0, 103, 104, 3, 34, 17, 0, 104, 130,
-		1, 0, 0, 0, 105, 106, 3, 16, 8, 0, 106, 107, 5, 49, 0, 0, 107, 108, 5,
-		22, 0, 0, 108, 109, 3, 34, 17, 0, 109, 130, 1, 0, 0, 0, 110, 111, 3, 16,
-		8, 0, 111, 112, 5, 49, 0, 0, 112, 113, 3, 24, 12, 0, 113, 130, 1, 0, 0,
-		0, 114, 115, 5, 49, 0, 0, 115, 116, 3, 24, 12, 0, 116, 117, 5, 22, 0, 0,
-		117, 118, 3, 34, 17, 0, 118, 130, 1, 0, 0, 0, 119, 120, 5, 49, 0, 0, 120,
-		121, 5, 22, 0, 0, 121, 122, 3, 18, 9, 0, 122, 123, 3, 6, 3, 0, 123, 130,
-		1, 0, 0, 0, 124, 125, 5, 49, 0, 0, 125, 126, 5, 22, 0, 0, 126, 127, 3,
-		20, 10, 0, 127, 128, 3, 6, 3, 0, 128, 130, 1, 0, 0, 0, 129, 99, 1, 0, 0,
-		0, 129, 105, 1, 0, 0, 0, 129, 110, 1, 0, 0, 0, 129, 114, 1, 0, 0, 0, 129,
-		119, 1, 0, 0, 0, 129, 124, 1, 0, 0, 0, 130, 5, 1, 0, 0, 0, 131, 140, 5,
-		36, 0, 0, 132, 137, 3, 34, 17, 0, 133, 134, 5, 43, 0, 0, 134, 136, 3, 34,
-		17, 0, 135, 133, 1, 0, 0, 0, 136, 139, 1, 0, 0, 0, 137, 135, 1, 0, 0, 0,
-		137, 138, 1, 0, 0, 0, 138, 141, 1, 0, 0, 0, 139, 137, 1, 0, 0, 0, 140,
-		132, 1, 0, 0, 0, 140, 141, 1, 0, 0, 0, 141, 142, 1, 0, 0, 0, 142, 143,
-		5, 37, 0, 0, 143, 7, 1, 0, 0, 0, 144, 149, 3, 28, 14, 0, 145, 146, 5, 38,
-		0, 0, 146, 147, 3, 34, 17, 0, 147, 148, 5, 39, 0, 0, 148, 150, 1, 0, 0,
-		0, 149, 145, 1, 0, 0, 0, 150, 151, 1, 0, 0, 0, 151, 149, 1, 0, 0, 0, 151,
-		152, 1, 0, 0, 0, 152, 9, 1, 0, 0, 0, 153, 154, 3, 8, 4, 0, 154, 155, 5,
-		42, 0, 0, 155, 156, 3, 28, 14, 0, 156, 11, 1, 0, 0, 0, 157, 158, 3, 8,
-		4, 0, 158, 159, 5, 42, 0, 0, 159, 160, 3, 56, 28, 0, 160, 13, 1, 0, 0,
-		0, 161, 164, 3, 18, 9, 0, 162, 164, 3, 20, 10, 0, 163, 161, 1, 0, 0, 0,
-		163, 162, 1, 0, 0, 0, 164, 165, 1, 0, 0, 0, 165, 166, 5, 34, 0, 0, 166,
-		167, 5, 49, 0, 0, 167, 168, 5, 41, 0, 0, 168, 169, 3, 34, 17, 0, 169, 170,
-		5, 43, 0, 0, 170, 171, 5, 49, 0, 0, 171, 172, 5, 41, 0, 0, 172, 173, 3,
-		34, 17, 0, 173, 174, 5, 35, 0, 0, 174, 15, 1, 0, 0, 0, 175, 176, 5, 1,
+		1, 0, 0, 0, 105, 106, 3, 6, 3, 0, 106, 107, 5, 49, 0, 0, 107, 108, 5, 22,
+		0, 0, 108, 109, 3, 34, 17, 0, 109, 130, 1, 0, 0, 0, 110, 111, 3, 6, 3,
+		0, 111, 112, 5, 49, 0, 0, 112, 113, 3, 24, 12, 0, 113, 130, 1, 0, 0, 0,
+		114, 115, 5, 49, 0, 0, 115, 116, 3, 24, 12, 0, 116, 117, 5, 22, 0, 0, 117,
+		118, 3, 34, 17, 0, 118, 130, 1, 0, 0, 0, 119, 120, 5, 49, 0, 0, 120, 121,
+		5, 22, 0, 0, 121, 122, 3, 18, 9, 0, 122, 123, 3, 8, 4, 0, 123, 130, 1,
+		0, 0, 0, 124, 125, 5, 49, 0, 0, 125, 126, 5, 22, 0, 0, 126, 127, 3, 20,
+		10, 0, 127, 128, 3, 8, 4, 0, 128, 130, 1, 0, 0, 0, 129, 99, 1, 0, 0, 0,
+		129, 105, 1, 0, 0, 0, 129, 110, 1, 0, 0, 0, 129, 114, 1, 0, 0, 0, 129,
+		119, 1, 0, 0, 0, 129, 124, 1, 0, 0, 0, 130, 5, 1, 0, 0, 0, 131, 132, 5,
+		1, 0, 0, 132, 7, 1, 0, 0, 0, 133, 142, 5, 36, 0, 0, 134, 139, 3, 34, 17,
+		0, 135, 136, 5, 43, 0, 0, 136, 138, 3, 34, 17, 0, 137, 135, 1, 0, 0, 0,
+		138, 141, 1, 0, 0, 0, 139, 137, 1, 0, 0, 0, 139, 140, 1, 0, 0, 0, 140,
+		143, 1, 0, 0, 0, 141, 139, 1, 0, 0, 0, 142, 134, 1, 0, 0, 0, 142, 143,
+		1, 0, 0, 0, 143, 144, 1, 0, 0, 0, 144, 145, 5, 37, 0, 0, 145, 9, 1, 0,
+		0, 0, 146, 151, 3, 28, 14, 0, 147, 148, 5, 38, 0, 0, 148, 149, 3, 34, 17,
+		0, 149, 150, 5, 39, 0, 0, 150, 152, 1, 0, 0, 0, 151, 147, 1, 0, 0, 0, 152,
+		153, 1, 0, 0, 0, 153, 151, 1, 0, 0, 0, 153, 154, 1, 0, 0, 0, 154, 11, 1,
+		0, 0, 0, 155, 156, 3, 10, 5, 0, 156, 157, 5, 42, 0, 0, 157, 158, 3, 28,
+		14, 0, 158, 13, 1, 0, 0, 0, 159, 160, 3, 10, 5, 0, 160, 161, 5, 42, 0,
+		0, 161, 162, 3, 56, 28, 0, 162, 15, 1, 0, 0, 0, 163, 166, 3, 18, 9, 0,
+		164, 166, 3, 20, 10, 0, 165, 163, 1, 0, 0, 0, 165, 164, 1, 0, 0, 0, 166,
+		167, 1, 0, 0, 0, 167, 168, 5, 34, 0, 0, 168, 169, 5, 49, 0, 0, 169, 170,
+		5, 41, 0, 0, 170, 171, 3, 34, 17, 0, 171, 172, 5, 43, 0, 0, 172, 173, 5,
+		49, 0, 0, 173, 174, 5, 41, 0, 0, 174, 175, 3, 34, 17, 0, 175, 176, 5, 35,
 		0, 0, 176, 17, 1, 0, 0, 0, 177, 178, 5, 38, 0, 0, 178, 179, 5, 39, 0, 0,
 		179, 180, 5, 49, 0, 0, 180, 19, 1, 0, 0, 0, 181, 188, 3, 22, 11, 0, 182,
 		183, 5, 38, 0, 0, 183, 184, 5, 39, 0, 0, 184, 185, 5, 38, 0, 0, 185, 186,
@@ -172,7 +172,7 @@ func vlanggrammarParserInit() {
 		1, 0, 0, 0, 196, 25, 1, 0, 0, 0, 197, 198, 3, 28, 14, 0, 198, 199, 5, 22,
 		0, 0, 199, 200, 3, 34, 17, 0, 200, 210, 1, 0, 0, 0, 201, 202, 3, 28, 14,
 		0, 202, 203, 7, 0, 0, 0, 203, 204, 3, 34, 17, 0, 204, 210, 1, 0, 0, 0,
-		205, 206, 3, 8, 4, 0, 206, 207, 7, 1, 0, 0, 207, 208, 3, 34, 17, 0, 208,
+		205, 206, 3, 10, 5, 0, 206, 207, 7, 1, 0, 0, 207, 208, 3, 34, 17, 0, 208,
 		210, 1, 0, 0, 0, 209, 197, 1, 0, 0, 0, 209, 201, 1, 0, 0, 0, 209, 205,
 		1, 0, 0, 0, 210, 27, 1, 0, 0, 0, 211, 216, 5, 49, 0, 0, 212, 213, 5, 42,
 		0, 0, 213, 215, 5, 49, 0, 0, 214, 212, 1, 0, 0, 0, 215, 218, 1, 0, 0, 0,
@@ -185,8 +185,8 @@ func vlanggrammarParserInit() {
 		1, 0, 0, 0, 230, 228, 1, 0, 0, 0, 231, 33, 1, 0, 0, 0, 232, 233, 6, 17,
 		-1, 0, 233, 234, 5, 34, 0, 0, 234, 235, 3, 34, 17, 0, 235, 236, 5, 35,
 		0, 0, 236, 249, 1, 0, 0, 0, 237, 249, 3, 56, 28, 0, 238, 249, 3, 28, 14,
-		0, 239, 249, 3, 8, 4, 0, 240, 249, 3, 10, 5, 0, 241, 249, 3, 12, 6, 0,
-		242, 249, 3, 30, 15, 0, 243, 249, 3, 6, 3, 0, 244, 249, 3, 14, 7, 0, 245,
+		0, 239, 249, 3, 10, 5, 0, 240, 249, 3, 12, 6, 0, 241, 249, 3, 14, 7, 0,
+		242, 249, 3, 30, 15, 0, 243, 249, 3, 8, 4, 0, 244, 249, 3, 16, 8, 0, 245,
 		249, 3, 32, 16, 0, 246, 247, 7, 2, 0, 0, 247, 249, 3, 34, 17, 7, 248, 232,
 		1, 0, 0, 0, 248, 237, 1, 0, 0, 0, 248, 238, 1, 0, 0, 0, 248, 239, 1, 0,
 		0, 0, 248, 240, 1, 0, 0, 0, 248, 241, 1, 0, 0, 0, 248, 242, 1, 0, 0, 0,
@@ -273,13 +273,13 @@ func vlanggrammarParserInit() {
 		474, 5, 36, 0, 0, 471, 473, 3, 72, 36, 0, 472, 471, 1, 0, 0, 0, 473, 476,
 		1, 0, 0, 0, 474, 472, 1, 0, 0, 0, 474, 475, 1, 0, 0, 0, 475, 477, 1, 0,
 		0, 0, 476, 474, 1, 0, 0, 0, 477, 478, 5, 37, 0, 0, 478, 71, 1, 0, 0, 0,
-		479, 480, 3, 16, 8, 0, 480, 483, 5, 49, 0, 0, 481, 482, 5, 41, 0, 0, 482,
+		479, 480, 3, 6, 3, 0, 480, 483, 5, 49, 0, 0, 481, 482, 5, 41, 0, 0, 482,
 		484, 3, 24, 12, 0, 483, 481, 1, 0, 0, 0, 483, 484, 1, 0, 0, 0, 484, 487,
 		1, 0, 0, 0, 485, 486, 5, 22, 0, 0, 486, 488, 3, 34, 17, 0, 487, 485, 1,
 		0, 0, 0, 487, 488, 1, 0, 0, 0, 488, 73, 1, 0, 0, 0, 489, 490, 5, 38, 0,
 		0, 490, 491, 5, 49, 0, 0, 491, 492, 5, 39, 0, 0, 492, 493, 5, 34, 0, 0,
-		493, 494, 5, 35, 0, 0, 494, 75, 1, 0, 0, 0, 45, 79, 83, 97, 129, 137, 140,
-		151, 163, 187, 195, 209, 216, 224, 230, 248, 268, 270, 278, 282, 290, 300,
+		493, 494, 5, 35, 0, 0, 494, 75, 1, 0, 0, 0, 45, 79, 83, 97, 129, 139, 142,
+		153, 165, 187, 195, 209, 216, 224, 230, 248, 268, 270, 278, 282, 290, 300,
 		311, 315, 325, 333, 342, 353, 368, 380, 386, 391, 401, 405, 410, 418, 428,
 		432, 436, 442, 446, 452, 462, 474, 483, 487,
 	}
@@ -379,12 +379,12 @@ const (
 	VLangGrammarRULE_program         = 0
 	VLangGrammarRULE_stmt            = 1
 	VLangGrammarRULE_decl_stmt       = 2
-	VLangGrammarRULE_vect_expr       = 3
-	VLangGrammarRULE_vect_item       = 4
-	VLangGrammarRULE_vect_prop       = 5
-	VLangGrammarRULE_vect_func       = 6
-	VLangGrammarRULE_repeating       = 7
-	VLangGrammarRULE_var_type        = 8
+	VLangGrammarRULE_var_type        = 3
+	VLangGrammarRULE_vect_expr       = 4
+	VLangGrammarRULE_vect_item       = 5
+	VLangGrammarRULE_vect_prop       = 6
+	VLangGrammarRULE_vect_func       = 7
+	VLangGrammarRULE_repeating       = 8
 	VLangGrammarRULE_vector_type     = 9
 	VLangGrammarRULE_matrix_type     = 10
 	VLangGrammarRULE_aux_matrix_type = 11
@@ -1722,6 +1722,112 @@ errorExit:
 	goto errorExit // Trick to prevent compiler error if the label is not used
 }
 
+// IVar_typeContext is an interface to support dynamic dispatch.
+type IVar_typeContext interface {
+	antlr.ParserRuleContext
+
+	// GetParser returns the parser.
+	GetParser() antlr.Parser
+
+	// Getter signatures
+	MUT() antlr.TerminalNode
+
+	// IsVar_typeContext differentiates from other interfaces.
+	IsVar_typeContext()
+}
+
+type Var_typeContext struct {
+	antlr.BaseParserRuleContext
+	parser antlr.Parser
+}
+
+func NewEmptyVar_typeContext() *Var_typeContext {
+	var p = new(Var_typeContext)
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
+	p.RuleIndex = VLangGrammarRULE_var_type
+	return p
+}
+
+func InitEmptyVar_typeContext(p *Var_typeContext) {
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
+	p.RuleIndex = VLangGrammarRULE_var_type
+}
+
+func (*Var_typeContext) IsVar_typeContext() {}
+
+func NewVar_typeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Var_typeContext {
+	var p = new(Var_typeContext)
+
+	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
+
+	p.parser = parser
+	p.RuleIndex = VLangGrammarRULE_var_type
+
+	return p
+}
+
+func (s *Var_typeContext) GetParser() antlr.Parser { return s.parser }
+
+func (s *Var_typeContext) MUT() antlr.TerminalNode {
+	return s.GetToken(VLangGrammarMUT, 0)
+}
+
+func (s *Var_typeContext) GetRuleContext() antlr.RuleContext {
+	return s
+}
+
+func (s *Var_typeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
+	return antlr.TreesStringTree(s, ruleNames, recog)
+}
+
+func (s *Var_typeContext) EnterRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(VLangGrammarListener); ok {
+		listenerT.EnterVar_type(s)
+	}
+}
+
+func (s *Var_typeContext) ExitRule(listener antlr.ParseTreeListener) {
+	if listenerT, ok := listener.(VLangGrammarListener); ok {
+		listenerT.ExitVar_type(s)
+	}
+}
+
+func (s *Var_typeContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
+	switch t := visitor.(type) {
+	case VLangGrammarVisitor:
+		return t.VisitVar_type(s)
+
+	default:
+		return t.VisitChildren(s)
+	}
+}
+
+func (p *VLangGrammar) Var_type() (localctx IVar_typeContext) {
+	localctx = NewVar_typeContext(p, p.GetParserRuleContext(), p.GetState())
+	p.EnterRule(localctx, 6, VLangGrammarRULE_var_type)
+	p.EnterOuterAlt(localctx, 1)
+	{
+		p.SetState(131)
+		p.Match(VLangGrammarMUT)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
+	}
+
+errorExit:
+	if p.HasError() {
+		v := p.GetError()
+		localctx.SetException(v)
+		p.GetErrorHandler().ReportError(p, v)
+		p.GetErrorHandler().Recover(p, v)
+		p.SetError(nil)
+	}
+	p.ExitRule()
+	return localctx
+	goto errorExit // Trick to prevent compiler error if the label is not used
+}
+
 // IVect_exprContext is an interface to support dynamic dispatch.
 type IVect_exprContext interface {
 	antlr.ParserRuleContext
@@ -1875,20 +1981,20 @@ func (s *VectorItemLisContext) Accept(visitor antlr.ParseTreeVisitor) interface{
 
 func (p *VLangGrammar) Vect_expr() (localctx IVect_exprContext) {
 	localctx = NewVect_exprContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 6, VLangGrammarRULE_vect_expr)
+	p.EnterRule(localctx, 8, VLangGrammarRULE_vect_expr)
 	var _la int
 
 	localctx = NewVectorItemLisContext(p, localctx)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(131)
+		p.SetState(133)
 		p.Match(VLangGrammarLBRACE)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-	p.SetState(140)
+	p.SetState(142)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -1897,10 +2003,10 @@ func (p *VLangGrammar) Vect_expr() (localctx IVect_exprContext) {
 
 	if (int64(_la) & ^0x3f) == 0 && ((int64(1)<<_la)&1108677088247808) != 0 {
 		{
-			p.SetState(132)
+			p.SetState(134)
 			p.expression(0)
 		}
-		p.SetState(137)
+		p.SetState(139)
 		p.GetErrorHandler().Sync(p)
 		if p.HasError() {
 			goto errorExit
@@ -1909,7 +2015,7 @@ func (p *VLangGrammar) Vect_expr() (localctx IVect_exprContext) {
 
 		for _la == VLangGrammarCOMMA {
 			{
-				p.SetState(133)
+				p.SetState(135)
 				p.Match(VLangGrammarCOMMA)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -1917,11 +2023,11 @@ func (p *VLangGrammar) Vect_expr() (localctx IVect_exprContext) {
 				}
 			}
 			{
-				p.SetState(134)
+				p.SetState(136)
 				p.expression(0)
 			}
 
-			p.SetState(139)
+			p.SetState(141)
 			p.GetErrorHandler().Sync(p)
 			if p.HasError() {
 				goto errorExit
@@ -1931,7 +2037,7 @@ func (p *VLangGrammar) Vect_expr() (localctx IVect_exprContext) {
 
 	}
 	{
-		p.SetState(142)
+		p.SetState(144)
 		p.Match(VLangGrammarRBRACE)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2121,16 +2227,16 @@ func (s *VectorItemContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
 
 func (p *VLangGrammar) Vect_item() (localctx IVect_itemContext) {
 	localctx = NewVect_itemContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 8, VLangGrammarRULE_vect_item)
+	p.EnterRule(localctx, 10, VLangGrammarRULE_vect_item)
 	var _alt int
 
 	localctx = NewVectorItemContext(p, localctx)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(144)
+		p.SetState(146)
 		p.Id_pattern()
 	}
-	p.SetState(149)
+	p.SetState(151)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2140,7 +2246,7 @@ func (p *VLangGrammar) Vect_item() (localctx IVect_itemContext) {
 		switch _alt {
 		case 1:
 			{
-				p.SetState(145)
+				p.SetState(147)
 				p.Match(VLangGrammarLBRACK)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -2148,11 +2254,11 @@ func (p *VLangGrammar) Vect_item() (localctx IVect_itemContext) {
 				}
 			}
 			{
-				p.SetState(146)
+				p.SetState(148)
 				p.expression(0)
 			}
 			{
-				p.SetState(147)
+				p.SetState(149)
 				p.Match(VLangGrammarRBRACK)
 				if p.HasError() {
 					// Recognition error - abort rule
@@ -2165,7 +2271,7 @@ func (p *VLangGrammar) Vect_item() (localctx IVect_itemContext) {
 			goto errorExit
 		}
 
-		p.SetState(151)
+		p.SetState(153)
 		p.GetErrorHandler().Sync(p)
 		_alt = p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 6, p.GetParserRuleContext())
 		if p.HasError() {
@@ -2318,15 +2424,15 @@ func (s *VectorPropertyContext) Accept(visitor antlr.ParseTreeVisitor) interface
 
 func (p *VLangGrammar) Vect_prop() (localctx IVect_propContext) {
 	localctx = NewVect_propContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 10, VLangGrammarRULE_vect_prop)
+	p.EnterRule(localctx, 12, VLangGrammarRULE_vect_prop)
 	localctx = NewVectorPropertyContext(p, localctx)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(153)
+		p.SetState(155)
 		p.Vect_item()
 	}
 	{
-		p.SetState(154)
+		p.SetState(156)
 		p.Match(VLangGrammarDOT)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2334,7 +2440,7 @@ func (p *VLangGrammar) Vect_prop() (localctx IVect_propContext) {
 		}
 	}
 	{
-		p.SetState(155)
+		p.SetState(157)
 		p.Id_pattern()
 	}
 
@@ -2483,15 +2589,15 @@ func (s *VectorFuncCallContext) Accept(visitor antlr.ParseTreeVisitor) interface
 
 func (p *VLangGrammar) Vect_func() (localctx IVect_funcContext) {
 	localctx = NewVect_funcContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 12, VLangGrammarRULE_vect_func)
+	p.EnterRule(localctx, 14, VLangGrammarRULE_vect_func)
 	localctx = NewVectorFuncCallContext(p, localctx)
 	p.EnterOuterAlt(localctx, 1)
 	{
-		p.SetState(157)
+		p.SetState(159)
 		p.Vect_item()
 	}
 	{
-		p.SetState(158)
+		p.SetState(160)
 		p.Match(VLangGrammarDOT)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2499,7 +2605,7 @@ func (p *VLangGrammar) Vect_func() (localctx IVect_funcContext) {
 		}
 	}
 	{
-		p.SetState(159)
+		p.SetState(161)
 		p.Func_call()
 	}
 
@@ -2713,10 +2819,10 @@ func (s *RepeatingDeclContext) Accept(visitor antlr.ParseTreeVisitor) interface{
 
 func (p *VLangGrammar) Repeating() (localctx IRepeatingContext) {
 	localctx = NewRepeatingContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 14, VLangGrammarRULE_repeating)
+	p.EnterRule(localctx, 16, VLangGrammarRULE_repeating)
 	localctx = NewRepeatingDeclContext(p, localctx)
 	p.EnterOuterAlt(localctx, 1)
-	p.SetState(163)
+	p.SetState(165)
 	p.GetErrorHandler().Sync(p)
 	if p.HasError() {
 		goto errorExit
@@ -2725,13 +2831,13 @@ func (p *VLangGrammar) Repeating() (localctx IRepeatingContext) {
 	switch p.GetInterpreter().AdaptivePredict(p.BaseParser, p.GetTokenStream(), 7, p.GetParserRuleContext()) {
 	case 1:
 		{
-			p.SetState(161)
+			p.SetState(163)
 			p.Vector_type()
 		}
 
 	case 2:
 		{
-			p.SetState(162)
+			p.SetState(164)
 			p.Matrix_type()
 		}
 
@@ -2739,7 +2845,7 @@ func (p *VLangGrammar) Repeating() (localctx IRepeatingContext) {
 		goto errorExit
 	}
 	{
-		p.SetState(165)
+		p.SetState(167)
 		p.Match(VLangGrammarLPAREN)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2747,7 +2853,7 @@ func (p *VLangGrammar) Repeating() (localctx IRepeatingContext) {
 		}
 	}
 	{
-		p.SetState(166)
+		p.SetState(168)
 		p.Match(VLangGrammarID)
 		if p.HasError() {
 			// Recognition error - abort rule
@@ -2755,20 +2861,8 @@ func (p *VLangGrammar) Repeating() (localctx IRepeatingContext) {
 		}
 	}
 	{
-		p.SetState(167)
-		p.Match(VLangGrammarCOLON)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
-		}
-	}
-	{
-		p.SetState(168)
-		p.expression(0)
-	}
-	{
 		p.SetState(169)
-		p.Match(VLangGrammarCOMMA)
+		p.Match(VLangGrammarCOLON)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -2776,15 +2870,11 @@ func (p *VLangGrammar) Repeating() (localctx IRepeatingContext) {
 	}
 	{
 		p.SetState(170)
-		p.Match(VLangGrammarID)
-		if p.HasError() {
-			// Recognition error - abort rule
-			goto errorExit
-		}
+		p.expression(0)
 	}
 	{
 		p.SetState(171)
-		p.Match(VLangGrammarCOLON)
+		p.Match(VLangGrammarCOMMA)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
@@ -2792,117 +2882,27 @@ func (p *VLangGrammar) Repeating() (localctx IRepeatingContext) {
 	}
 	{
 		p.SetState(172)
-		p.expression(0)
-	}
-	{
-		p.SetState(173)
-		p.Match(VLangGrammarRPAREN)
+		p.Match(VLangGrammarID)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
 		}
 	}
-
-errorExit:
-	if p.HasError() {
-		v := p.GetError()
-		localctx.SetException(v)
-		p.GetErrorHandler().ReportError(p, v)
-		p.GetErrorHandler().Recover(p, v)
-		p.SetError(nil)
+	{
+		p.SetState(173)
+		p.Match(VLangGrammarCOLON)
+		if p.HasError() {
+			// Recognition error - abort rule
+			goto errorExit
+		}
 	}
-	p.ExitRule()
-	return localctx
-	goto errorExit // Trick to prevent compiler error if the label is not used
-}
-
-// IVar_typeContext is an interface to support dynamic dispatch.
-type IVar_typeContext interface {
-	antlr.ParserRuleContext
-
-	// GetParser returns the parser.
-	GetParser() antlr.Parser
-
-	// Getter signatures
-	MUT() antlr.TerminalNode
-
-	// IsVar_typeContext differentiates from other interfaces.
-	IsVar_typeContext()
-}
-
-type Var_typeContext struct {
-	antlr.BaseParserRuleContext
-	parser antlr.Parser
-}
-
-func NewEmptyVar_typeContext() *Var_typeContext {
-	var p = new(Var_typeContext)
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = VLangGrammarRULE_var_type
-	return p
-}
-
-func InitEmptyVar_typeContext(p *Var_typeContext) {
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, nil, -1)
-	p.RuleIndex = VLangGrammarRULE_var_type
-}
-
-func (*Var_typeContext) IsVar_typeContext() {}
-
-func NewVar_typeContext(parser antlr.Parser, parent antlr.ParserRuleContext, invokingState int) *Var_typeContext {
-	var p = new(Var_typeContext)
-
-	antlr.InitBaseParserRuleContext(&p.BaseParserRuleContext, parent, invokingState)
-
-	p.parser = parser
-	p.RuleIndex = VLangGrammarRULE_var_type
-
-	return p
-}
-
-func (s *Var_typeContext) GetParser() antlr.Parser { return s.parser }
-
-func (s *Var_typeContext) MUT() antlr.TerminalNode {
-	return s.GetToken(VLangGrammarMUT, 0)
-}
-
-func (s *Var_typeContext) GetRuleContext() antlr.RuleContext {
-	return s
-}
-
-func (s *Var_typeContext) ToStringTree(ruleNames []string, recog antlr.Recognizer) string {
-	return antlr.TreesStringTree(s, ruleNames, recog)
-}
-
-func (s *Var_typeContext) EnterRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(VLangGrammarListener); ok {
-		listenerT.EnterVar_type(s)
+	{
+		p.SetState(174)
+		p.expression(0)
 	}
-}
-
-func (s *Var_typeContext) ExitRule(listener antlr.ParseTreeListener) {
-	if listenerT, ok := listener.(VLangGrammarListener); ok {
-		listenerT.ExitVar_type(s)
-	}
-}
-
-func (s *Var_typeContext) Accept(visitor antlr.ParseTreeVisitor) interface{} {
-	switch t := visitor.(type) {
-	case VLangGrammarVisitor:
-		return t.VisitVar_type(s)
-
-	default:
-		return t.VisitChildren(s)
-	}
-}
-
-func (p *VLangGrammar) Var_type() (localctx IVar_typeContext) {
-	localctx = NewVar_typeContext(p, p.GetParserRuleContext(), p.GetState())
-	p.EnterRule(localctx, 16, VLangGrammarRULE_var_type)
-	p.EnterOuterAlt(localctx, 1)
 	{
 		p.SetState(175)
-		p.Match(VLangGrammarMUT)
+		p.Match(VLangGrammarRPAREN)
 		if p.HasError() {
 			// Recognition error - abort rule
 			goto errorExit
