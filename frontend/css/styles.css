@@ -714,8 +714,9 @@ body {
 }
 
 .symbol-name {
-    color: #81c784;
     font-weight: 600;
+    color: #81c784;
+    font-family: 'Consolas', monospace;
 }
 
 .symbol-type {
@@ -728,8 +729,44 @@ body {
 }
 
 .symbol-scope {
-    color: #8c8c8c;
+    font-family: 'Consolas', monospace;
+    font-style: italic;
+    padding: 2px 6px;
+    border-radius: 3px;
     font-size: 11px;
+}
+
+.scope-global {
+    color: #81c784;
+    background: rgba(129, 199, 132, 0.1);
+    border-left: 2px solid #81c784;
+}
+
+.scope-function {
+    color: #64b5f6;
+    background: rgba(100, 181, 246, 0.1);
+    border-left: 2px solid #64b5f6;
+}
+
+.scope-struct {
+    color: #ba68c8;
+    background: rgba(186, 104, 200, 0.1);
+    border-left: 2px solid #ba68c8;
+}
+
+.scope-local {
+    color: #ffb74d;
+    background: rgba(255, 183, 77, 0.1);
+    border-left: 2px solid #ffb74d;
+}
+
+.symbol-row:hover .symbol-name {
+    color: #ffffff;
+}
+
+.symbol-row:hover .symbol-location {
+    background: rgba(144, 164, 174, 0.2);
+    color: #ffffff;
 }
 
 .symbol-details {
@@ -1067,19 +1104,52 @@ body {
     text-align: center;
 }
 
+/* Estilos mejorados para tipos de errores */
 .error-type-lexical {
-    background: #5a2d2d;
-    color: #ff9999;
+    background: #8B0000;
+    color: #FFB6C1;
+    border: 1px solid #CD5C5C;
 }
 
 .error-type-syntax {
-    background: #5a4d2d;
-    color: #ffcc99;
+    background: #B8860B;
+    color: #FFFFE0;
+    border: 1px solid #DAA520;
 }
 
 .error-type-semantic {
-    background: #4d2d5a;
-    color: #cc99ff;
+    background: #4B0082;
+    color: #DDA0DD;
+    border: 1px solid #9370DB;
+}
+
+.error-type-runtime {
+    background: #8B4513;
+    color: #F4A460;
+    border: 1px solid #CD853F;
+}
+
+.error-type-unknown {
+    background: #2F4F4F;
+    color: #F5F5F5;
+    border: 1px solid #696969;
+}
+
+.error-message {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 12px;
+    max-width: 400px;
+    word-wrap: break-word;
+}
+
+/* Resaltar fila de error al hacer hover */
+.error-row:hover {
+    background: #3d2b2b !important;
+    cursor: pointer;
+}
+
+.error-row:hover .error-message {
+    color: #ffcdd2;
 }
 
 .symbol-type-cell {
@@ -1091,13 +1161,47 @@ body {
 }
 
 .symbol-type-variable {
-    background: #2d5a2d;
-    color: #99ff99;
+    background: #1b5e20;
+    color: #c8e6c9;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
 }
 
 .symbol-type-function {
-    background: #2d4d5a;
-    color: #99ccff;
+    background: #0d47a1;
+    color: #bbdefb;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.symbol-type-struct {
+    background: #4a148c;
+    color: #e1bee7;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.symbol-type-builtin {
+    background: #e65100;
+    color: #ffe0b2;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.symbol-location {
+    font-family: 'Consolas', monospace;
+    color: #90a4ae;
+    background: rgba(144, 164, 174, 0.1);
+    padding: 2px 6px;
+    border-radius: 3px;
 }
 
 .symbol-type-class {
@@ -1115,11 +1219,12 @@ body {
 .ast-visualization {
     width: 100%;
     height: 100%;
-    overflow: auto;
     background: #1e1e1e;
-    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
+/* Empty state mejorado */
 .empty-ast {
     display: flex;
     flex-direction: column;
@@ -1128,16 +1233,83 @@ body {
     height: 100%;
     color: #8c8c8c;
     text-align: center;
+    padding: 40px;
+}
+
+.empty-ast-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
 }
 
 .empty-ast p {
-    font-size: 16px;
+    font-size: 18px;
     margin-bottom: 8px;
+    color: #cccccc;
 }
 
 .empty-ast small {
-    font-size: 12px;
+    font-size: 14px;
     opacity: 0.7;
+}
+
+/* SVG Wrapper */
+.ast-svg-wrapper {
+    position: relative;
+    background: #1e1e1e;
+}
+
+.ast-svg-wrapper svg {
+    transition: transform 0.2s ease;
+}
+
+/* JSON Tree Visualization */
+.ast-json-wrapper {
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.ast-object,
+.ast-array {
+    border-left: 2px solid #3e3e42;
+    padding-left: 8px;
+}
+
+.ast-property {
+    margin: 2px 0;
+}
+
+.ast-key {
+    font-weight: 600;
+}
+
+/* Text Wrapper */
+.ast-text-wrapper {
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Controles AST mejorados */
+.ast-controls .control-btn {
+    background: #007acc;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    margin: 0 2px;
+    transition: background 0.2s;
+}
+
+.ast-controls .control-btn:hover {
+    background: #1177bb;
+}
+
+.ast-controls .control-btn:disabled {
+    background: #464647;
+    cursor: not-allowed;
+    opacity: 0.5;
 }
 
 /* AST Node Styles */

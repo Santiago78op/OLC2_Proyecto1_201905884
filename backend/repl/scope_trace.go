@@ -526,7 +526,6 @@ func NewStructScope() *BaseScopeTrace {
 }
 
 // Reporteria
-
 type ReportTable struct {
 	GlobalScope ReportScope
 }
@@ -540,10 +539,11 @@ type ReportScope struct {
 }
 
 type ReportSymbol struct {
-	Name   string
-	Type   string
-	Line   int
-	Column int
+	Name   string `json:"name"`
+	Type   string `json:"type"`
+	Line   int    `json:"line"`
+	Column int    `json:"column"`
+	Scope  string `json:"scope"` // Agregar este campo si no existe
 }
 
 func (s *ScopeTrace) Report() ReportTable {
@@ -553,7 +553,6 @@ func (s *ScopeTrace) Report() ReportTable {
 }
 
 func (s *BaseScopeTrace) Report() ReportScope {
-
 	reportScope := ReportScope{
 		Name:        s.name,
 		Vars:        make([]ReportSymbol, 0),
@@ -563,7 +562,6 @@ func (s *BaseScopeTrace) Report() ReportScope {
 	}
 
 	for _, v := range s.variables {
-
 		token := v.Token
 		line := 0
 		column := 0
@@ -591,7 +589,6 @@ func (s *BaseScopeTrace) Report() ReportScope {
 				Column: 0,
 			})
 		case *Function:
-
 			line := 0
 			column := 0
 

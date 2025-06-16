@@ -132,11 +132,18 @@ class ReportsManager {
     updateReports(data) {
         if (!data) return;
 
+        // Mapear los datos del backend a la estructura esperada
         this.currentReports = {
             errors: data.errors || [],
             symbols: data.symbols || data.symbolTable || [],
-            ast: data.ast || null
+            ast: data.ast || data.cstSvg || null
         };
+
+        console.log('📊 Reportes actualizados:', {
+            errores: this.currentReports.errors.length,
+            símbolos: this.currentReports.symbols.length,
+            tieneAST: !!this.currentReports.ast
+        });
 
         // Si el modal está abierto, actualizar
         if (document.getElementById('reportsModal').style.display !== 'none') {
@@ -168,14 +175,32 @@ class ReportsManager {
             const row = document.createElement('tr');
             row.className = 'error-row';
 
-            const typeClass = `error-type-${error.type || 'error'}`;
+            // Mapear tipos de error a clases CSS
+            const typeMapping = {
+                'lexical': 'error-type-lexical',
+                'syntax': 'error-type-syntax', 
+                'semantic': 'error-type-semantic',
+                'runtime': 'error-type-runtime'
+            };
+
+            const typeClass = typeMapping[error.type] || 'error-type-unknown';
+            
+            // Nombres en español para mostrar
+            const typeNames = {
+                'lexical': 'LÉXICO',
+                'syntax': 'SINTÁCTICO',
+                'semantic': 'SEMÁNTICO', 
+                'runtime': 'EJECUCIÓN'
+            };
+
+            const typeName = typeNames[error.type] || error.type.toUpperCase();
 
             row.innerHTML = `
                 <td>${index + 1}</td>
-                <td>${this.escapeHtml(error.message || error.description || '')}</td>
+                <td class="error-message">${this.escapeHtml(error.message || error.msg || '')}</td>
                 <td>${error.line || 0}</td>
                 <td>${error.column || 0}</td>
-                <td><span class="error-type-cell ${typeClass}">${(error.type || 'ERROR').toUpperCase()}</span></td>
+                <td><span class="error-type-cell ${typeClass}">${typeName}</span></td>
             `;
 
             // Click para ir a la línea
@@ -219,7 +244,7 @@ class ReportsManager {
         count.textContent = `${symbols.length} ${symbols.length === 1 ? 'símbolo' : 'símbolos'}`;
 
         if (symbols.length === 0) {
-            tbody.innerHTML = '<tr class="empty-row"><td colspan="6">No hay símbolos que mostrar</td></tr>';
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="5">No hay símbolos que mostrar</td></tr>';
             return;
         }
 
@@ -228,15 +253,16 @@ class ReportsManager {
             const row = document.createElement('tr');
             row.className = 'symbol-row';
 
-            const typeClass = `symbol-type-${symbol.type || 'variable'}`;
+            // Determinar tipo y clase CSS
+            const symbolType = this.getSymbolTypeClass(symbol.type);
+            const scopeClass = this.getScopeClass(symbol.scope);
 
             row.innerHTML = `
-                <td>${symbol.id || symbol.name || `SYM_${index + 1}`}</td>
-                <td><span class="symbol-type-cell ${typeClass}">${(symbol.type || 'VARIABLE').toUpperCase()}</span></td>
-                <td>${symbol.dataType || symbol.valueType || 'unknown'}</td>
-                <td>${symbol.scope || symbol.ambito || 'global'}</td>
-                <td>${symbol.line || 0}</td>
-                <td>${symbol.column || 0}</td>
+                <td><span class="symbol-name">${symbol.name || `SYM_${index + 1}`}</span></td>
+                <td><span class="symbol-type-cell ${symbolType}">${this.getSymbolTypeDisplay(symbol.type)}</span></td>
+                <td>${symbol.type || 'unknown'}</td>
+                <td><span class="symbol-scope ${scopeClass}">${symbol.scope || 'global'}</span></td>
+                <td><span class="symbol-location">${symbol.line || 0}:${symbol.column || 0}</span></td>
             `;
 
             // Click para ir a la línea
@@ -249,6 +275,38 @@ class ReportsManager {
 
             tbody.appendChild(row);
         });
+    }
+
+    // Función para determinar la clase CSS del tipo
+    getSymbolTypeClass(type) {
+        if (!type) return 'symbol-type-unknown';
+        
+        if (type.includes('Embebida')) return 'symbol-type-builtin';
+        if (type === 'variable' || type === 'int' || type === 'string' || type === 'bool' || type === 'float') return 'symbol-type-variable';
+        if (type === 'function' || type.includes('function')) return 'symbol-type-function';
+        if (type === 'struct') return 'symbol-type-struct';
+        
+        return 'symbol-type-variable';
+    }
+
+    // Función para determinar la clase CSS del scope
+    getScopeClass(scope) {
+        if (!scope || scope === 'global') return 'scope-global';
+        if (scope.includes('func') || scope.includes('function')) return 'scope-function';
+        if (scope.includes('struct')) return 'scope-struct';
+        return 'scope-local';
+    }
+
+    // Función para mostrar el tipo de símbolo
+    getSymbolTypeDisplay(type) {
+        if (!type) return 'DESCONOCIDO';
+        
+        if (type.includes('Embebida')) return 'INCORPORADA';
+        if (type === 'variable' || type === 'int' || type === 'string' || type === 'bool' || type === 'float') return 'VARIABLE';
+        if (type === 'function' || type.includes('function')) return 'FUNCIÓN';
+        if (type === 'struct') return 'ESTRUCTURA';
+        
+        return type.toUpperCase();
     }
 
     downloadSymbols(format) {
@@ -277,11 +335,18 @@ class ReportsManager {
     // ==================== AST ====================
     updateASTVisualization() {
         const container = document.getElementById('astVisualization');
-        const ast = this.currentReports.ast;
+        const ast = this.currentReports.ast || this.currentReports.cstSvg;
+
+        console.log('🌳 Actualizando AST:', {
+            tieneAST: !!ast,
+            tipoAST: typeof ast,
+            longitudAST: ast ? ast.length : 0
+        });
 
         if (!ast) {
             container.innerHTML = `
                 <div class="empty-ast">
+                    <div class="empty-ast-icon">🌳</div>
                     <p>No hay AST que mostrar</p>
                     <small>Ejecuta código para generar el árbol de sintaxis</small>
                 </div>
@@ -293,109 +358,190 @@ class ReportsManager {
 
         // Si la tab de AST está activa, renderizar inmediatamente
         const astTab = document.getElementById('astTab');
-        if (astTab.classList.contains('active')) {
+        if (astTab && astTab.classList.contains('active')) {
             this.renderAST();
         }
     }
 
     renderAST() {
-        if (!this.astData) return;
+        if (!this.astData) {
+            console.log('❌ No hay datos de AST para renderizar');
+            return;
+        }
 
         const container = document.getElementById('astVisualization');
         container.innerHTML = '';
 
-        const width = container.clientWidth || 800;
-        const height = container.clientHeight || 600;
+        console.log('🎨 Renderizando AST...');
 
-        // Crear SVG
-        this.astSvg = d3.select(container)
-            .append('svg')
-            .attr('class', 'ast-svg')
-            .attr('width', width)
-            .attr('height', height);
+        // Verificar si es SVG
+        if (typeof this.astData === 'string' && this.astData.includes('<svg')) {
+            this.renderSVGAST(container);
+        } else if (typeof this.astData === 'object') {
+            this.renderJSONAST(container);
+        } else {
+            this.renderTextAST(container);
+        }
+    }
 
-        // Crear grupo principal con zoom
-        const g = this.astSvg.append('g');
+    // Método para renderizar AST en formato SVG
+    renderSVGAST(container) {
+        console.log('📊 Renderizando SVG AST');
+        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'ast-svg-wrapper';
+        wrapper.style.cssText = `
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #1e1e1e;
+            overflow: auto;
+            padding: 20px;
+            box-sizing: border-box;
+        `;
 
-        // Configurar zoom
-        const zoom = d3.zoom()
-            .scaleExtent([0.1, 3])
-            .on('zoom', (event) => {
-                g.attr('transform', event.transform);
-            });
+        // Insertar el SVG directamente
+        wrapper.innerHTML = this.astData;
 
-        this.astSvg.call(zoom);
+        // Ajustar el SVG para que sea responsive
+        const svg = wrapper.querySelector('svg');
+        if (svg) {
+            svg.style.cssText = `
+                max-width: 100%;
+                max-height: 100%;
+                width: auto;
+                height: auto;
+                border: 1px solid #3e3e42;
+                border-radius: 8px;
+                background: #1e1e1e;
+            `;
+            
+            // Agregar zoom con scroll
+            this.addSVGZoomControls(wrapper, svg);
+        }
 
-        // Crear layout de árbol
-        const tree = d3.tree()
-            .size([width - 100, height - 100])
-            .separation((a, b) => (a.parent === b.parent ? 1 : 2) / a.depth);
-
-        // Convertir datos
-        const root = d3.hierarchy(this.astData);
-        tree(root);
-
-        // Crear enlaces
-        const links = g.selectAll('.link')
-            .data(root.links())
-            .enter().append('path')
-            .attr('class', 'link')
-            .attr('d', d3.linkHorizontal()
-                .x(d => d.y + 50)
-                .y(d => d.x + 50));
-
-        // Crear nodos
-        const nodes = g.selectAll('.node')
-            .data(root.descendants())
-            .enter().append('g')
-            .attr('class', 'node')
-            .attr('transform', d => `translate(${d.y + 50},${d.x + 50})`);
-
-        // Círculos de nodos
-        nodes.append('circle')
-            .attr('r', 20)
-            .on('click', (event, d) => {
-                if (d.data.line > 0) {
-                    this.goToLocation(d.data.line, d.data.column);
-                    this.hideReportsModal();
-                }
-            });
-
-        // Texto de nodos
-        nodes.append('text')
-            .text(d => d.data.type || 'Node')
-            .style('font-size', '10px');
-
-        // Tooltips
-        nodes.append('title')
-            .text(d => {
-                const info = [];
-                if (d.data.type) info.push(`Tipo: ${d.data.type}`);
-                if (d.data.value) info.push(`Valor: ${d.data.value}`);
-                if (d.data.line) info.push(`Línea: ${d.data.line}`);
-                if (d.data.column) info.push(`Columna: ${d.data.column}`);
-                return info.join('\n');
-            });
-
+        container.appendChild(wrapper);
         this.astZoom = 1;
+    }
+
+    // Método para renderizar AST en formato JSON/Objeto
+    renderJSONAST(container) {
+        console.log('🔧 Renderizando JSON AST');
+        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'ast-json-wrapper';
+        wrapper.style.cssText = `
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            padding: 20px;
+            background: #1e1e1e;
+            font-family: 'Consolas', monospace;
+        `;
+
+        // Crear visualización en árbol
+        const treeHTML = this.createTreeVisualization(this.astData);
+        wrapper.innerHTML = treeHTML;
+
+        container.appendChild(wrapper);
+    }
+
+    // Método para renderizar AST en formato texto
+    renderTextAST(container) {
+        console.log('📝 Renderizando texto AST');
+        
+        const wrapper = document.createElement('div');
+        wrapper.className = 'ast-text-wrapper';
+        wrapper.style.cssText = `
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            padding: 20px;
+            background: #1e1e1e;
+            font-family: 'Consolas', monospace;
+            color: #d4d4d4;
+            white-space: pre-wrap;
+        `;
+
+        wrapper.textContent = this.astData;
+        container.appendChild(wrapper);
+    }
+
+    // Agregar controles de zoom para SVG
+    addSVGZoomControls(wrapper, svg) {
+        let scale = 1;
+        const minScale = 0.1;
+        const maxScale = 3;
+
+        wrapper.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            scale = Math.max(minScale, Math.min(maxScale, scale * delta));
+            
+            svg.style.transform = `scale(${scale})`;
+            this.astZoom = scale;
+        });
+    }
+
+    // Crear visualización en árbol para JSON
+    createTreeVisualization(data, level = 0) {
+        const indent = '  '.repeat(level);
+        let html = '';
+
+        if (typeof data === 'object' && data !== null) {
+            if (Array.isArray(data)) {
+                html += `<div class="ast-array" style="margin-left: ${level * 20}px;">[\n`;
+                data.forEach((item, index) => {
+                    html += this.createTreeVisualization(item, level + 1);
+                    if (index < data.length - 1) html += ',';
+                    html += '\n';
+                });
+                html += `${indent}]</div>`;
+            } else {
+                html += `<div class="ast-object" style="margin-left: ${level * 20}px;">{\n`;
+                Object.keys(data).forEach((key, index, keys) => {
+                    html += `<div class="ast-property" style="margin-left: ${(level + 1) * 20}px;">`;
+                    html += `<span class="ast-key" style="color: #9cdcfe;">"${key}"</span>: `;
+                    html += this.createTreeVisualization(data[key], level + 1);
+                    if (index < keys.length - 1) html += ',';
+                    html += '</div>\n';
+                });
+                html += `${indent}}</div>`;
+            }
+        } else {
+            const color = typeof data === 'string' ? '#ce9178' : 
+                        typeof data === 'number' ? '#b5cea8' : 
+                        typeof data === 'boolean' ? '#569cd6' : '#d4d4d4';
+            
+            const value = typeof data === 'string' ? `"${data}"` : String(data);
+            html += `<span style="color: ${color};">${value}</span>`;
+        }
+
+        return html;
     }
 
     zoomAST(factor) {
-        if (!this.astSvg) return;
-
-        this.astZoom *= factor;
-        this.astSvg.transition()
-            .duration(300)
-            .call(d3.zoom().scaleBy, factor);
+        const container = document.getElementById('astVisualization');
+        const svg = container.querySelector('svg');
+        
+        if (svg) {
+            this.astZoom *= factor;
+            this.astZoom = Math.max(0.1, Math.min(3, this.astZoom));
+            svg.style.transform = `scale(${this.astZoom})`;
+        }
     }
 
     resetASTZoom() {
-        if (!this.astSvg) return;
-
-        this.astZoom = 1;
-        this.astSvg.transition()
-            .duration(500)
-            .call(d3.zoom().transform, d3.zoomIdentity);
+        const container = document.getElementById('astVisualization');
+        const svg = container.querySelector('svg');
+        
+        if (svg) {
+            this.astZoom = 1;
+            svg.style.transform = 'scale(1)';
+        }
     }
 
     expandAllAST() {
@@ -428,45 +574,64 @@ class ReportsManager {
     }
 
     downloadASTSVG() {
-        if (!this.astSvg) return;
+        if (!this.astData || !this.astData.includes('<svg')) {
+            alert('No hay SVG AST para descargar');
+            return;
+        }
 
-        const svgElement = this.astSvg.node();
-        const serializer = new XMLSerializer();
-        const svgString = serializer.serializeToString(svgElement);
-
-        const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        const blob = new Blob([this.astData], { type: 'image/svg+xml' });
         this.downloadBlob(blob, 'ast.svg');
     }
 
-    downloadASTPNG() {
-        if (!this.astSvg) return;
+    downloadASTJSON() {
+        if (!this.astData) {
+            alert('No hay AST para descargar');
+            return;
+        }
 
-        const svgElement = this.astSvg.node();
+        let jsonContent;
+        if (typeof this.astData === 'string') {
+            jsonContent = JSON.stringify({ ast: this.astData }, null, 2);
+        } else {
+            jsonContent = JSON.stringify(this.astData, null, 2);
+        }
+
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        this.downloadBlob(blob, 'ast.json');
+    }
+
+
+    downloadASTPNG() {
+        const container = document.getElementById('astVisualization');
+        const svg = container.querySelector('svg');
+        
+        if (!svg) {
+            alert('No hay SVG para convertir a PNG');
+            return;
+        }
+
+        // Crear canvas y convertir SVG a PNG
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-
-        const data = (new XMLSerializer()).serializeToString(svgElement);
+        const data = new XMLSerializer().serializeToString(svg);
+        
         const img = new Image();
-
         img.onload = () => {
-            canvas.width = img.width;
-            canvas.height = img.height;
+            canvas.width = img.width || 800;
+            canvas.height = img.height || 600;
+            
+            // Fondo negro
             ctx.fillStyle = '#1e1e1e';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
             ctx.drawImage(img, 0, 0);
-
+            
             canvas.toBlob((blob) => {
                 this.downloadBlob(blob, 'ast.png');
             });
         };
-
-        img.src = 'data:image/svg+xml;base64,' + btoa(data);
-    }
-
-    downloadASTJSON() {
-        const jsonString = JSON.stringify(this.astData, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        this.downloadBlob(blob, 'ast.json');
+        
+        img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(data)));
     }
 
     // ==================== UTILIDADES ====================
