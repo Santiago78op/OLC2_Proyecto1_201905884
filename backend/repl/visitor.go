@@ -1536,111 +1536,79 @@ func (v *ReplVisitor) VisitBlockInd(ctx *compiler.BlockIndContext) interface{} {
 	return nil
 }
 
-/*
 func (v *ReplVisitor) VisitForStmt(ctx *compiler.ForStmtContext) interface{} {
 
-	varName := ctx.ID().GetText()
-	var iterableItem *VectorValue = DefaultEmptyVectorValue
+	indexName := ctx.ID(0).GetText()
+	valueName := ctx.ID(1).GetText()
 
-	if ctx.Range_() != nil {
-		rangeItem, ok := v.Visit(ctx.Range_()).(*VectorValue)
+	iterableValue := v.Visit(ctx.Expression()).(value.IVOR)
 
-		if !ok {
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), "El valor del rango debe ser un vector")
-			return nil
-		}
+	var iterableItem *VectorValue
 
-		iterableItem = rangeItem
-	}
-
-	if ctx.Expr() != nil {
-		iterableValue := v.Visit(ctx.Expr()).(value.IVOR)
-
-		if IsVectorType(iterableValue.Type()) {
-			iterableItem = iterableValue.(*VectorValue)
-		} else if iterableValue.Type() == value.IVOR_STRING {
-			iterableItem = StringToVector(iterableValue.(*value.StringValue))
-		} else {
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), "El valor del rango debe ser un vector o una cadena")
-			return nil
-		}
+	if IsVectorType(iterableValue.Type()) {
+		iterableItem = iterableValue.(*VectorValue)
+	} else if iterableValue.Type() == value.IVOR_STRING {
+		iterableItem = StringToVector(iterableValue.(*value.StringValue))
+	} else {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El valor del for debe ser un vector o una cadena")
+		return nil
 	}
 
 	if iterableItem.Size() == 0 {
 		return nil
 	}
 
-	// Push scope outer scope
 	outerForScope := v.ScopeTrace.PushScope("outer_for")
 
-	// create the associated variable to the iterable
-	iterableVariable, msg := outerForScope.AddVariable(varName, iterableItem.ItemType, iterableItem.Current(), true, false, ctx.ID().GetSymbol())
+	// Declarar índice y valor
+	indexVar, msg1 := outerForScope.AddVariable(indexName, value.IVOR_INT, &value.IntValue{InternalValue: 0}, true, false, ctx.ID(0).GetSymbol())
+	valueVar, msg2 := outerForScope.AddVariable(valueName, iterableItem.ItemType, iterableItem.Current(), true, false, ctx.ID(1).GetSymbol())
 
-	if iterableVariable == nil {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg)
-		log.Fatal("This should not happen")
+	if indexVar == nil || valueVar == nil {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), msg1+" "+msg2)
+		log.Fatal("Error declarando variables del for")
 		return nil
 	}
 
-	// Push forItem to call stack [breakable, continuable]
-
 	forItem := &CallStackItem{
 		ReturnValue: value.DefaultNilValue,
-		Type: []string{
-			BreakItem,
-			ContinueItem,
-		},
+		Type:        []string{BreakItem, ContinueItem},
 	}
 
 	v.CallStack.Push(forItem)
-
-	// Push inner for scope
 	innerForScope := v.ScopeTrace.PushScope("inner_for")
 
-	v.VisitInnerFor(ctx, outerForScope, innerForScope, forItem, iterableItem, iterableVariable)
+	v.VisitInnerForWithIndex(ctx, outerForScope, innerForScope, forItem, iterableItem, indexVar, valueVar)
 
 	iterableItem.Reset()
-	v.ScopeTrace.PopScope()    // pop inner for scope
-	v.ScopeTrace.PopScope()    // pop outer for scope
-	v.CallStack.Clean(forItem) // ? clean item if it's still in call stack
-
+	v.ScopeTrace.PopScope()
+	v.ScopeTrace.PopScope()
+	v.CallStack.Clean(forItem)
 	return nil
 }
 
-func (v *ReplVisitor) VisitInnerFor(ctx *compiler.ForStmtContext, outerForScope *BaseScope, innerForScope *BaseScope, forItem *CallStackItem, iterableItem *VectorValue, iterableVariable *Variable) {
+func (v *ReplVisitor) VisitInnerForWithIndex(ctx *compiler.ForStmtContext, outerForScope *BaseScopeTrace, innerForScope *BaseScopeTrace, forItem *CallStackItem, iterableItem *VectorValue, indexVar *Variable, valueVar *Variable) {
 
-	// handle break and continue statements from call stack
 	defer func() {
-
-		// reset scope
 		innerForScope.Reset()
 		if item, ok := recover().(*CallStackItem); item != nil && ok {
-
-			// Not a for item, propagate panic
 			if item != forItem {
 				panic(item)
 			}
-
-			// Continue
 			if item.IsAction(ContinueItem) {
-				item.ResetAction()                                                                          // reset action, can be used again
-				iterableItem.Next()                                                                         // next item
-				v.VisitInnerFor(ctx, outerForScope, innerForScope, forItem, iterableItem, iterableVariable) // continue
+				item.ResetAction()
+				iterableItem.Next()
+				v.VisitInnerForWithIndex(ctx, outerForScope, innerForScope, forItem, iterableItem, indexVar, valueVar)
 			}
-
-			// Break
 			if item.IsAction(BreakItem) {
 				return
 			}
-
 		}
 	}()
 
-	// iterableItem.Size()
 	for iterableItem.CurrentIndex < iterableItem.Size() {
-
-		// update variable value
-		iterableVariable.Value = iterableItem.Current()
+		indexVar.Value = &value.IntValue{InternalValue: iterableItem.CurrentIndex}
+		valueVar.Value = iterableItem.Current()
 
 		for _, stmt := range ctx.AllStmt() {
 			v.Visit(stmt)
@@ -1650,36 +1618,3 @@ func (v *ReplVisitor) VisitInnerFor(ctx *compiler.ForStmtContext, outerForScope 
 		innerForScope.Reset()
 	}
 }
-
-func (v *ReplVisitor) VisitNumericRange(ctx *compiler.NumericRangeContext) interface{} {
-
-	leftExpr := v.Visit(ctx.Expr(0)).(value.IVOR)
-	rightExpr := v.Visit(ctx.Expr(1)).(value.IVOR)
-
-	if leftExpr.Type() != value.IVOR_INT || rightExpr.Type() != value.IVOR_INT {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Los valores de los rangos deben ser enteros")
-		return value.DefaultNilValue
-	}
-
-	left := leftExpr.(*value.IntValue).InternalValue
-	right := rightExpr.(*value.IntValue).InternalValue
-
-	if left > right {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El valor izquierdo del rango debe ser menor o igual al valor derecho")
-	}
-
-	var values []value.IVOR
-
-	for i := left; i <= right; i++ {
-		values = append(values, &value.IntValue{
-			InternalValue: i,
-		})
-	}
-
-	return &VectorValue{
-		InternalValue: values,
-		CurrentIndex:  0,
-		ItemType:      value.IVOR_INT,
-	}
-}
-*/
