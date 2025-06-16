@@ -21,7 +21,6 @@ stmt:
     | vect_func 
     | func_dcl
     | strct_dcl
-    | struct_instantiation
     ;
 
 // Inicia Declaracion de variable
@@ -141,7 +140,8 @@ expression
     ) right = expression                             # BinaryExpr
     | left = expression op = AND right = expression  # BinaryExpr
     | left = expression op = OR right = expression   # BinaryExpr
-    | struct_instantiation                           # StructInstantiationExpr
+    | ID LBRACE struct_param_list? RBRACE            # StructInstantiationExpr
+    | expression '.' ID                              # StructAccessExpr
     ;
 // Terminan Expresiones
 
@@ -211,9 +211,7 @@ struct_prop:
     type ID SEMI # StructAttr
 ;
 
-struct_instantiation
-    : ID LBRACE struct_param_list? RBRACE
-    ;
+//struct_instantiation: ID LBRACE struct_param_list? RBRACE;
 
 struct_param_list
     : struct_param (',' struct_param)* ','?

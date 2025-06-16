@@ -90,8 +90,8 @@ func (v *ReplVisitor) VisitStmt(ctx *compiler.StmtContext) interface{} {
 		v.Visit(ctx.For_stmt())
 	} else if ctx.Strct_dcl() != nil {
 		v.Visit(ctx.Strct_dcl())
-	} else if ctx.Struct_instantiation() != nil {
-		v.Visit(ctx.Struct_instantiation())
+		//} else if ctx.Struct_instantiation() != nil {
+		//	v.Visit(ctx.Struct_instantiation())
 	} else {
 		log.Println("⚠️ Statement no reconocido:", ctx.GetText())
 	}
@@ -1306,10 +1306,10 @@ type StructInstance struct {
 	Fields     map[string]value.IVOR
 }
 
-func (v *ReplVisitor) VisitStructInstantiationExpr(ctx *compiler.Struct_instantiationContext) interface{} {
+func (v *ReplVisitor) VisitStructInstantiationExpr(ctx *compiler.StructInstantiationExprContext) interface{} {
 	idToken := ctx.ID()
 	if idToken == nil {
-		log.Println("❌ Error: no se pudo obtener el ID del struct")
+		log.Println("Error: no se pudo obtener el ID del struct")
 		return nil
 	}
 	structName := idToken.GetText()
@@ -1357,6 +1357,30 @@ func (v *ReplVisitor) VisitStruct_param(ctx *compiler.Struct_paramContext) inter
 type StructFieldValue struct {
 	Name  string
 	Value value.IVOR
+}
+
+func (v *ReplVisitor) VisitStructAccessExpr(ctx *compiler.StructAccessExprContext) interface{} {
+	// Evaluar la expresión a la izquierda del punto (debería ser una variable o un acceso anidado)
+	left := v.Visit(ctx.Expression())
+
+	// Obtener el nombre del atributo accedido
+	attrName := ctx.ID().GetText()
+
+	// Validar que la expresión de la izquierda sea una instancia de struct
+	structVal, ok := left.(*value.StructValue)
+	if !ok {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La expresión no es una instancia de struct")
+		return nil
+	}
+
+	// Buscar el atributo en los campos del struct
+	attrVal, exists := structVal.Instance.Fields[attrName]
+	if !exists {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "El atributo '"+attrName+"' no existe en el struct '"+structVal.Instance.StructName+"'")
+		return nil
+	}
+
+	return attrVal
 }
 
 // func (v *ReplVisitor) VisitStructFunc(ctx *compiler.StructFuncContext) interface{} {

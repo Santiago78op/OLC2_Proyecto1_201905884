@@ -188,6 +188,12 @@ func (s *BaseVLangGrammarListener) EnterIncredecr(ctx *IncredecrContext) {}
 // ExitIncredecr is called when production incredecr is exited.
 func (s *BaseVLangGrammarListener) ExitIncredecr(ctx *IncredecrContext) {}
 
+// EnterStructAccessExpr is called when production StructAccessExpr is entered.
+func (s *BaseVLangGrammarListener) EnterStructAccessExpr(ctx *StructAccessExprContext) {}
+
+// ExitStructAccessExpr is called when production StructAccessExpr is exited.
+func (s *BaseVLangGrammarListener) ExitStructAccessExpr(ctx *StructAccessExprContext) {}
+
 // EnterBinaryExpr is called when production BinaryExpr is entered.
 func (s *BaseVLangGrammarListener) EnterBinaryExpr(ctx *BinaryExprContext) {}
 
@@ -392,12 +398,6 @@ func (s *BaseVLangGrammarListener) EnterStructAttr(ctx *StructAttrContext) {}
 
 // ExitStructAttr is called when production StructAttr is exited.
 func (s *BaseVLangGrammarListener) ExitStructAttr(ctx *StructAttrContext) {}
-
-// EnterStruct_instantiation is called when production struct_instantiation is entered.
-func (s *BaseVLangGrammarListener) EnterStruct_instantiation(ctx *Struct_instantiationContext) {}
-
-// ExitStruct_instantiation is called when production struct_instantiation is exited.
-func (s *BaseVLangGrammarListener) ExitStruct_instantiation(ctx *Struct_instantiationContext) {}
 
 // EnterStruct_param_list is called when production struct_param_list is entered.
 func (s *BaseVLangGrammarListener) EnterStruct_param_list(ctx *Struct_param_listContext) {}

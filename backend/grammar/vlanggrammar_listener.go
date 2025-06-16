@@ -91,6 +91,9 @@ type VLangGrammarListener interface {
 	// EnterIncredecr is called when entering the incredecr production.
 	EnterIncredecr(c *IncredecrContext)
 
+	// EnterStructAccessExpr is called when entering the StructAccessExpr production.
+	EnterStructAccessExpr(c *StructAccessExprContext)
+
 	// EnterBinaryExpr is called when entering the BinaryExpr production.
 	EnterBinaryExpr(c *BinaryExprContext)
 
@@ -193,9 +196,6 @@ type VLangGrammarListener interface {
 	// EnterStructAttr is called when entering the StructAttr production.
 	EnterStructAttr(c *StructAttrContext)
 
-	// EnterStruct_instantiation is called when entering the struct_instantiation production.
-	EnterStruct_instantiation(c *Struct_instantiationContext)
-
 	// EnterStruct_param_list is called when entering the struct_param_list production.
 	EnterStruct_param_list(c *Struct_param_listContext)
 
@@ -288,6 +288,9 @@ type VLangGrammarListener interface {
 
 	// ExitIncredecr is called when exiting the incredecr production.
 	ExitIncredecr(c *IncredecrContext)
+
+	// ExitStructAccessExpr is called when exiting the StructAccessExpr production.
+	ExitStructAccessExpr(c *StructAccessExprContext)
 
 	// ExitBinaryExpr is called when exiting the BinaryExpr production.
 	ExitBinaryExpr(c *BinaryExprContext)
@@ -390,9 +393,6 @@ type VLangGrammarListener interface {
 
 	// ExitStructAttr is called when exiting the StructAttr production.
 	ExitStructAttr(c *StructAttrContext)
-
-	// ExitStruct_instantiation is called when exiting the struct_instantiation production.
-	ExitStruct_instantiation(c *Struct_instantiationContext)
 
 	// ExitStruct_param_list is called when exiting the struct_param_list production.
 	ExitStruct_param_list(c *Struct_param_listContext)
