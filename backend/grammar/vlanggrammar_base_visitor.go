@@ -71,7 +71,7 @@ func (v *BaseVLangGrammarVisitor) VisitMatrix_type(ctx *Matrix_typeContext) inte
 	return v.VisitChildren(ctx)
 }
 
-func (v *BaseVLangGrammarVisitor) VisitAux_matrix_type(ctx *Aux_matrix_typeContext) interface{} {
+func (v *BaseVLangGrammarVisitor) VisitMatrix_expr(ctx *Matrix_exprContext) interface{} {
 	return v.VisitChildren(ctx)
 }
 

@@ -55,8 +55,8 @@ type VLangGrammarListener interface {
 	// EnterMatrix_type is called when entering the matrix_type production.
 	EnterMatrix_type(c *Matrix_typeContext)
 
-	// EnterAux_matrix_type is called when entering the aux_matrix_type production.
-	EnterAux_matrix_type(c *Aux_matrix_typeContext)
+	// EnterMatrix_expr is called when entering the matrix_expr production.
+	EnterMatrix_expr(c *Matrix_exprContext)
 
 	// EnterType is called when entering the type production.
 	EnterType(c *TypeContext)
@@ -259,8 +259,8 @@ type VLangGrammarListener interface {
 	// ExitMatrix_type is called when exiting the matrix_type production.
 	ExitMatrix_type(c *Matrix_typeContext)
 
-	// ExitAux_matrix_type is called when exiting the aux_matrix_type production.
-	ExitAux_matrix_type(c *Aux_matrix_typeContext)
+	// ExitMatrix_expr is called when exiting the matrix_expr production.
+	ExitMatrix_expr(c *Matrix_exprContext)
 
 	// ExitType is called when exiting the type production.
 	ExitType(c *TypeContext)
