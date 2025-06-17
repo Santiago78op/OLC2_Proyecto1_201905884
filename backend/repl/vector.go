@@ -1,6 +1,11 @@
 package repl
 
-import "main.go/value"
+import (
+	"fmt"
+	"main.go/value"
+)
+
+
 
 type VectorValue struct {
 	*ObjectValue
@@ -94,4 +99,17 @@ type VectorItemReference struct {
 	Vector *VectorValue
 	Index  int
 	Value  value.IVOR
+}
+
+
+func (v *VectorValue) String() string {
+	result := "["
+	for i, item := range v.InternalValue {
+		if i > 0 {
+			result += " "
+		}
+		result += fmt.Sprintf("%v", item.Value())
+	}
+	result += "]"
+	return result
 }

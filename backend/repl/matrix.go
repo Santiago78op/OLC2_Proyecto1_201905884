@@ -1,6 +1,10 @@
 package repl
 
-import "main.go/value"
+import (
+	"fmt"
+
+	"main.go/value"
+)
 
 type MatrixValue struct {
 	Items    [][]value.IVOR // bidimensional puro
@@ -36,9 +40,22 @@ func (v MatrixValue) Copy() value.IVOR {
 	return NewMatrixValue(copyItems, v.FullType, v.ItemType)
 }
 
-func (v *MatrixValue) Set(index []int, value value.IVOR) bool {
+func (v *MatrixValue) Set(index []int, val value.IVOR) bool {
+	if len(index) != 2 {
+		return false
+	}
 
-	return false
+	i, j := index[0], index[1]
+
+	if i < 0 || i >= len(v.Items) {
+		return false
+	}
+	if j < 0 || j >= len(v.Items[i]) {
+		return false
+	}
+
+	v.Items[i][j] = val
+	return true
 }
 
 func removeBuiltinsFromVector(vectorItems []value.IVOR) {
@@ -56,4 +73,23 @@ type MatrixItemReference struct {
 	Matrix *MatrixValue
 	Index  []int
 	Value  value.IVOR
+}
+
+func (m *MatrixValue) String() string {
+	result := "[ "
+	for i, fila := range m.Items {
+		if i > 0 {
+			result += " "
+		}
+		result += "["
+		for j, item := range fila {
+			if j > 0 {
+				result += " "
+			}
+			result += fmt.Sprintf("%v", item.Value())
+		}
+		result += "]"
+	}
+	result += " ]"
+	return result
 }

@@ -4,6 +4,8 @@ import (
 	"strconv"
 	"strings"
 
+	"fmt"
+
 	"main.go/value"
 )
 
@@ -45,6 +47,8 @@ func PrintCore(context *ReplContext, args []*Argument, newLine bool) (value.IVOR
 		if !value.IsPrimitiveType(arg.Value.Type()) && !IsVectorType(arg.Value.Type()) && !IsMatrixType(arg.Value.Type()) {
 			return value.DefaultNilValue, false, "La función print solo acepta tipos primitivos, vectores y matrices"
 		}
+
+		fmt.Printf("DEBUG: Argumento recibido - Nombre: %s, Tipo: %s, Valor Go: %T\n", arg.Name, arg.Value.Type(), arg.Value)
 
 		switch arg.Value.Type() {
 

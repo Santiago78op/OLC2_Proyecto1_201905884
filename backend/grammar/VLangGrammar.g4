@@ -81,11 +81,6 @@ matrix_expr
 
 // Finaliza Declaracion de Matriz
 
-matrix_item:
-    id_pattern LBRACK expression RBRACK LBRACK expression RBRACK  # MatrixItem
-    ;
-
-
 
 type: 
     ID 
@@ -138,7 +133,6 @@ expression
     | func_call                                      # FuncCallExpr 
     | id_pattern                                     # IdPatternExpr
     | vect_item                                      # VectorItemExpr
-    | matrix_item                                    # MatrixItemExpr
     | vect_prop                                      # VectorPropertyExpr
     | vect_func                                      # VectorFuncCallExpr
     | literal                                        # LiteralExpr
