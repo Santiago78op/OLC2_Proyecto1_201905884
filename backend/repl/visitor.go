@@ -384,66 +384,103 @@ func (v *ReplVisitor) VisitVector_type(ctx *compiler.Vector_typeContext) interfa
 func (v *ReplVisitor) VisitVectorItem(ctx *compiler.VectorItemContext) interface{} {
 
 	varName := ctx.Id_pattern().GetText()
+	fmt.Println("DEBUG: VisitVectorItem - Accediendo a variable:", varName)
 
 	variable := v.ScopeTrace.GetVariable(varName)
-
 	if variable == nil {
 		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Variable "+varName+" no encontrada")
 		return nil
 	}
 
-	if !(IsVectorType(variable.Type)) {
-		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La variable "+varName+" no es un vector o una matriz")
+	// Validar que la variable sea vector o matriz
+	if !(IsVectorType(variable.Type)) && !(IsMatrixType(variable.Type)) {
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "La variable "+varName+" no es un vector o matriz")
 		return nil
 	}
 
-	structType := value.IVOR_VECTOR
-
-	index := v.Visit(ctx.Expression(0)).(value.IVOR)
-
-	if len(ctx.AllExpression()) != 1 {
-		structType = value.IVOR_MATRIX
-	}
-
-	indexes := []int{}
-
+	// Obtener todos los índices
+	var indexes []int
 	for _, expr := range ctx.AllExpression() {
-
 		val := v.Visit(expr).(value.IVOR)
-
 		if val.Type() != value.IVOR_INT {
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Los indices de acceso deben ser enteros")
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Los índices deben ser enteros")
 			return nil
 		}
-
 		indexes = append(indexes, val.Value().(int))
 	}
+	fmt.Println("DEBUG: Índices evaluados:", indexes)
+	// Verificar si es acceso a vector (1D)
+	// Acceso con 1 índice
+	if len(indexes) == 1 {
+		index := indexes[0]
 
-	if structType == value.IVOR_VECTOR {
+		// Si es vector
+		if vectorValue, ok := variable.Value.(*VectorValue); ok {
 
-		switch vectorValue := variable.Value.(type) {
-
-		case *VectorValue:
-			indexValue := index.(*value.IntValue).InternalValue
-
-			if !vectorValue.ValidIndex(indexValue) {
-				v.ErrorTable.NewSemanticError(ctx.GetStart(), "El indice "+strconv.Itoa(indexValue)+" esta fuera de rango")
+			if !vectorValue.ValidIndex(index) {
+				v.ErrorTable.NewSemanticError(ctx.GetStart(), "Índice "+strconv.Itoa(index)+" fuera de rango")
 				return nil
 			}
-
+			valor := vectorValue.Get(index)
+			fmt.Printf("DEBUG: Retornando elemento del vector en posición [%d]: %v\n", index, valor)
 			return &VectorItemReference{
 				Vector: vectorValue,
-				Index:  indexValue,
-				Value:  vectorValue.Get(indexValue),
+				Index:  index,
+				Value:  vectorValue.Get(index),
 			}
-		default:
-			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La variable "+varName+" no es un vector")
-			return nil
 		}
 
-	} else {
-		log.Fatal("Invalid struct type")
+		// Si es matriz y se accede a la fila completa
+		if matrixValue, ok := variable.Value.(*MatrixValue); ok {
+			if index < 0 || index >= len(matrixValue.Items) {
+				v.ErrorTable.NewSemanticError(ctx.GetStart(), "Fila "+strconv.Itoa(index)+" fuera de rango")
+				return nil
+			}
+			fila := matrixValue.Items[index]
+			fmt.Println("DEBUG: Accediendo a fila completa:", fila)
+
+			// Crear el VectorValue de la fila
+			vectorValue := &VectorValue{
+				InternalValue: fila,
+				ItemType:      matrixValue.ItemType,
+				FullType:      "[]" + matrixValue.ItemType,
+				SizeValue:     &value.IntValue{InternalValue: len(fila)},
+				IsEmpty:       &value.BoolValue{InternalValue: len(fila) == 0},
+			}
+			fmt.Printf("DEBUG: Retornando VectorValue: %+v\n", vectorValue)
+			return vectorValue
+		}
+
+		v.ErrorTable.NewSemanticError(ctx.GetStart(), "Acceso inválido con un solo índice a variable "+varName)
+		return nil
 	}
+
+	// Verificar si es acceso a matriz (2D)
+	if len(indexes) == 2 {
+		i, j := indexes[0], indexes[1]
+		matrixValue, ok := variable.Value.(*MatrixValue)
+		if !ok {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "La variable "+varName+" no es una matriz")
+			return nil
+		}
+		if i < 0 || i >= len(matrixValue.Items) {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Fila "+strconv.Itoa(i)+" fuera de rango")
+			return nil
+		}
+		if j < 0 || j >= len(matrixValue.Items[i]) {
+			v.ErrorTable.NewSemanticError(ctx.GetStart(), "Columna "+strconv.Itoa(j)+" fuera de rango")
+			return nil
+		}
+		valor := matrixValue.Items[i][j]
+		fmt.Printf("DEBUG: Retornando elemento matriz [%d][%d]: %v\n", i, j, valor)
+		return &MatrixItemReference{
+			Matrix: matrixValue,
+			Index:  []int{i, j},
+			Value:  matrixValue.Items[i][j],
+		}
+	}
+
+	v.ErrorTable.NewSemanticError(ctx.GetStart(), "Número de índices inválido")
 	return nil
 }
 

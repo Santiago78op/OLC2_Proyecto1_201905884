@@ -116,11 +116,11 @@ func (s *BaseVLangGrammarListener) EnterMatrix_type(ctx *Matrix_typeContext) {}
 // ExitMatrix_type is called when production matrix_type is exited.
 func (s *BaseVLangGrammarListener) ExitMatrix_type(ctx *Matrix_typeContext) {}
 
-// EnterAux_matrix_type is called when production aux_matrix_type is entered.
-func (s *BaseVLangGrammarListener) EnterAux_matrix_type(ctx *Aux_matrix_typeContext) {}
+// EnterMatrixItemList is called when production MatrixItemList is entered.
+func (s *BaseVLangGrammarListener) EnterMatrixItemList(ctx *MatrixItemListContext) {}
 
-// ExitAux_matrix_type is called when production aux_matrix_type is exited.
-func (s *BaseVLangGrammarListener) ExitAux_matrix_type(ctx *Aux_matrix_typeContext) {}
+// ExitMatrixItemList is called when production MatrixItemList is exited.
+func (s *BaseVLangGrammarListener) ExitMatrixItemList(ctx *MatrixItemListContext) {}
 
 // EnterType is called when production type is entered.
 func (s *BaseVLangGrammarListener) EnterType(ctx *TypeContext) {}
