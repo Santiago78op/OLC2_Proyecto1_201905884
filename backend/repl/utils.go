@@ -40,3 +40,11 @@ func IsVectorType(_type string) bool {
 func RemoveBrackets(s string) string {
 	return strings.Trim(s, "[]")
 }
+
+func IsMatrixType(typ string) bool {
+	return strings.HasPrefix(typ, "[[]]")
+}
+
+func RemoveMatrixBrackets(typ string) string {
+	return strings.Replace(typ, "[[]]", "", 1)
+}

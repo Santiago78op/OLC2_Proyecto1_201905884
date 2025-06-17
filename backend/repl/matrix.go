@@ -1,143 +1,61 @@
 package repl
 
-import "main.go/value"
+import (
+	"fmt"
+
+	"main.go/value"
+)
 
 type MatrixValue struct {
-	*VectorValue
+	Items    [][]value.IVOR // bidimensional puro
+	ItemType string
+	FullType string
 }
 
-func (v *MatrixValue) Copy() value.IVOR {
-
-	internalCopy := make([]value.IVOR, len(v.InternalValue))
-
-	for i, item := range v.InternalValue {
-		internalCopy[i] = item.Copy()
+func NewMatrixValue(items [][]value.IVOR, fullType string, itemType string) *MatrixValue {
+	return &MatrixValue{
+		Items:    items,
+		ItemType: itemType,
+		FullType: fullType,
 	}
-
-	return NewMatrixValue(internalCopy, v.FullType, v.ItemType)
-
 }
 
-func (v *MatrixValue) ValidIndexes(indexes []int) bool {
+func (v MatrixValue) Value() interface{} {
+	return v.Items
+}
 
-	// check if indexes are valid
-	pivot := v.VectorValue
+func (v MatrixValue) Type() string {
+	return v.FullType
+}
 
-	for i, index := range indexes {
-		if index < 0 || index >= pivot.Size() {
-			return false
-		}
-
-		item := pivot.Get(index)
-
-		// vector, matrix or value
-		switch s := item.(type) {
-		case *VectorValue:
-			pivot = s
-
-			if i == len(indexes)-1 {
-				return true
-			}
-
-		case *MatrixValue:
-			pivot = s.VectorValue
-
-			if i == len(indexes)-1 {
-				return true
-			}
-
-		default:
-			if i != len(indexes)-1 {
-				return false
-			} else {
-				return true
-			}
+func (v MatrixValue) Copy() value.IVOR {
+	copyItems := make([][]value.IVOR, len(v.Items))
+	for i := range v.Items {
+		copyItems[i] = make([]value.IVOR, len(v.Items[i]))
+		for j := range v.Items[i] {
+			copyItems[i][j] = v.Items[i][j].Copy()
 		}
 	}
 
-	return false
+	return NewMatrixValue(copyItems, v.FullType, v.ItemType)
 }
 
-func (v *MatrixValue) Get(index []int) value.IVOR {
-
-	// check if indexes are valid
-	if !v.ValidIndexes(index) {
-		return nil
-	}
-
-	pivot := v.VectorValue
-
-	for i := 0; i < len(index); i++ {
-		item := pivot.Get(index[i])
-
-		// vector, matrix or value
-		switch s := item.(type) {
-		case *VectorValue:
-			pivot = s
-
-			if i == len(index)-1 {
-				return pivot
-			}
-
-		case *MatrixValue:
-			pivot = s.VectorValue
-
-			if i == len(index)-1 {
-				return pivot
-			}
-		default:
-			return item
-		}
-	}
-
-	return nil
-}
-
-func (v *MatrixValue) Set(index []int, value value.IVOR) bool {
-
-	// check if indexes are valid
-	if !v.ValidIndexes(index) {
+func (v *MatrixValue) Set(index []int, val value.IVOR) bool {
+	if len(index) != 2 {
 		return false
 	}
 
-	pivot := v.VectorValue
+	i, j := index[0], index[1]
 
-	for i := 0; i < len(index); i++ {
-		item := pivot.Get(index[i])
-
-		// vector, matrix or value
-		switch s := item.(type) {
-		case *VectorValue:
-			pivot = s
-		case *MatrixValue:
-			pivot = s.VectorValue
-		default:
-			if i == len(index)-1 {
-				pivot.InternalValue[index[i]] = value
-				return true
-			}
-		}
+	if i < 0 || i >= len(v.Items) {
+		return false
+	}
+	if j < 0 || j >= len(v.Items[i]) {
+		return false
 	}
 
-	return false
-}
-
-func NewMatrixValue(vectorItems []value.IVOR, fullType, itemType string) *MatrixValue {
-	vector := &VectorValue{
-		InternalValue: vectorItems,
-		CurrentIndex:  0,
-		ItemType:      itemType,
-		FullType:      fullType,
-		SizeValue:     &value.IntValue{InternalValue: len(vectorItems)},
-		IsEmpty:       &value.BoolValue{InternalValue: len(vectorItems) == 0},
-	}
-
-	// remove builtins from vector value
-	removeBuiltinsFromVector(vectorItems)
-
-	return &MatrixValue{
-		VectorValue: vector,
-	}
+	v.Items[i][j] = val
+	return true
 }
 
 func removeBuiltinsFromVector(vectorItems []value.IVOR) {
@@ -155,4 +73,23 @@ type MatrixItemReference struct {
 	Matrix *MatrixValue
 	Index  []int
 	Value  value.IVOR
+}
+
+func (m *MatrixValue) String() string {
+	result := "[ "
+	for i, fila := range m.Items {
+		if i > 0 {
+			result += " "
+		}
+		result += "["
+		for j, item := range fila {
+			if j > 0 {
+				result += " "
+			}
+			result += fmt.Sprintf("%v", item.Value())
+		}
+		result += "]"
+	}
+	result += " ]"
+	return result
 }

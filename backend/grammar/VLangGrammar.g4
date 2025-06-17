@@ -32,7 +32,7 @@ decl_stmt:
     | var_type ID type                  # ValDeclVec    // mut vector []int
     | ID type ASSIGN expression         # VarAssDecl    // num2 int = 5                                          
     | ID ASSIGN vector_type vect_expr   # VarVectDecl   // numbers = []int {1, 2, 3, 4, 5}
-    | ID ASSIGN matrix_type vect_expr   # VarMatrixDecl // matrix = [][]int { {1, 2}, {3, 4} }
+    | ID ASSIGN matrix_type matrix_expr  # VarMatrixDecl // matrix = [][]int { {1, 2}, {3, 4} }
     ;
 
 var_type:
@@ -70,14 +70,18 @@ repeating:
 vector_type: LBRACK RBRACK ID
     ;
 
-matrix_type:
-    aux_matrix_type
-    | LBRACK RBRACK LBRACK RBRACK ID
+
+// Inicia Declaracion de Matriz
+// [][] int, [][] float, [][] String, [][] bool
+matrix_type: LBRACK RBRACK LBRACK RBRACK ID
     ;
 
-aux_matrix_type: LBRACK RBRACK matrix_type
+matrix_expr
+    : LBRACE vect_expr (COMMA vect_expr)* RBRACE  #MatrixItemList
     ;
 
+// Finaliza Declaracion de Matriz
+    
 type: 
     ID 
     | vector_type 

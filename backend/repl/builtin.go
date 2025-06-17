@@ -1,6 +1,7 @@
 package repl
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -42,9 +43,11 @@ func PrintCore(context *ReplContext, args []*Argument, newLine bool) (value.IVOR
 	for i, arg := range args {
 
 		// Verificar si es un tipo primitivo O un vector
-		if !value.IsPrimitiveType(arg.Value.Type()) && !IsVectorType(arg.Value.Type()) {
-			return value.DefaultNilValue, false, "La función print solo acepta tipos primitivos y vectores"
+		if !value.IsPrimitiveType(arg.Value.Type()) && !IsVectorType(arg.Value.Type()) && !IsMatrixType(arg.Value.Type()) {
+			return value.DefaultNilValue, false, "La función print solo acepta tipos primitivos, vectores y matrices"
 		}
+
+		fmt.Printf("DEBUG: Argumento recibido - Nombre: %s, Tipo: %s, Valor Go: %T\n", arg.Name, arg.Value.Type(), arg.Value)
 
 		switch arg.Value.Type() {
 
@@ -61,10 +64,13 @@ func PrintCore(context *ReplContext, args []*Argument, newLine bool) (value.IVOR
 		case value.IVOR_NIL:
 			output += "nil"
 		default:
-			// Si no es un tipo primitivo, verificar si es un vector
+			// Si es vector
 			if IsVectorType(arg.Value.Type()) {
 				vectorOutput := formatVector(arg.Value.(*VectorValue))
 				output += vectorOutput
+			} else if IsMatrixType(arg.Value.Type()) {
+				matrixOutput := formatMatrix(arg.Value.(*MatrixValue))
+				output += matrixOutput
 			} else {
 				return value.DefaultNilValue, false, "Tipo no soportado para print: " + arg.Value.Type()
 			}
@@ -83,6 +89,47 @@ func PrintCore(context *ReplContext, args []*Argument, newLine bool) (value.IVOR
 	}
 
 	return value.DefaultNilValue, true, ""
+}
+
+func formatMatrix(matrix *MatrixValue) string {
+	if len(matrix.Items) == 0 {
+		return "[ ]"
+	}
+
+	var result strings.Builder
+	result.WriteString("[ ")
+
+	for i, row := range matrix.Items {
+		result.WriteString("[ ")
+		for j, item := range row {
+			switch item.Type() {
+			case value.IVOR_BOOL:
+				result.WriteString(strconv.FormatBool(item.Value().(bool)))
+			case value.IVOR_INT:
+				result.WriteString(strconv.Itoa(item.Value().(int)))
+			case value.IVOR_FLOAT:
+				result.WriteString(strconv.FormatFloat(item.Value().(float64), 'f', 4, 64))
+			case value.IVOR_STRING:
+				result.WriteString(item.Value().(string))
+			case value.IVOR_CHARACTER:
+				result.WriteString(item.Value().(string))
+			case value.IVOR_NIL:
+				result.WriteString("nil")
+			default:
+				result.WriteString(item.Type())
+			}
+			if j < len(row)-1 {
+				result.WriteString(" ")
+			}
+		}
+		result.WriteString(" ]")
+		if i < len(matrix.Items)-1 {
+			result.WriteString(" ")
+		}
+	}
+
+	result.WriteString(" ]")
+	return result.String()
 }
 
 // Función auxiliar para formatear vectores
